@@ -246,7 +246,7 @@ export default function ExploreClient({ initialOrgs = [] }) {
           {/* Main content */}
           <div>
             {/* Table */}
-            <div style={{overflowX:'auto',marginBottom:selected?'2rem':0}}>
+            <div style={{overflowX:'auto',overflowY:'auto',maxHeight:'480px',marginBottom:'2rem',border:'1px solid rgba(212,206,196,0.1)'}}>
               <table style={{width:'100%',borderCollapse:'collapse'}}>
                 <thead>
                   <tr style={{borderBottom:'1px solid rgba(212,206,196,0.2)'}}>
