@@ -238,7 +238,7 @@ export default async function OrgPage({ params }) {
                     Assessment Summary
                     <span style={{ flex: 1, height: 1, background: 'rgba(212,206,196,0.15)' }} />
                   </div>
-                  <p style={{ fontSize: '1.05rem', color: 'var(--paper)', lineHeight: 1.8, margin: 0 }}>{org.summary_text}</p>
+                  <p style={{ fontSize: '1.05rem', color: '#e8e4dc', lineHeight: 1.8, margin: 0 }}>{org.summary_text}</p>
                 </div>
               )}
 
@@ -284,12 +284,12 @@ export default async function OrgPage({ params }) {
                       </div>
                       {/* Body text — much brighter */}
                       {isNA && na_rationale && (
-                        <p style={{ fontSize: '0.88rem', color: 'rgba(212,206,196,0.65)', fontStyle: 'italic', margin: 0, lineHeight: 1.75 }}>
+                        <p style={{ fontSize: '0.88rem', color: 'rgba(212,206,196,0.8)', fontStyle: 'italic', margin: 0, lineHeight: 1.75 }}>
                           {na_rationale}
                         </p>
                       )}
                       {body_text && (
-                        <p style={{ fontSize: '0.9rem', color: 'rgba(212,206,196,0.82)', margin: 0, lineHeight: 1.8 }}>
+                        <p style={{ fontSize: '0.9rem', color: '#d4cec4', margin: 0, lineHeight: 1.8 }}>
                           {body_text}
                         </p>
                       )}
@@ -319,7 +319,7 @@ export default async function OrgPage({ params }) {
                     ))}
                   </div>
                   {ps.scoring_notes && (
-                    <p style={{ fontSize: '0.85rem', color: 'rgba(212,206,196,0.55)', lineHeight: 1.7, marginTop: '0.75rem', marginBottom: 0 }}>
+                    <p style={{ fontSize: '0.85rem', color: 'rgba(212,206,196,0.75)', lineHeight: 1.7, marginTop: '0.75rem', marginBottom: 0 }}>
                       {ps.scoring_notes}
                     </p>
                   )}
@@ -331,7 +331,7 @@ export default async function OrgPage({ params }) {
                 <p style={{ fontFamily: 'var(--mono)', fontSize: '0.6rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '0.5rem' }}>
                   Methodology & Provenance
                 </p>
-                <p style={{ fontSize: '0.87rem', color: 'rgba(212,206,196,0.7)', margin: 0, lineHeight: 1.75 }}>
+                <p style={{ fontSize: '0.87rem', color: 'rgba(212,206,196,0.82)', margin: 0, lineHeight: 1.75 }}>
                   Scored under{' '}
                   <strong style={{ color: 'var(--paper)' }}>{org.methodology_version ?? 'V4.0'}</strong>
                   {' '}of the Cultiness Spectrum dual-metric system. Last revised{' '}
@@ -347,7 +347,7 @@ export default async function OrgPage({ params }) {
               </div>
 
               {/* Citation */}
-              <div style={{ fontFamily: 'var(--mono)', fontSize: '0.75rem', color: 'rgba(212,206,196,0.45)', lineHeight: 1.9, padding: '1.25rem 1.5rem', background: 'rgba(244,240,232,0.02)', border: '1px solid rgba(212,206,196,0.08)', marginBottom: '2rem' }}>
+              <div style={{ fontFamily: 'var(--mono)', fontSize: '0.75rem', color: 'rgba(212,206,196,0.72)', lineHeight: 1.9, padding: '1.25rem 1.5rem', background: 'rgba(244,240,232,0.02)', border: '1px solid rgba(212,206,196,0.08)', marginBottom: '2rem' }}>
                 <span style={{ color: 'rgba(212,206,196,0.3)', fontSize: '0.58rem', display: 'block', marginBottom: '0.35rem', letterSpacing: '0.12em', textTransform: 'uppercase' }}>Cite this assessment</span>
                 Mays, Zachary S. &ldquo;{org.name}.&rdquo; <em>Cultiness Spectrum Dataset</em>,
                 HWGH-v1, {org.methodology_version ?? 'V4.0'} ({lastUpdated}).
