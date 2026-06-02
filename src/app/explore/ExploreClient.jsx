@@ -95,7 +95,7 @@ export default function ExploreClient({ initialOrgs = [] }) {
     setSelected(org);
     if (criterionScores[org.id]) return;
     setLoadingDetail(true);
-    fetch(`${SUPABASE_URL}/rest/v1/calibration_criterion_scores?anchor_id=eq.${org.id}&select=criterion,score,body_text&order=criterion`, {
+    fetch(`${SUPABASE_URL}/rest/v1/criterion_scores?org_id=eq.${org.id}&select=criterion,score,body_text&order=criterion`, {
       headers: { apikey: ANON_KEY, Authorization: `Bearer ${ANON_KEY}` }
     })
       .then(r => r.json())
@@ -305,7 +305,7 @@ export default function ExploreClient({ initialOrgs = [] }) {
                   {[
                     {label:'Composite',  value:`${parseFloat(selected.composite_score).toFixed(1)}%`},
                     {label:"Young's",    value:`${selected.youngs_score}/10`},
-                    {label:'Type',       value:selected.anchor_type},
+                    {label:'Scope',      value:selected.membership_scope||'Active'},
                   ].map((s,i) => (
                     <div key={i} style={{background:'var(--ink)',padding:'0.85rem',textAlign:'center'}}>
                       <div style={{fontFamily:'var(--serif)',fontSize:'1.25rem',fontWeight:700,color:'var(--gold)',lineHeight:1,marginBottom:'0.25rem'}}>{s.value}</div>
@@ -314,6 +314,12 @@ export default function ExploreClient({ initialOrgs = [] }) {
                   ))}
                 </div>
 
+                {selected.summary_text && (
+                  <div style={{marginBottom:'1.75rem',padding:'1rem',background:'rgba(244,240,232,0.03)',border:'1px solid rgba(212,206,196,0.1)'}}>
+                    <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--gold)',marginBottom:'0.5rem'}}>Summary</div>
+                    <p style={{fontSize:'0.85rem',color:'var(--muted)',lineHeight:1.7,margin:0}}>{selected.summary_text}</p>
+                  </div>
+                )}
                 <div style={{fontFamily:'var(--mono)',fontSize:'0.63rem',letterSpacing:'0.15em',textTransform:'uppercase',color:'var(--gold)',marginBottom:'0.6rem'}}>
                   Criterion Scores — tap to expand
                 </div>
