@@ -38,13 +38,13 @@ export default function CompassClient({ orgs=[], regimes=[], presidentialEras=[]
   const [quadFilter, setQuadFilter] = useState([]);
   const [showRegimes, setShowRegimes]   = useState(true);
   const [showPresEras, setShowPresEras] = useState(true);
-  const [svgSize, setSvgSize]           = useState(560);
+  const [svgSize, setSvgSize]           = useState(700);
   const containerRef = useRef(null);
 
   useEffect(() => {
     const update = () => {
       if (containerRef.current)
-        setSvgSize(Math.min(containerRef.current.offsetWidth, 560));
+        setSvgSize(Math.min(containerRef.current.offsetWidth, 800));
     };
     update();
     window.addEventListener('resize', update);
@@ -180,22 +180,49 @@ export default function CompassClient({ orgs=[], regimes=[], presidentialEras=[]
 
   return (
     <>
-      <section className="hero">
-        <div className="container--narrow">
-          <span className="hero__eyebrow animate-up">
-            <Link href="/explore" style={{color:'var(--gold)'}}>Dataset Explorer</Link>{' '}— Political Compass
-          </span>
-          <h1 className="hero__title animate-up-2">Political<br />Compass</h1>
-          <p className="hero__subtitle animate-up-3">
-            {orgs.length} organizations plotted by economic and authority axes, colored by cultiness tier.
-            Reference points: {regimes.length} historical regimes (◆) and {presidentialEras.length} US presidential eras (★).
-          </p>
+      <section style={{padding:'2.5rem 0 1.5rem',borderBottom:'1px solid rgba(212,206,196,0.1)'}}>
+        <div className="container--wide">
+          <div style={{display:'flex',alignItems:'baseline',justifyContent:'space-between',flexWrap:'wrap',gap:'0.5rem',marginBottom:'0.6rem'}}>
+            <div>
+              <span style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.15em',textTransform:'uppercase',color:'var(--gold)',marginRight:'0.5rem'}}>
+                <Link href="/explore" style={{color:'var(--gold)'}}>Dataset Explorer</Link>{' '}—
+              </span>
+              <span style={{fontFamily:'var(--serif)',fontSize:'clamp(1.3rem,2.5vw,1.9rem)',color:'var(--paper)',fontWeight:700}}>
+                Political Compass
+              </span>
+            </div>
+            <span style={{fontFamily:'var(--mono)',fontSize:'0.62rem',color:'var(--muted)'}}>
+              {orgs.length} organizations · {regimes.length} regimes ◆ · {presidentialEras.length} eras ★
+            </span>
+          </div>
+          {/* Visualization nav */}
+          <div style={{display:'flex',gap:'0.5rem',flexWrap:'wrap'}}>
+            {[
+              {href:'/explore',          label:'Explorer'},
+              {href:'/explore/heatmap',  label:'Heatmap'},
+              {href:'/explore/distributions', label:'Distributions'},
+              {href:'/explore/correlations',  label:'Correlations'},
+              {href:'/explore/lineage',  label:'Lineage'},
+              {href:'/explore/compare',  label:'Compare'},
+              {href:'/explore/map',      label:'Map'},
+            ].map(({href,label})=>(
+              <Link key={href} href={href}
+                style={{fontFamily:'var(--mono)',fontSize:'0.58rem',letterSpacing:'0.08em',textTransform:'uppercase',
+                  padding:'0.22rem 0.55rem',background:'transparent',
+                  border:'1px solid rgba(212,206,196,0.18)',color:'var(--muted)',textDecoration:'none',
+                  transition:'color 0.15s,border-color 0.15s'}}
+                onMouseEnter={e=>{e.currentTarget.style.color='var(--paper)';e.currentTarget.style.borderColor='rgba(212,206,196,0.45)';}}
+                onMouseLeave={e=>{e.currentTarget.style.color='var(--muted)';e.currentTarget.style.borderColor='rgba(212,206,196,0.18)';}}
+              >{label}</Link>
+            ))}
+          </div>
         </div>
       </section>
 
-      <section className="section">
+      <section className="section--tight">
         <div className="container--wide">
-          <div style={{display:'grid',gridTemplateColumns:'155px 1fr 195px',gap:'1.5rem',alignItems:'start'}}>
+          <div style={{display:'flex',justifyContent:'center'}}>
+          <div style={{width:'75%',minWidth:320,display:'grid',gridTemplateColumns:'155px 1fr 195px',gap:'1.5rem',alignItems:'start'}}>
 
             {/* Filters */}
             <div style={{position:'sticky',top:'120px'}}>
@@ -350,6 +377,9 @@ export default function CompassClient({ orgs=[], regimes=[], presidentialEras=[]
               </div>
             </div>
           </div>
+
+          </div>{/* end 75% wrapper */}
+          </div>{/* end centering flex */}
 
           <div style={{marginTop:'2.5rem',padding:'1.25rem',background:'rgba(244,240,232,0.02)',border:'1px solid rgba(212,206,196,0.08)'}}>
             <p style={{fontFamily:'var(--mono)',fontSize:'0.67rem',color:'var(--muted)',margin:0,lineHeight:1.7}}>

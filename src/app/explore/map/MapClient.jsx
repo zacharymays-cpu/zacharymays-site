@@ -15,7 +15,23 @@ const SIZE_LABELS  = { micro:'< 1k', small:'1k–50k', medium:'50k–1M', large:
 const SIZE_RADIUS  = { micro:5, small:7, medium:10, large:14, mass:20 };
 
 // Dark basemap — free, no API key, matches site ink palette
-const MAP_STYLE = 'https://tiles.stadiamaps.com/styles/alidade_smooth_dark.json';
+// MapLibre style — using a minimal dark style via protomaps (no API key required)
+const MAP_STYLE = {
+  version: 8,
+  glyphs: 'https://fonts.openmaptiles.org/{fontstack}/{range}.pbf',
+  sources: {
+    'osm-tiles': {
+      type: 'raster',
+      tiles: ['https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png'],
+      tileSize: 512,
+      attribution: '© OpenStreetMap contributors © CARTO',
+    }
+  },
+  layers: [
+    { id: 'background', type: 'background', paint: { 'background-color': '#1a1410' } },
+    { id: 'basemap', type: 'raster', source: 'osm-tiles', paint: { 'raster-opacity': 0.85 } },
+  ]
+};
 
 // Choropleth: score → fill color (dark red = high, dark green = low)
 function scoreToFill(score) {
@@ -96,10 +112,10 @@ export default function MapClient({ orgs=[], stateStats=[], foundingData=[], wit
     if (typeof window === 'undefined') return;
     const link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css';
+    link.href = 'https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/4.7.1/maplibre-gl.css';
     document.head.appendChild(link);
     const script = document.createElement('script');
-    script.src = 'https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js';
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/4.7.1/maplibre-gl.js';
     script.async = true;
     script.onload = () => initMap();
     script.onerror = () => setMapError(true);
