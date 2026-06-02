@@ -1,13 +1,13 @@
 'use client';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 
 const SUPABASE_URL = 'https://shgdrkrqjnwtlyxcdayp.supabase.co';
 const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNoZ2Rya3Jxam53dGx5eGNkYXlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzMzgwNjYsImV4cCI6MjA5NTkxNDA2Nn0.L5NPabtJGLFWb81SruP3XfjgFuycu4DhvaMJhInqWfo';
 
 const TIER_COLORS = {
-  'Cult':'#6b1010','Cult Dynamics':'#8b2020','High Control':'#7a4a1a',
-  'Concerning':'#7a6a2a','Mildly Culty':'#4a6a2a','Healthy Group':'#2a6b4a',
+  'Cult':'#c02020','Cult Dynamics':'#c04040','High Control':'#b07030',
+  'Concerning':'#a09040','Mildly Culty':'#6a9840','Healthy Group':'#30a060',
 };
 const TIER_CLASS = {
   'Cult':'tier-cult','Cult Dynamics':'tier-cult-dynamics','High Control':'tier-high-control',
@@ -29,40 +29,47 @@ const CRITERIA_DETAIL = {
   C10:{name:'Ends Justify the Means',desc:'Institutional harm tolerated in pursuit of mission, cover-ups occur, perpetrators protected. Multi-generation non-correcting patterns score at the ceiling.'},
 };
 
+// ── Criterion row inside the modal ──────────────────────────────────────────
 function CriterionRow({ code, score, bodyText }) {
   const [expanded, setExpanded] = useState(false);
   const detail = CRITERIA_DETAIL[code];
   const isNA = score === null || score === undefined;
-  const color = !isNA ? (score>=8?'#8b2020':score>=6?'#7a4a1a':score>=4?'#7a6a2a':'#2a6b4a') : 'transparent';
   const pct = !isNA ? (score/10)*100 : 0;
+  const color = !isNA ? (score>=8?'#c02020':score>=6?'#b07030':score>=4?'#a09040':'#30a060') : 'transparent';
+
   return (
     <div style={{borderBottom:'1px solid rgba(212,206,196,0.08)'}}>
-      <div onClick={()=>setExpanded(e=>!e)} style={{display:'grid',gridTemplateColumns:'2rem 1fr auto',gap:'0.75rem',alignItems:'center',padding:'0.7rem 0',cursor:'pointer'}}>
-        <span style={{fontFamily:'var(--mono)',fontSize:'0.65rem',color:'var(--gold)'}}>{code}</span>
+      <div onClick={()=>setExpanded(e=>!e)}
+        style={{display:'grid',gridTemplateColumns:'2.2rem 1fr 2.8rem auto',gap:'0.6rem',alignItems:'center',
+          padding:'0.75rem 0',cursor:'pointer',userSelect:'none'}}>
+        <span style={{fontFamily:'var(--mono)',fontSize:'0.62rem',color:'var(--gold)',letterSpacing:'0.05em'}}>{code}</span>
         <div>
-          <div style={{fontSize:'0.82rem',color:'var(--paper)',fontFamily:'var(--serif)',marginBottom:'0.3rem'}}>{detail.name}</div>
-          <div style={{display:'flex',alignItems:'center',gap:'0.5rem'}}>
-            <div style={{flex:1,height:'3px',background:'rgba(212,206,196,0.12)',borderRadius:'2px'}}>
-              {!isNA&&<div style={{width:`${pct}%`,height:'100%',background:color,borderRadius:'2px'}}/>}
+          <div style={{fontSize:'0.83rem',color:'var(--paper)',fontFamily:'var(--serif)',marginBottom:'0.3rem',lineHeight:1.2}}>{detail.name}</div>
+          <div style={{display:'flex',alignItems:'center',gap:'0.4rem'}}>
+            <div style={{flex:1,height:'3px',background:'rgba(212,206,196,0.1)',borderRadius:'2px'}}>
+              {!isNA&&<div style={{width:`${pct}%`,height:'100%',background:color,borderRadius:'2px',transition:'width 0.3s'}}/>}
             </div>
-            <span style={{fontFamily:'var(--mono)',fontSize:'0.72rem',color:isNA?'rgba(212,206,196,0.3)':'var(--paper)',minWidth:'2.5rem',textAlign:'right'}}>
-              {isNA?'N/A':`${score}/10`}
-            </span>
           </div>
         </div>
-        <span style={{fontFamily:'var(--mono)',fontSize:'0.65rem',color:'rgba(212,206,196,0.35)',userSelect:'none'}}>{expanded?'▲':'▼'}</span>
+        <span style={{fontFamily:'var(--mono)',fontSize:'0.75rem',
+          color:isNA?'rgba(212,206,196,0.3)':'var(--paper)',textAlign:'right',letterSpacing:'-0.02em'}}>
+          {isNA ? 'N/A' : `${score}/10`}
+        </span>
+        <span style={{fontFamily:'var(--mono)',fontSize:'0.6rem',color:'rgba(212,206,196,0.3)'}}>{expanded?'▲':'▼'}</span>
       </div>
       {expanded&&(
-        <div style={{padding:'0 0 1rem 2.75rem'}}>
-          <p style={{fontSize:'0.8rem',color:'rgba(212,206,196,0.5)',fontStyle:'italic',lineHeight:1.6,marginBottom:bodyText?'0.75rem':0}}>{detail.desc}</p>
-          {bodyText?(
-            <div style={{background:'rgba(244,240,232,0.03)',border:'1px solid rgba(212,206,196,0.1)',padding:'0.9rem',marginTop:'0.5rem'}}>
-              <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--gold)',marginBottom:'0.5rem'}}>Analytical Notes</div>
-              <p style={{fontSize:'0.82rem',color:'var(--muted)',lineHeight:1.7,margin:0}}>{bodyText}</p>
+        <div style={{padding:'0 0 1rem 2.8rem'}}>
+          <p style={{fontSize:'0.78rem',color:'rgba(212,206,196,0.45)',fontStyle:'italic',lineHeight:1.65,marginBottom:bodyText?'0.75rem':0}}>
+            {detail.desc}
+          </p>
+          {bodyText ? (
+            <div style={{background:'rgba(244,240,232,0.03)',border:'1px solid rgba(212,206,196,0.1)',padding:'0.9rem',marginTop:'0.4rem'}}>
+              <div style={{fontFamily:'var(--mono)',fontSize:'0.58rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--gold)',marginBottom:'0.5rem'}}>Analytical Notes</div>
+              <p style={{fontSize:'0.81rem',color:'var(--muted)',lineHeight:1.75,margin:0}}>{bodyText}</p>
             </div>
-          ):(
-            <div style={{fontFamily:'var(--mono)',fontSize:'0.65rem',color:'rgba(212,206,196,0.25)',marginTop:'0.4rem',fontStyle:'italic'}}>
-              Analytical notes pending human review
+          ) : (
+            <div style={{fontFamily:'var(--mono)',fontSize:'0.63rem',color:'rgba(212,206,196,0.22)',fontStyle:'italic',marginTop:'0.35rem'}}>
+              Analytical notes pending review
             </div>
           )}
         </div>
@@ -71,6 +78,170 @@ function CriterionRow({ code, score, bodyText }) {
   );
 }
 
+// ── Detail Modal ─────────────────────────────────────────────────────────────
+function DetailModal({ org, criterionScores, loading, onClose }) {
+  const scores = criterionScores[org?.id] || {};
+  const tierColor = TIER_COLORS[org?.composite_tier] || '#888';
+  const composite = org ? parseFloat(org.composite_score).toFixed(1) : '—';
+
+  // Close on Escape
+  useEffect(() => {
+    const handler = (e) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [onClose]);
+
+  // Lock body scroll while open
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = ''; };
+  }, []);
+
+  if (!org) return null;
+
+  return (
+    <>
+      {/* Backdrop */}
+      <div onClick={onClose} style={{
+        position:'fixed',inset:0,background:'rgba(10,8,6,0.75)',zIndex:1000,
+        backdropFilter:'blur(2px)',
+        animation:'fadeIn 0.18s ease',
+      }}/>
+
+      {/* Panel — slides in from right */}
+      <div style={{
+        position:'fixed',top:0,right:0,bottom:0,
+        width:'min(680px,100vw)',
+        background:'#1c1814',
+        borderLeft:'1px solid rgba(212,206,196,0.15)',
+        zIndex:1001,
+        overflowY:'auto',
+        overflowX:'hidden',
+        animation:'slideIn 0.22s cubic-bezier(0.22,1,0.36,1)',
+        boxShadow:'-20px 0 60px rgba(0,0,0,0.5)',
+      }}>
+
+        {/* Header */}
+        <div style={{
+          position:'sticky',top:0,background:'#1c1814',
+          borderBottom:'1px solid rgba(212,206,196,0.12)',
+          padding:'1.25rem 1.5rem',
+          display:'flex',alignItems:'flex-start',justifyContent:'space-between',
+          zIndex:2,
+        }}>
+          <div style={{flex:1,paddingRight:'1rem'}}>
+            <div style={{fontFamily:'var(--mono)',fontSize:'0.58rem',letterSpacing:'0.14em',textTransform:'uppercase',color:'var(--muted)',marginBottom:'0.4rem'}}>
+              {org.category}
+            </div>
+            <h2 style={{fontFamily:'var(--serif)',fontSize:'clamp(1.1rem,3vw,1.5rem)',color:'var(--paper)',lineHeight:1.2,margin:0}}>
+              {org.name}
+            </h2>
+          </div>
+          <button onClick={onClose} style={{
+            background:'transparent',border:'1px solid rgba(212,206,196,0.15)',
+            color:'var(--muted)',fontFamily:'var(--mono)',fontSize:'0.75rem',
+            cursor:'pointer',padding:'0.4rem 0.7rem',flexShrink:0,lineHeight:1,
+          }}>✕ ESC</button>
+        </div>
+
+        <div style={{padding:'1.5rem'}}>
+
+          {/* Tier + trajectory badge row */}
+          <div style={{display:'flex',alignItems:'center',gap:'0.75rem',marginBottom:'1.5rem',flexWrap:'wrap'}}>
+            <div style={{display:'flex',alignItems:'center',gap:'0.5rem',padding:'0.35rem 0.75rem',
+              background:`rgba(${hexToRgb(tierColor)},0.15)`,
+              border:`1px solid rgba(${hexToRgb(tierColor)},0.4)`}}>
+              <div style={{width:8,height:8,borderRadius:'50%',background:tierColor}}/>
+              <span style={{fontFamily:'var(--mono)',fontSize:'0.65rem',letterSpacing:'0.1em',color:tierColor}}>{org.composite_tier}</span>
+            </div>
+            {org.trajectory&&(
+              <div style={{padding:'0.35rem 0.75rem',border:'1px solid rgba(212,206,196,0.15)'}}>
+                <span style={{fontFamily:'var(--mono)',fontSize:'0.65rem',letterSpacing:'0.08em',color:'var(--muted)'}}>{org.trajectory}</span>
+              </div>
+            )}
+          </div>
+
+          {/* Score cards */}
+          <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'1px',background:'rgba(212,206,196,0.08)',marginBottom:'1.75rem'}}>
+            {[
+              {label:'Composite',value:`${composite}%`,color:'var(--gold)'},
+              {label:"Young's",value:`${org.youngs_score}/10`,color:'var(--paper)'},
+              {label:"Young's Band",value:org.youngs_band||'—',color:'var(--muted)'},
+            ].map((s,i)=>(
+              <div key={i} style={{background:'#1c1814',padding:'1rem 0.75rem',textAlign:'center'}}>
+                <div style={{fontFamily:'var(--serif)',fontSize:'1.35rem',fontWeight:700,color:s.color,lineHeight:1,marginBottom:'0.3rem'}}>{s.value}</div>
+                <div style={{fontFamily:'var(--mono)',fontSize:'0.58rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'var(--muted)'}}>{s.label}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Summary */}
+          {org.summary_text&&(
+            <div style={{marginBottom:'1.75rem',padding:'1rem 1.1rem',background:'rgba(244,240,232,0.03)',borderLeft:`3px solid ${tierColor}`,borderRight:'1px solid rgba(212,206,196,0.08)',borderTop:'1px solid rgba(212,206,196,0.08)',borderBottom:'1px solid rgba(212,206,196,0.08)'}}>
+              <div style={{fontFamily:'var(--mono)',fontSize:'0.58rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--gold)',marginBottom:'0.6rem'}}>Assessment</div>
+              <p style={{fontSize:'0.86rem',color:'var(--muted)',lineHeight:1.75,margin:0}}>{org.summary_text}</p>
+            </div>
+          )}
+
+          {/* Criteria */}
+          <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.15em',textTransform:'uppercase',color:'var(--gold)',marginBottom:'0.75rem'}}>
+            Criterion Scores
+            <span style={{color:'rgba(212,206,196,0.3)',marginLeft:'0.5rem',fontSize:'0.55rem'}}>— click any row to expand</span>
+          </div>
+
+          {loading ? (
+            <div style={{padding:'2rem 0',textAlign:'center',fontFamily:'var(--mono)',fontSize:'0.75rem',color:'var(--muted)'}}>
+              Loading criteria…
+            </div>
+          ) : (
+            <div style={{marginBottom:'1.25rem'}}>
+              {CRITERIA.map(c=>(
+                <CriterionRow key={c} code={c} score={scores[c]?.score} bodyText={scores[c]?.bodyText}/>
+              ))}
+            </div>
+          )}
+
+          {/* N/A note */}
+          <div style={{padding:'0.75rem 1rem',background:'rgba(244,240,232,0.02)',border:'1px solid rgba(212,206,196,0.07)',marginBottom:'1.5rem'}}>
+            <p style={{fontFamily:'var(--mono)',fontSize:'0.62rem',color:'rgba(212,206,196,0.3)',margin:0,lineHeight:1.65}}>
+              N/A indicates structural inapplicability — the criterion describes a dynamic that is absent by design or whose documented behavior is the structural opposite of the criterion. It is not a low score.
+            </p>
+          </div>
+
+          {/* Scope / membership */}
+          {org.membership_scope && (
+            <div style={{marginBottom:'1.5rem'}}>
+              <div style={{fontFamily:'var(--mono)',fontSize:'0.58rem',letterSpacing:'0.14em',textTransform:'uppercase',color:'var(--muted)',marginBottom:'0.35rem'}}>Scope</div>
+              <div style={{fontFamily:'var(--mono)',fontSize:'0.75rem',color:'var(--muted)',lineHeight:1.6}}>{org.membership_scope}</div>
+            </div>
+          )}
+
+          {/* Close footer */}
+          <div style={{paddingTop:'1rem',borderTop:'1px solid rgba(212,206,196,0.08)',display:'flex',justifyContent:'flex-end'}}>
+            <button onClick={onClose} style={{
+              fontFamily:'var(--mono)',fontSize:'0.65rem',letterSpacing:'0.1em',textTransform:'uppercase',
+              padding:'0.55rem 1.25rem',background:'transparent',
+              border:'1px solid rgba(212,206,196,0.2)',color:'var(--muted)',cursor:'pointer',
+            }}>Close ✕</button>
+          </div>
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+        @keyframes slideIn { from { transform:translateX(100%); } to { transform:translateX(0); } }
+      `}</style>
+    </>
+  );
+}
+
+// Simple hex to rgb helper for rgba()
+function hexToRgb(hex) {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? `${parseInt(result[1],16)},${parseInt(result[2],16)},${parseInt(result[3],16)}` : '128,128,128';
+}
+
+// ── Main Explorer ─────────────────────────────────────────────────────────────
 export default function ExploreClient({ initialOrgs=[] }) {
   const [orgs] = useState(initialOrgs);
   const [criterionScores, setCriterionScores] = useState({});
@@ -86,15 +257,13 @@ export default function ExploreClient({ initialOrgs=[] }) {
   const [scoreMin, setScoreMin] = useState(0);
   const [scoreMax, setScoreMax] = useState(100);
 
-  // Get sorted categories with counts
   const categories = useMemo(() => {
     const counts = {};
     orgs.forEach(o => { counts[o.category] = (counts[o.category]||0)+1; });
     return Object.entries(counts).sort((a,b) => b[1]-a[1]);
   }, [orgs]);
 
-  const loadDetail = (org) => {
-    if (selected?.id===org.id) { setSelected(null); return; }
+  const openDetail = (org) => {
     setSelected(org);
     if (criterionScores[org.id]) return;
     setLoadingDetail(true);
@@ -108,6 +277,8 @@ export default function ExploreClient({ initialOrgs=[] }) {
         setLoadingDetail(false);
       }).catch(()=>setLoadingDetail(false));
   };
+
+  const closeDetail = () => setSelected(null);
 
   const toggle = (val,state,setter) =>
     setter(state.includes(val)?state.filter(v=>v!==val):[...state,val]);
@@ -244,99 +415,67 @@ export default function ExploreClient({ initialOrgs=[] }) {
                   Clear All
                 </button>
               )}
+
+              {/* Hint */}
+              <div style={{marginTop:'1.5rem',padding:'0.75rem',background:'rgba(244,240,232,0.02)',border:'1px solid rgba(212,206,196,0.07)'}}>
+                <p style={{fontFamily:'var(--mono)',fontSize:'0.6rem',color:'rgba(212,206,196,0.3)',margin:0,lineHeight:1.65}}>
+                  Click any row to open the full detail panel. Press Esc to close.
+                </p>
+              </div>
             </div>
           </div>
 
-          {/* Main */}
+          {/* Table */}
           <div>
-            {/* Scrollable table */}
-            <div style={{overflowX:'auto',overflowY:'auto',maxHeight:'480px',marginBottom:'2rem',border:'1px solid rgba(212,206,196,0.1)'}}>
+            <div style={{overflowX:'auto',overflowY:'auto',maxHeight:'70vh',border:'1px solid rgba(212,206,196,0.1)'}}>
               <table style={{width:'100%',borderCollapse:'collapse',minWidth:'500px'}}>
-                <thead style={{position:'sticky',top:0,background:'var(--ink)',zIndex:1}}>
+                <thead style={{position:'sticky',top:0,background:'#1a1512',zIndex:1}}>
                   <tr style={{borderBottom:'1px solid rgba(212,206,196,0.2)'}}>
                     {[['name','Organization'],['composite_score','Score'],['youngs_score',"Young's"],['category','Category'],['trajectory','Trajectory']].map(([col,label])=>(
                       <th key={col} onClick={()=>handleSort(col)} className={col==='category'||col==='trajectory'?'explore-table-hide-mobile':''} style={{fontFamily:'var(--mono)',fontSize:'0.65rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--muted)',textAlign:'left',padding:'0.6rem 0.75rem',cursor:'pointer',userSelect:'none',whiteSpace:'nowrap'}}>
                         {label} <SortIcon col={col}/>
                       </th>
                     ))}
+                    <th style={{fontFamily:'var(--mono)',fontSize:'0.6rem',color:'rgba(212,206,196,0.2)',padding:'0.6rem 0.75rem',textAlign:'right'}}>Detail</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filtered.map((org,i)=>(
-                    <tr key={org.id} onClick={()=>loadDetail(org)}
+                    <tr key={org.id} onClick={()=>openDetail(org)}
                       className={TIER_CLASS[org.composite_tier]||''}
-                      style={{borderBottom:'1px solid rgba(212,206,196,0.07)',background:selected?.id===org.id?'rgba(200,168,75,0.06)':i%2===0?'transparent':'rgba(244,240,232,0.015)',cursor:'pointer'}}>
+                      style={{borderBottom:'1px solid rgba(212,206,196,0.07)',
+                        background:selected?.id===org.id?'rgba(200,168,75,0.05)':i%2===0?'transparent':'rgba(244,240,232,0.012)',
+                        cursor:'pointer',transition:'background 0.1s'}}>
                       <td style={{padding:'0.65rem 0.75rem',color:'var(--paper)',fontSize:'0.88rem',fontFamily:'var(--serif)'}}>{org.name}</td>
                       <td style={{padding:'0.65rem 0.75rem',fontFamily:'var(--mono)',fontSize:'0.82rem',color:'var(--paper)',whiteSpace:'nowrap'}}>{parseFloat(org.composite_score).toFixed(1)}%</td>
                       <td style={{padding:'0.65rem 0.75rem',fontFamily:'var(--mono)',fontSize:'0.82rem',color:'var(--muted)'}}>{org.youngs_score}/10</td>
                       <td className="explore-table-hide-mobile" style={{padding:'0.65rem 0.75rem',color:'var(--muted)',fontSize:'0.75rem',fontFamily:'var(--mono)',whiteSpace:'nowrap'}}>{org.category}</td>
                       <td className="explore-table-hide-mobile" style={{padding:'0.65rem 0.75rem',fontFamily:'var(--mono)',fontSize:'0.72rem',color:'var(--muted)',whiteSpace:'nowrap'}}>{org.trajectory}</td>
+                      <td style={{padding:'0.65rem 0.75rem',textAlign:'right',fontFamily:'var(--mono)',fontSize:'0.65rem',color:'rgba(200,168,75,0.35)'}}>→</td>
                     </tr>
                   ))}
                   {filtered.length===0&&(
-                    <tr><td colSpan={5} style={{padding:'3rem',textAlign:'center',color:'var(--muted)',fontFamily:'var(--mono)',fontSize:'0.8rem'}}>No organizations match current filters.</td></tr>
+                    <tr><td colSpan={6} style={{padding:'3rem',textAlign:'center',color:'var(--muted)',fontFamily:'var(--mono)',fontSize:'0.8rem'}}>No organizations match current filters.</td></tr>
                   )}
                 </tbody>
               </table>
             </div>
-
-            {/* Detail panel */}
-            {selected&&(
-              <div style={{border:'1px solid rgba(200,168,75,0.25)',background:'rgba(244,240,232,0.02)',padding:'1.5rem',position:'relative'}}>
-                <button onClick={()=>setSelected(null)} style={{position:'absolute',top:'1rem',right:'1rem',background:'transparent',border:'none',color:'var(--muted)',fontFamily:'var(--mono)',fontSize:'0.75rem',cursor:'pointer'}}>✕</button>
-
-                <div style={{marginBottom:'1.25rem',paddingRight:'2rem'}}>
-                  <h2 style={{fontFamily:'var(--serif)',fontSize:'clamp(1.1rem,2.5vw,1.6rem)',color:'var(--paper)',marginBottom:'0.4rem'}}>{selected.name}</h2>
-                  <div style={{fontFamily:'var(--mono)',fontSize:'0.7rem',color:'var(--muted)',letterSpacing:'0.06em',marginBottom:'0.6rem'}}>{selected.category} · {selected.trajectory}</div>
-                  <div style={{display:'flex',alignItems:'center',gap:'0.6rem'}}>
-                    <div style={{width:10,height:10,borderRadius:'50%',background:TIER_COLORS[selected.composite_tier]||'#555'}}/>
-                    <span style={{fontFamily:'var(--mono)',fontSize:'0.68rem',letterSpacing:'0.08em',textTransform:'uppercase',color:'var(--paper)'}}>{selected.composite_tier}</span>
-                  </div>
-                </div>
-
-                <div className="explore-score-grid" style={{gap:'1px',background:'rgba(212,206,196,0.1)',marginBottom:'1.75rem'}}>
-                  {[
-                    {label:'Composite',  value:`${parseFloat(selected.composite_score).toFixed(1)}%`},
-                    {label:"Young's",    value:`${selected.youngs_score}/10`},
-                    {label:"Young's Band", value:selected.youngs_band||'—'},
-                  ].map((s,i)=>(
-                    <div key={i} style={{background:'var(--ink)',padding:'0.85rem',textAlign:'center'}}>
-                      <div style={{fontFamily:'var(--serif)',fontSize:'1.25rem',fontWeight:700,color:'var(--gold)',lineHeight:1,marginBottom:'0.25rem'}}>{s.value}</div>
-                      <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'var(--muted)'}}>{s.label}</div>
-                    </div>
-                  ))}
-                </div>
-
-                {selected.summary_text&&(
-                  <div style={{marginBottom:'1.75rem',padding:'1rem',background:'rgba(244,240,232,0.03)',border:'1px solid rgba(212,206,196,0.1)'}}>
-                    <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--gold)',marginBottom:'0.5rem'}}>Summary</div>
-                    <p style={{fontSize:'0.85rem',color:'var(--muted)',lineHeight:1.7,margin:0}}>{selected.summary_text}</p>
-                  </div>
-                )}
-
-                <div style={{fontFamily:'var(--mono)',fontSize:'0.63rem',letterSpacing:'0.15em',textTransform:'uppercase',color:'var(--gold)',marginBottom:'0.6rem'}}>
-                  Criterion Scores — click to expand
-                </div>
-
-                {loadingDetail?(
-                  <div style={{fontFamily:'var(--mono)',fontSize:'0.75rem',color:'var(--muted)',padding:'1rem 0'}}>Loading...</div>
-                ):criterionScores[selected.id]?(
-                  <div>
-                    {CRITERIA.map(c=>(
-                      <CriterionRow key={c} code={c} score={criterionScores[selected.id][c]?.score} bodyText={criterionScores[selected.id][c]?.bodyText}/>
-                    ))}
-                    <div style={{marginTop:'1.25rem',padding:'0.75rem',background:'rgba(244,240,232,0.02)',border:'1px solid rgba(212,206,196,0.08)'}}>
-                      <p style={{fontFamily:'var(--mono)',fontSize:'0.63rem',color:'rgba(212,206,196,0.35)',margin:0,lineHeight:1.6}}>
-                        N/A indicates the criterion is structurally inapplicable — not a low score.
-                      </p>
-                    </div>
-                  </div>
-                ):null}
-              </div>
-            )}
+            <div style={{marginTop:'0.6rem',fontFamily:'var(--mono)',fontSize:'0.62rem',color:'rgba(212,206,196,0.25)',textAlign:'right'}}>
+              {filtered.length} of {orgs.length} organizations · click any row for full detail
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Modal */}
+      {selected&&(
+        <DetailModal
+          org={selected}
+          criterionScores={criterionScores}
+          loading={loadingDetail}
+          onClose={closeDetail}
+        />
+      )}
     </div>
   );
 }
