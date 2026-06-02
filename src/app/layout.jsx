@@ -23,6 +23,12 @@ export default function RootLayout({ children }) {
                   The Culting of America
                 </a>
               </p>
+              <p className="footer__text">
+                <a href="/terms"
+                   style={{color: 'inherit', textDecoration: 'underline', textDecorationColor: 'rgba(212,206,196,0.3)'}}>
+                  Terms of Use
+                </a>
+              </p>
             </div>
           </div>
         </footer>
