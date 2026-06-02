@@ -78,6 +78,74 @@ function CriterionRow({ code, score, bodyText }) {
   );
 }
 
+// ── Radar / Spider Chart ──────────────────────────────────────────────────────
+function RadarChart({ scores }) {
+  const CRITERIA = ['C1','C2','C3','C4','C5','C6','C7','C8','C9','C10'];
+  const N = CRITERIA.length;
+  const SIZE = 160;
+  const CX = SIZE/2, CY = SIZE/2, R = 62, R_INNER = 12;
+
+  const angle = (i) => (Math.PI * 2 * i / N) - Math.PI/2;
+  const pt = (i, r) => {
+    const a = angle(i);
+    return { x: CX + r * Math.cos(a), y: CY + r * Math.sin(a) };
+  };
+
+  const rings = [0.2, 0.4, 0.6, 0.8, 1.0];
+
+  const polyPts = CRITERIA.map((c,i) => {
+    const v = scores[c]?.score ?? null;
+    const r = v !== null ? R_INNER + (v/10) * (R - R_INNER) : R_INNER;
+    return pt(i, r);
+  });
+
+  const polyPath = polyPts.map((p,i)=>`${i===0?'M':'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ')+'Z';
+
+  // Color by average score
+  const validScores = CRITERIA.map(c=>scores[c]?.score).filter(v=>v!=null);
+  const avg = validScores.length ? validScores.reduce((a,b)=>a+b,0)/validScores.length : 0;
+  const fill = avg>=8?'rgba(192,32,32,0.25)':avg>=6?'rgba(176,96,32,0.22)':avg>=4?'rgba(160,144,48,0.2)':'rgba(48,160,96,0.18)';
+  const stroke = avg>=8?'rgba(192,32,32,0.8)':avg>=6?'rgba(176,96,32,0.75)':avg>=4?'rgba(160,144,48,0.7)':'rgba(48,160,96,0.6)';
+
+  return (
+    <svg viewBox={`0 0 ${SIZE} ${SIZE}`} style={{width:'100%',maxWidth:SIZE,display:'block',margin:'0 auto'}}>
+      {/* Rings */}
+      {rings.map(f=>{
+        const ringPts = CRITERIA.map((_,i)=>pt(i,R_INNER+(R-R_INNER)*f));
+        const path=ringPts.map((p,i)=>`${i===0?'M':'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ')+'Z';
+        return <path key={f} d={path} fill="none" stroke="rgba(212,206,196,0.1)" strokeWidth="0.5"/>;
+      })}
+      {/* Spokes */}
+      {CRITERIA.map((_,i)=>{
+        const outer=pt(i,R+8);
+        return <line key={i} x1={CX} y1={CY} x2={outer.x.toFixed(1)} y2={outer.y.toFixed(1)} stroke="rgba(212,206,196,0.1)" strokeWidth="0.5"/>;
+      })}
+      {/* Data polygon */}
+      <path d={polyPath} fill={fill} stroke={stroke} strokeWidth="1.5" strokeLinejoin="round"/>
+      {/* Data points */}
+      {CRITERIA.map((c,i)=>{
+        const v=scores[c]?.score??null;
+        if(v===null) return null;
+        const p=pt(i, R_INNER+(v/10)*(R-R_INNER));
+        return <circle key={c} cx={p.x} cy={p.y} r={2.5} fill={stroke} stroke="rgba(26,20,14,0.6)" strokeWidth="0.5"/>;
+      })}
+      {/* Criterion labels */}
+      {CRITERIA.map((c,i)=>{
+        const lp=pt(i,R+14);
+        const v=scores[c]?.score??null;
+        return (
+          <g key={c}>
+            <text x={lp.x} y={lp.y+3} textAnchor="middle" fill={v===null?'rgba(212,206,196,0.25)':'rgba(212,206,196,0.65)'} fontSize={7} fontFamily="monospace">{c}</text>
+          </g>
+        );
+      })}
+      {/* Center dot */}
+      <circle cx={CX} cy={CY} r={2} fill="rgba(212,206,196,0.2)"/>
+    </svg>
+  );
+}
+
+
 // ── Detail Modal ─────────────────────────────────────────────────────────────
 function DetailModal({ org, criterionScores, loading, onClose }) {
   const scores = criterionScores[org?.id] || {};
@@ -175,7 +243,20 @@ function DetailModal({ org, criterionScores, loading, onClose }) {
             ))}
           </div>
 
-          {/* Summary */}
+          
+          {/* Radar chart */}
+          {!loading && Object.keys(scores).length > 0 && (
+            <div style={{marginBottom:'1.75rem',padding:'1rem',background:'rgba(244,240,232,0.02)',border:'1px solid rgba(212,206,196,0.08)'}}>
+              <div style={{fontFamily:'var(--mono)',fontSize:'0.58rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--gold)',marginBottom:'0.75rem',textAlign:'center'}}>Criterion Profile</div>
+              <RadarChart scores={scores} />
+              <div style={{display:'flex',justifyContent:'space-between',marginTop:'0.5rem',paddingTop:'0.5rem',borderTop:'1px solid rgba(212,206,196,0.07)'}}>
+                <span style={{fontFamily:'var(--mono)',fontSize:'0.58rem',color:'rgba(212,206,196,0.3)'}}>1 inner</span>
+                <span style={{fontFamily:'var(--mono)',fontSize:'0.58rem',color:'rgba(212,206,196,0.3)'}}>10 outer · N/A = center</span>
+              </div>
+            </div>
+          )}
+
+{/* Summary */}
           {org.summary_text&&(
             <div style={{marginBottom:'1.75rem',padding:'1rem 1.1rem',background:'rgba(244,240,232,0.03)',borderLeft:`3px solid ${tierColor}`,borderRight:'1px solid rgba(212,206,196,0.08)',borderTop:'1px solid rgba(212,206,196,0.08)',borderBottom:'1px solid rgba(212,206,196,0.08)'}}>
               <div style={{fontFamily:'var(--mono)',fontSize:'0.58rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--gold)',marginBottom:'0.6rem'}}>Assessment</div>
