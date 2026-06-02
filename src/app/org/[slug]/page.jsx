@@ -364,15 +364,15 @@ export default async function OrgPage({ params }) {
             </div>
 
             {/* ── RIGHT: sidebar charts ──────────────────────────────── */}
-            <div style={{ position: 'sticky', top: '100px' }}>
+            <div style={{ position: 'sticky', top: '100px', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
 
               {/* Score summary cards */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px', marginBottom: '1.5rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px' }}>
                 {[
                   { label: 'Composite', value: `${parseFloat(org.composite_score).toFixed(0)}%`, sub: org.composite_tier },
                   { label: "Young's",   value: `${org.youngs_score}/10`,                          sub: org.youngs_band },
                 ].map(({ label, value, sub }) => (
-                  <div key={label} style={{ background: 'rgba(244,240,232,0.03)', border: '1px solid rgba(212,206,196,0.1)', padding: '1rem 0.75rem', textAlign: 'center' }}>
+                  <div key={label} style={{ background: 'rgba(244,240,232,0.03)', border: '1px solid rgba(212,206,196,0.12)', padding: '1rem 0.75rem', textAlign: 'center' }}>
                     <div style={{ fontFamily: 'var(--mono)', fontSize: '0.52rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(212,206,196,0.65)', marginBottom: '0.3rem' }}>{label}</div>
                     <div style={{ fontFamily: 'var(--serif)', fontSize: '1.6rem', fontWeight: 700, color: tierText, lineHeight: 1 }}>{value}</div>
                     <div style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', color: 'rgba(212,206,196,0.65)', marginTop: '0.25rem' }}>{sub}</div>
@@ -380,8 +380,42 @@ export default async function OrgPage({ params }) {
                 ))}
               </div>
 
+              {/* Political compass — always shown */}
+              <div style={{ background: 'rgba(244,240,232,0.02)', border: '1px solid rgba(212,206,196,0.12)', padding: '1rem' }}>
+                <div style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(212,206,196,0.65)', marginBottom: '0.75rem', textAlign: 'center' }}>
+                  Political Compass
+                </div>
+                {ps ? (
+                  <>
+                    <MiniCompass
+                      econ={ps.economic_axis}
+                      auth={ps.authority_axis}
+                      quadrant={ps.political_quadrant}
+                      tierColor={tierColor}
+                    />
+                    <div style={{ display: 'flex', justifyContent: 'center', gap: '1.25rem', marginTop: '0.65rem' }}>
+                      <span style={{ fontFamily: 'var(--mono)', fontSize: '0.6rem', color: 'rgba(212,206,196,0.75)' }}>
+                        Econ {parseFloat(ps.economic_axis) > 0 ? '+' : ''}{ps.economic_axis}
+                      </span>
+                      <span style={{ fontFamily: 'var(--mono)', fontSize: '0.6rem', color: 'rgba(212,206,196,0.75)' }}>
+                        Auth {parseFloat(ps.authority_axis) > 0 ? '+' : ''}{ps.authority_axis}
+                      </span>
+                    </div>
+                    {ps.political_quadrant && (
+                      <div style={{ textAlign: 'center', marginTop: '0.3rem', fontFamily: 'var(--mono)', fontSize: '0.62rem', color: 'rgba(212,206,196,0.75)', letterSpacing: '0.06em' }}>
+                        {ps.political_quadrant}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div style={{ textAlign: 'center', padding: '1.5rem 0', fontFamily: 'var(--mono)', fontSize: '0.6rem', color: 'rgba(212,206,196,0.3)' }}>
+                    Political position not yet scored
+                  </div>
+                )}
+              </div>
+
               {/* Radar chart */}
-              <div style={{ background: 'rgba(244,240,232,0.02)', border: '1px solid rgba(212,206,196,0.1)', padding: '1rem', marginBottom: '1rem' }}>
+              <div style={{ background: 'rgba(244,240,232,0.02)', border: '1px solid rgba(212,206,196,0.12)', padding: '1rem' }}>
                 <div style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(212,206,196,0.65)', marginBottom: '0.75rem', textAlign: 'center' }}>
                   Criteria Profile
                 </div>
@@ -402,34 +436,6 @@ export default async function OrgPage({ params }) {
                   })}
                 </div>
               </div>
-
-              {/* Mini political compass */}
-              {ps && (
-                <div style={{ background: 'rgba(244,240,232,0.02)', border: '1px solid rgba(212,206,196,0.1)', padding: '1rem' }}>
-                  <div style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '0.75rem', textAlign: 'center' }}>
-                    Political Position
-                  </div>
-                  <MiniCompass
-                    econ={ps.economic_axis}
-                    auth={ps.authority_axis}
-                    quadrant={ps.political_quadrant}
-                    tierColor={tierColor}
-                  />
-                  <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '0.6rem' }}>
-                    <span style={{ fontFamily: 'var(--mono)', fontSize: '0.58rem', color: 'var(--muted)' }}>
-                      Econ {ps.economic_axis > 0 ? '+' : ''}{ps.economic_axis}
-                    </span>
-                    <span style={{ fontFamily: 'var(--mono)', fontSize: '0.58rem', color: 'var(--muted)' }}>
-                      Auth {ps.authority_axis > 0 ? '+' : ''}{ps.authority_axis}
-                    </span>
-                  </div>
-                  {ps.political_quadrant && (
-                    <div style={{ textAlign: 'center', marginTop: '0.3rem', fontFamily: 'var(--mono)', fontSize: '0.6rem', color: 'rgba(212,206,196,0.45)' }}>
-                      {ps.political_quadrant}
-                    </div>
-                  )}
-                </div>
-              )}
 
             </div>
           </div>
