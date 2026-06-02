@@ -14,6 +14,7 @@ export default function Nav() {
             <li><Link href="/cultiness"           className={active('/cultiness')}>The Spectrum</Link></li>
             <li><Link href="/how-we-got-here"     className={active('/how-we-got-here')}>How We Got Here</Link></li>
             <li><Link href="/assholes-in-history" className={active('/assholes-in-history')}>Assholes in History</Link></li>
+            <li><Link href="/explore"             className={active('/explore')}>Explore</Link></li>
             <li><Link href="/about"               className={active('/about')}>About</Link></li>
             <li><Link href="/donate"              className={active('/donate')}>Support</Link></li>
           </ul>
