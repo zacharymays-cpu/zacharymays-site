@@ -73,6 +73,12 @@ a:hover { color: var(--paper); }
   padding: 0 2rem;
 }
 
+.container--wide {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
 /* ── Rule ────────────────────────────────────────────────── */
 .rule {
   border: none;
