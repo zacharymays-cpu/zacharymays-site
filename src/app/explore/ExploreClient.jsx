@@ -420,6 +420,11 @@ export default function ExploreClient({ initialOrgs=[] }) {
               <Link href="/compass" className="explore-compass-link" style={{fontFamily:'var(--mono)',fontSize:'0.68rem',letterSpacing:'0.1em',textTransform:'uppercase',padding:'0.45rem 0.9rem',border:'1px solid rgba(200,168,75,0.4)',color:'var(--gold)',textDecoration:'none'}}>
                 Compass →
               </Link>
+              <div style={{display:'flex',gap:'0.5rem',flexWrap:'wrap'}}>
+                {[['Heatmap','/explore/heatmap'],['Distributions','/explore/distributions'],['Correlations','/explore/correlations'],['Lineage','/explore/lineage']].map(([l,href])=>(
+                  <Link key={l} href={href} style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.08em',textTransform:'uppercase',padding:'0.35rem 0.65rem',border:'1px solid rgba(212,206,196,0.2)',color:'var(--muted)',textDecoration:'none'}}>{l}</Link>
+                ))}
+              </div>
             </div>
           </div>
           <div style={{marginTop:'1.25rem'}}>
