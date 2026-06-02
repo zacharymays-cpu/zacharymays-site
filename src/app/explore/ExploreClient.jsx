@@ -25,6 +25,16 @@ const CRITERIA_DETAIL = {
   C10: { name:'Ends Justify the Means',       desc:'Institutional harm tolerated in pursuit of mission, cover-ups occur, perpetrators protected. Multi-generation non-correcting patterns score at the ceiling.' },
 };
 
+
+const TIER_CLASS = {
+  'Cult':          'tier-cult',
+  'Cult Dynamics': 'tier-cult-dynamics',
+  'High Control':  'tier-high-control',
+  'Concerning':    'tier-concerning',
+  'Mildly Culty':  'tier-mildly-culty',
+  'Healthy Group': 'tier-healthy-group',
+};
+
 function TierBadge({ tier, small }) {
   const color = TIER_COLORS[tier] || '#555';
   return (
@@ -268,7 +278,8 @@ export default function ExploreClient({ initialOrgs = [] }) {
                 <tbody>
                   {filtered.map((org,i) => (
                     <tr key={org.id} onClick={()=>loadDetail(org)}
-                      style={{borderBottom:'1px solid rgba(212,206,196,0.07)',borderLeft:`3px solid ${TIER_COLORS[org.composite_tier]||'transparent'}`,background:selected?.id===org.id?'rgba(200,168,75,0.06)':i%2===0?'transparent':'rgba(244,240,232,0.015)',cursor:'pointer'}}>
+                      className={TIER_CLASS[org.composite_tier]||''}
+                      style={{borderBottom:'1px solid rgba(212,206,196,0.07)',background:selected?.id===org.id?'rgba(200,168,75,0.06)':i%2===0?'transparent':'rgba(244,240,232,0.015)',cursor:'pointer'}}>
                       <td style={{padding:'0.65rem 0.75rem',color:'var(--paper)',fontSize:'0.88rem',fontFamily:'var(--serif)'}}>{org.name}</td>
 
                       <td style={{padding:'0.65rem 0.75rem',fontFamily:'var(--mono)',fontSize:'0.82rem',color:'var(--paper)',whiteSpace:'nowrap'}}>{parseFloat(org.composite_score).toFixed(1)}%</td>
