@@ -13,7 +13,7 @@ export const revalidate = 3600;
 async function getOrgs() {
   try {
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/organizations?select=id,name,category,composite_score,youngs_score,composite_tier,trajectory,membership_scope,summary_text&active=eq.true&order=composite_score.desc`,
+      `${SUPABASE_URL}/rest/v1/organizations?select=id,name,category,composite_score,youngs_score,youngs_band,composite_tier,trajectory,summary_text&active=eq.true&order=composite_score.desc`,
       { headers: { apikey: ANON_KEY, Authorization: `Bearer ${ANON_KEY}` }, next: { revalidate: 3600 } }
     );
     if (!res.ok) return [];
