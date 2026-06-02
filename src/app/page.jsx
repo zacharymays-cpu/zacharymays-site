@@ -53,10 +53,10 @@ export default function HomePage() {
               },
               {
                 href: '/assholes-in-history',
-                eyebrow: 'Temper Temper Publications',
+                eyebrow: 'Forthcoming',
                 title: 'Assholes in History',
                 sub: 'A Comprehensive Survey of Catastrophic Leadership',
-                text: "Twenty-three of history\'s most spectacularly awful rulers — not as monsters, but as products. The impulse is universal. The outcome is not.",
+                text: "Twenty-four of history\'s most spectacularly awful rulers — not as monsters, but as products. The impulse is universal. The outcome is not.",
               }
             ].map((book, i) => (
               <Link key={i} href={book.href} className="book-card-link">
