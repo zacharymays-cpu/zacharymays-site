@@ -79,13 +79,21 @@ function CriterionRow({ code, score, bodyText }) {
 }
 
 // ── Mini Political Compass ────────────────────────────────────────────────────
+// Four reference anchors: cover three quadrant extremes + one centrist landmark
+const COMPASS_REFS = [
+  { label:'Stalin USSR', econ:-5.0, auth: 5.0 },
+  { label:'Nazi Germany', econ: 1.0, auth: 5.0 },
+  { label:'Nordic Avg',  econ:-2.5, auth:-2.0 },
+  { label:'Trump II',    econ: 2.5, auth: 5.0 },
+];
+
 function MiniCompass({ econ, auth, quadrant, tierColor }) {
-  const SIZE = 160;
-  const PAD = 16;
+  const SIZE = 170;
+  const PAD = 18;
   const INNER = SIZE - PAD*2;
-  const cx = (v) => PAD + ((v+5)/10)*INNER;
-  const cy = (v) => PAD + ((5-v)/10)*INNER;
-  const dotX = cx(econ), dotY = cy(auth);
+  const px = (v) => PAD + ((v+5)/10)*INNER;
+  const py = (v) => PAD + ((5-v)/10)*INNER;
+  const dotX = px(econ), dotY = py(auth);
 
   return (
     <svg viewBox={`0 0 ${SIZE} ${SIZE}`} style={{width:'100%',maxWidth:SIZE,display:'block',margin:'0 auto'}}>
@@ -94,32 +102,47 @@ function MiniCompass({ econ, auth, quadrant, tierColor }) {
       <rect x={PAD+INNER/2} y={PAD} width={INNER/2} height={INNER/2} fill="rgba(120,100,30,0.07)"/>
       <rect x={PAD} y={PAD+INNER/2} width={INNER/2} height={INNER/2} fill="rgba(42,107,74,0.06)"/>
       <rect x={PAD+INNER/2} y={PAD+INNER/2} width={INNER/2} height={INNER/2} fill="rgba(42,107,74,0.04)"/>
-      {/* Axes */}
-      <line x1={PAD} y1={SIZE/2} x2={SIZE-PAD} y2={SIZE/2} stroke="rgba(212,206,196,0.2)" strokeWidth="0.75"/>
-      <line x1={SIZE/2} y1={PAD} x2={SIZE/2} y2={SIZE-PAD} stroke="rgba(212,206,196,0.2)" strokeWidth="0.75"/>
       {/* Grid */}
       {[-3,0,3].map(v=>(
         <g key={v}>
-          <line x1={cx(v)} y1={PAD} x2={cx(v)} y2={SIZE-PAD} stroke="rgba(212,206,196,0.05)" strokeWidth="0.5"/>
-          <line x1={PAD} y1={cy(v)} x2={SIZE-PAD} y2={cy(v)} stroke="rgba(212,206,196,0.05)" strokeWidth="0.5"/>
+          <line x1={px(v)} y1={PAD} x2={px(v)} y2={SIZE-PAD} stroke="rgba(212,206,196,0.05)" strokeWidth="0.5"/>
+          <line x1={PAD} y1={py(v)} x2={SIZE-PAD} y2={py(v)} stroke="rgba(212,206,196,0.05)" strokeWidth="0.5"/>
         </g>
       ))}
+      {/* Axes */}
+      <line x1={PAD} y1={SIZE/2} x2={SIZE-PAD} y2={SIZE/2} stroke="rgba(212,206,196,0.22)" strokeWidth="0.75"/>
+      <line x1={SIZE/2} y1={PAD} x2={SIZE/2} y2={SIZE-PAD} stroke="rgba(212,206,196,0.22)" strokeWidth="0.75"/>
       {/* Corner labels */}
-      <text x={PAD+2} y={PAD+9} fill="rgba(212,206,196,0.18)" fontSize={6} fontFamily="monospace">AUTH L</text>
-      <text x={SIZE-PAD-2} y={PAD+9} textAnchor="end" fill="rgba(212,206,196,0.18)" fontSize={6} fontFamily="monospace">AUTH R</text>
-      <text x={PAD+2} y={SIZE-PAD-3} fill="rgba(212,206,196,0.18)" fontSize={6} fontFamily="monospace">LIB L</text>
-      <text x={SIZE-PAD-2} y={SIZE-PAD-3} textAnchor="end" fill="rgba(212,206,196,0.18)" fontSize={6} fontFamily="monospace">LIB R</text>
-      {/* Org dot */}
-      <circle cx={dotX} cy={dotY} r={6} fill={tierColor||'#888'} fillOpacity={0.85}
-        stroke="rgba(255,255,255,0.3)" strokeWidth="1"/>
+      <text x={PAD+2} y={PAD+8} fill="rgba(212,206,196,0.15)" fontSize={5.5} fontFamily="monospace">AUTH L</text>
+      <text x={SIZE-PAD-2} y={PAD+8} textAnchor="end" fill="rgba(212,206,196,0.15)" fontSize={5.5} fontFamily="monospace">AUTH R</text>
+      <text x={PAD+2} y={SIZE-PAD-2} fill="rgba(212,206,196,0.15)" fontSize={5.5} fontFamily="monospace">LIB L</text>
+      <text x={SIZE-PAD-2} y={SIZE-PAD-2} textAnchor="end" fill="rgba(212,206,196,0.15)" fontSize={5.5} fontFamily="monospace">LIB R</text>
+      {/* Reference anchors — diamonds */}
+      {COMPASS_REFS.map(ref => {
+        const rx = px(ref.econ), ry = py(ref.auth);
+        const s = 4;
+        // Nudge labels to avoid overlapping corners/edges
+        const labelBelow = ref.auth > 3;
+        const labelRight = ref.econ < 0;
+        const lx = rx + (labelRight ? 6 : -6);
+        const ly = ry + (labelBelow ? 10 : -5);
+        const anchor = labelRight ? 'start' : 'end';
+        return (
+          <g key={ref.label}>
+            <path d={`M${rx} ${ry-s} L${rx+s} ${ry} L${rx} ${ry+s} L${rx-s} ${ry}Z`}
+              fill="rgba(200,168,75,0.18)" stroke="rgba(200,168,75,0.55)" strokeWidth="0.75"/>
+            <text x={lx} y={ly} textAnchor={anchor}
+              fill="rgba(200,168,75,0.55)" fontSize={5.5} fontFamily="monospace">{ref.label}</text>
+          </g>
+        );
+      })}
+      {/* Org dot — rendered last so it's on top */}
       <circle cx={dotX} cy={dotY} r={10} fill={tierColor||'#888'} fillOpacity={0.15}/>
-      {/* Axis value labels */}
-      <text x={SIZE/2} y={SIZE-2} textAnchor="middle" fill="rgba(212,206,196,0.3)" fontSize={7} fontFamily="monospace">
-        Econ {econ>0?'+':''}{econ}
-      </text>
-      <text x={2} y={SIZE/2+3} textAnchor="start" fill="rgba(212,206,196,0.3)" fontSize={7} fontFamily="monospace"
-        transform={`rotate(-90,2,${SIZE/2})`}>
-        Auth {auth>0?'+':''}{auth}
+      <circle cx={dotX} cy={dotY} r={5.5} fill={tierColor||'#888'} fillOpacity={0.9}
+        stroke="rgba(255,255,255,0.35)" strokeWidth="1"/>
+      {/* Axis value callout */}
+      <text x={SIZE/2} y={SIZE-3} textAnchor="middle" fill="rgba(212,206,196,0.3)" fontSize={6.5} fontFamily="monospace">
+        Econ {econ>0?'+':''}{econ} · Auth {auth>0?'+':''}{auth}
       </text>
     </svg>
   );
