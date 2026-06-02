@@ -601,7 +601,7 @@ export default function ExploreClient({ initialOrgs=[] }) {
               {/* Hint */}
               <div style={{marginTop:'1.5rem',padding:'0.75rem',background:'rgba(244,240,232,0.02)',border:'1px solid rgba(212,206,196,0.07)'}}>
                 <p style={{fontFamily:'var(--mono)',fontSize:'0.6rem',color:'rgba(212,206,196,0.3)',margin:0,lineHeight:1.65}}>
-                  Click any row to open the full detail panel. Press Esc to close.
+                  Click any row to open the full assessment in a new tab.
                 </p>
               </div>
             </div>
@@ -623,10 +623,10 @@ export default function ExploreClient({ initialOrgs=[] }) {
                 </thead>
                 <tbody>
                   {filtered.map((org,i)=>(
-                    <tr key={org.id} onClick={()=>openDetail(org)}
+                    <tr key={org.id} onClick={()=>window.open('/org/'+(org.slug||org.id),'_blank')}
                       className={TIER_CLASS[org.composite_tier]||''}
                       style={{borderBottom:'1px solid rgba(212,206,196,0.07)',
-                        background:selected?.id===org.id?'rgba(200,168,75,0.05)':i%2===0?'transparent':'rgba(244,240,232,0.012)',
+                        background:i%2===0?'transparent':'rgba(244,240,232,0.012)',
                         cursor:'pointer',transition:'background 0.1s'}}>
                       <td style={{padding:'0.65rem 0.75rem',color:'var(--paper)',fontSize:'0.88rem',fontFamily:'var(--serif)'}}>{org.name}</td>
                       <td style={{padding:'0.65rem 0.75rem',fontFamily:'var(--mono)',fontSize:'0.82rem',color:'var(--paper)',whiteSpace:'nowrap'}}>{parseFloat(org.composite_score).toFixed(1)}%</td>
@@ -643,7 +643,7 @@ export default function ExploreClient({ initialOrgs=[] }) {
               </table>
             </div>
             <div style={{marginTop:'0.6rem',fontFamily:'var(--mono)',fontSize:'0.62rem',color:'rgba(212,206,196,0.25)',textAlign:'right'}}>
-              {filtered.length} of {orgs.length} organizations · click any row for full detail
+              {filtered.length} of {orgs.length} organizations · click any row to open full assessment
             </div>
           </div>
         </div>
