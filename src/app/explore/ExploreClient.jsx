@@ -316,7 +316,7 @@ export default function ExploreClient({ initialOrgs = [] }) {
                   {[
                     {label:'Composite',  value:`${parseFloat(selected.composite_score).toFixed(1)}%`},
                     {label:"Young's",    value:`${selected.youngs_score}/10`},
-                    {label:'Scope',      value:selected.membership_scope||'Active'},
+                    {label:"Young's Band", value:selected.youngs_band||'—'},
                   ].map((s,i) => (
                     <div key={i} style={{background:'var(--ink)',padding:'0.85rem',textAlign:'center'}}>
                       <div style={{fontFamily:'var(--serif)',fontSize:'1.25rem',fontWeight:700,color:'var(--gold)',lineHeight:1,marginBottom:'0.25rem'}}>{s.value}</div>
