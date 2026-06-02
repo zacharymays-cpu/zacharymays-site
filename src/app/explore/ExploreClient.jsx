@@ -146,7 +146,7 @@ export default function ExploreClient({ initialOrgs=[] }) {
     <div style={{minHeight:'100vh'}}>
       {/* Sticky header */}
       <div style={{borderBottom:'1px solid rgba(212,206,196,0.1)',padding:'2rem 0 1.5rem',background:'var(--ink)',position:'sticky',top:'60px',zIndex:50}}>
-        <div className="container">
+        <div className="container--wide">
           <div className="explore-header-row">
             <div>
               <span style={{fontFamily:'var(--mono)',fontSize:'0.65rem',letterSpacing:'0.18em',textTransform:'uppercase',color:'var(--gold)'}}>
@@ -178,7 +178,7 @@ export default function ExploreClient({ initialOrgs=[] }) {
         </div>
       </div>
 
-      <div className="container" style={{paddingTop:'2rem',paddingBottom:'4rem'}}>
+      <div className="container--wide" style={{paddingTop:'2rem',paddingBottom:'4rem'}}>
         <div className={`explore-layout${sidebarOpen?'':' collapsed'}`}>
 
           {/* Sidebar */}
