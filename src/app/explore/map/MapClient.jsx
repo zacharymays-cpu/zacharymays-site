@@ -15,7 +15,6 @@ const SIZE_RADIUS = { micro:5, small:7, medium:10, large:14, mass:20 };
 // CARTO dark basemap — no API key required
 const MAP_STYLE = {
   version: 8,
-  glyphs: 'https://fonts.openmaptiles.org/{fontstack}/{range}.pbf',
   sources: {
     'carto-dark': {
       type: 'raster',
@@ -110,11 +109,12 @@ export default function MapClient({ orgs=[], stateStats=[], foundingData=[], wit
 
     let map;
     import('maplibre-gl').then(({ default: maplibregl }) => {
-    // Inject CSS once
-    if (!document.querySelector('link[href*="maplibre-gl"]')) {
+    // Inject MapLibre CSS
+    if (!document.getElementById('maplibre-css')) {
       const link = document.createElement('link');
+      link.id = 'maplibre-css';
       link.rel = 'stylesheet';
-      link.href = 'https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css';
+      link.href = 'https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.css';
       document.head.appendChild(link);
     }
     try {
@@ -135,7 +135,13 @@ export default function MapClient({ orgs=[], stateStats=[], foundingData=[], wit
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
     map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-right');
 
-    map.on('error', e => setMapError(e.error?.message || 'Map error'));
+    // Only fatal WebGL errors kill the map — tile/glyph 404s are recoverable
+    map.on('error', e => {
+      const msg = e.error?.message || '';
+      if (msg.includes('WebGL') || msg.includes('canvas') || msg.includes('context')) {
+        setMapError('WebGL not available in this browser');
+      }
+    });
 
     map.on('load', () => {
       // State choropleth
