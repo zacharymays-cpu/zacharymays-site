@@ -176,17 +176,20 @@ function DetailModal({ org, criterionScores, loading, onClose }) {
         animation:'fadeIn 0.18s ease',
       }}/>
 
-      {/* Panel — slides in from right */}
+      {/* Panel — centered modal */}
       <div style={{
-        position:'fixed',top:0,right:0,bottom:0,
-        width:'min(680px,100vw)',
+        position:'fixed',
+        top:'50%',left:'50%',
+        transform:'translate(-50%,-50%)',
+        width:'75%',
+        maxHeight:'90vh',
         background:'#1c1814',
-        borderLeft:'1px solid rgba(212,206,196,0.15)',
+        border:'1px solid rgba(212,206,196,0.18)',
         zIndex:1001,
         overflowY:'auto',
         overflowX:'hidden',
-        animation:'slideIn 0.22s cubic-bezier(0.22,1,0.36,1)',
-        boxShadow:'-20px 0 60px rgba(0,0,0,0.5)',
+        animation:'popIn 0.2s cubic-bezier(0.22,1,0.36,1)',
+        boxShadow:'0 24px 80px rgba(0,0,0,0.7)',
       }}>
 
         {/* Header */}
@@ -310,7 +313,7 @@ function DetailModal({ org, criterionScores, loading, onClose }) {
 
       <style>{`
         @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-        @keyframes slideIn { from { transform:translateX(100%); } to { transform:translateX(0); } }
+        @keyframes popIn { from { transform:translate(-50%,-50%) scale(0.96); opacity:0; } to { transform:translate(-50%,-50%) scale(1); opacity:1; } }
       `}</style>
     </>
   );
