@@ -126,7 +126,7 @@ function RadarChart({ criteria, tierColor }) {
           : Math.cos(sp.a) < -0.1 ? 'end' : 'middle'
         return (
           <g key={key}>
-            <text x={lx} y={ly + 4} textAnchor={anchor} fontSize="8.5" fontFamily="monospace" fill="rgba(212,206,196,0.55)">{key}</text>
+            <text x={lx} y={ly + 4} textAnchor={anchor} fontSize="8.5" fontFamily="monospace" fill="rgba(212,206,196,0.75)">{key}</text>
             {!isNA && <circle cx={dotX} cy={dotY} r="3.5" fill={SCORE_COLOR(c.score)} />}
           </g>
         )
@@ -210,13 +210,13 @@ export default async function OrgPage({ params }) {
             <span style={{ fontFamily: 'var(--mono)', fontSize: '0.68rem', letterSpacing: '0.1em', textTransform: 'uppercase', padding: '0.3rem 0.75rem', background: tierColor, color: tierText, border: `1px solid ${tierText}50` }}>
               {org.composite_tier}
             </span>
-            <span style={{ fontFamily: 'var(--mono)', fontSize: '0.68rem', letterSpacing: '0.1em', textTransform: 'uppercase', padding: '0.3rem 0.75rem', background: 'rgba(244,240,232,0.04)', color: 'var(--muted)', border: '1px solid rgba(212,206,196,0.15)' }}>
+            <span style={{ fontFamily: 'var(--mono)', fontSize: '0.68rem', letterSpacing: '0.1em', textTransform: 'uppercase', padding: '0.3rem 0.75rem', background: 'rgba(244,240,232,0.06)', color: 'rgba(212,206,196,0.85)', border: '1px solid rgba(212,206,196,0.28)' }}>
               {TRAJ[org.trajectory] ?? org.trajectory}
             </span>
             <span style={{ fontFamily: 'var(--mono)', fontSize: '0.68rem', padding: '0.3rem 0.75rem', background: 'rgba(244,240,232,0.04)', color: tierText, border: `1px solid ${tierText}30`, fontWeight: 700 }}>
               {parseFloat(org.composite_score).toFixed(0)}%
             </span>
-            <span style={{ fontFamily: 'var(--mono)', fontSize: '0.68rem', padding: '0.3rem 0.75rem', background: 'rgba(244,240,232,0.04)', color: 'var(--muted)', border: '1px solid rgba(212,206,196,0.15)' }}>
+            <span style={{ fontFamily: 'var(--mono)', fontSize: '0.68rem', padding: '0.3rem 0.75rem', background: 'rgba(244,240,232,0.06)', color: 'rgba(212,206,196,0.85)', border: '1px solid rgba(212,206,196,0.28)' }}>
               Young's {org.youngs_score}/10 · {org.youngs_band}
             </span>
           </div>
@@ -373,16 +373,16 @@ export default async function OrgPage({ params }) {
                   { label: "Young's",   value: `${org.youngs_score}/10`,                          sub: org.youngs_band },
                 ].map(({ label, value, sub }) => (
                   <div key={label} style={{ background: 'rgba(244,240,232,0.03)', border: '1px solid rgba(212,206,196,0.1)', padding: '1rem 0.75rem', textAlign: 'center' }}>
-                    <div style={{ fontFamily: 'var(--mono)', fontSize: '0.52rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '0.3rem' }}>{label}</div>
+                    <div style={{ fontFamily: 'var(--mono)', fontSize: '0.52rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(212,206,196,0.65)', marginBottom: '0.3rem' }}>{label}</div>
                     <div style={{ fontFamily: 'var(--serif)', fontSize: '1.6rem', fontWeight: 700, color: tierText, lineHeight: 1 }}>{value}</div>
-                    <div style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', color: 'var(--muted)', marginTop: '0.25rem' }}>{sub}</div>
+                    <div style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', color: 'rgba(212,206,196,0.65)', marginTop: '0.25rem' }}>{sub}</div>
                   </div>
                 ))}
               </div>
 
               {/* Radar chart */}
               <div style={{ background: 'rgba(244,240,232,0.02)', border: '1px solid rgba(212,206,196,0.1)', padding: '1rem', marginBottom: '1rem' }}>
-                <div style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '0.75rem', textAlign: 'center' }}>
+                <div style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(212,206,196,0.65)', marginBottom: '0.75rem', textAlign: 'center' }}>
                   Criteria Profile
                 </div>
                 <RadarChart criteria={criteria} tierColor={tierColor} />
@@ -393,7 +393,7 @@ export default async function OrgPage({ params }) {
                     return (
                       <div key={criterion} style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', padding: '0.15rem 0.25rem' }}>
                         <div style={{ width: 6, height: 6, borderRadius: '50%', background: isNA ? 'rgba(212,206,196,0.2)' : SCORE_COLOR(score), flexShrink: 0 }} />
-                        <span style={{ fontFamily: 'var(--mono)', fontSize: '0.52rem', color: 'rgba(212,206,196,0.5)', flex: 1 }}>{criterion}</span>
+                        <span style={{ fontFamily: 'var(--mono)', fontSize: '0.52rem', color: 'rgba(212,206,196,0.72)', flex: 1 }}>{criterion}</span>
                         <span style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', color: isNA ? 'rgba(212,206,196,0.3)' : SCORE_COLOR(score), fontWeight: isNA ? 400 : 600 }}>
                           {isNA ? 'N/A' : score}
                         </span>
