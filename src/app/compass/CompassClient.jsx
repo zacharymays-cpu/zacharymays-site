@@ -194,7 +194,7 @@ export default function CompassClient({ orgs=[], regimes=[], presidentialEras=[]
       </section>
 
       <section className="section">
-        <div className="container">
+        <div className="container--wide">
           <div style={{display:'grid',gridTemplateColumns:'155px 1fr 195px',gap:'1.5rem',alignItems:'start'}}>
 
             {/* Filters */}
