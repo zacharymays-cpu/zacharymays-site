@@ -1,217 +1,316 @@
 'use client';
-import { useState } from 'react';
-import Link from 'next/link';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
-// Etiological chain data — documented formation lineages from methodology files
-const CHAINS = [
-  {
-    id: 'white-supremacist',
-    label: 'White Supremacist Formation Pipeline',
-    color: '#8b1c1c',
-    nodes: [
-      { id:'kn', name:'Know-Nothings', years:'1844–1860', score:71, tier:'Cult Dynamics', x:0, y:0 },
-      { id:'kkk1', name:'Ku Klux Klan (1st)', years:'1865–1871', score:87, tier:'Cult', x:1, y:0 },
-      { id:'bl', name:'Black Legion', years:'1925–1940', score:81, tier:'Cult Dynamics', x:2, y:0 },
-      { id:'kkk2', name:'KKK (Revival)', years:'1915–present', score:87, tier:'Cult', x:2, y:1 },
-      { id:'jbs', name:'John Birch Society', years:'1958–present', score:62, tier:'High Control', x:3, y:0 },
-      { id:'pf', name:'Patriot Front', years:'2017–present', score:89, tier:'Cult', x:4, y:0 },
-      { id:'3p', name:'Three Percenters', years:'2008–present', score:76, tier:'Cult Dynamics', x:4, y:1 },
-      { id:'ok', name:'Oath Keepers', years:'2009–present', score:74, tier:'Cult Dynamics', x:4, y:2 },
-    ],
-    edges: [
-      ['kn','kkk1'],['kkk1','bl'],['kkk1','kkk2'],['bl','jbs'],['kkk2','jbs'],
-      ['jbs','pf'],['jbs','3p'],['jbs','ok'],
-    ],
-  },
-  {
-    id: 'media-pipeline',
-    label: 'Conservative Media Formation Pipeline',
-    color: '#6b3a1c',
-    nodes: [
-      { id:'cou', name:'Coughlinism', years:'1926–1942', score:68, tier:'High Control', x:0, y:0 },
-      { id:'ctr', name:'Conservative Talk Radio', years:'1988–present', score:58, tier:'High Control', x:1, y:0 },
-      { id:'fox', name:'Fox News', years:'1996–present', score:67, tier:'High Control', x:2, y:0 },
-      { id:'dw', name:'Daily Wire', years:'2015–present', score:59, tier:'High Control', x:3, y:0 },
-      { id:'maga', name:'MAGA', years:'2015–present', score:84, tier:'Cult Dynamics', x:4, y:0 },
-    ],
-    edges: [['cou','ctr'],['ctr','fox'],['fox','dw'],['fox','maga'],['dw','maga']],
-  },
-  {
-    id: 'high-control-religious',
-    label: 'High-Control Religious Formation Pipeline',
-    color: '#6b4a1c',
-    nodes: [
-      { id:'woff', name:'Word of Faith Fellowship', years:'1979–present', score:93, tier:'Cult', x:0, y:0 },
-      { id:'tti', name:'Troubled Teen Industry', years:'1960s–present', score:91, tier:'Cult', x:1, y:0 },
-      { id:'ct', name:'Conversion Therapy Network', years:'1970s–present', score:82, tier:'Cult Dynamics', x:2, y:0 },
-      { id:'cn', name:'Christian Nationalism Pipeline', years:'1980s–present', score:76, tier:'Cult Dynamics', x:3, y:0 },
-    ],
-    edges: [['woff','tti'],['tti','ct'],['ct','cn'],['woff','cn']],
-  },
-  {
-    id: 'surveillance',
-    label: 'Surveillance Infrastructure Formation (V4.0)',
-    color: '#1c3a6b',
-    nodes: [
-      { id:'ic', name:'Post-9/11 Intelligence Community', years:'2001–present', score:72, tier:'Cult Dynamics', x:0, y:0 },
-      { id:'pal', name:'Palantir Technologies', years:'2003–present', score:85, tier:'Cult', x:1, y:0 },
-      { id:'doge', name:'DOGE-Era Gov AI Integration', years:'2025–present', score:82, tier:'Cult Dynamics', x:2, y:0 },
-      { id:'pop', name:'Population-Scale Algorithmic Control', years:'2020s–present', score:88, tier:'Cult', x:3, y:0 },
-    ],
-    edges: [['ic','pal'],['pal','doge'],['pal','pop'],['doge','pop']],
-  },
-];
+const TIER_COLORS = {
+  'Cult':          '#c02020',
+  'Cult Dynamics': '#cb4b16',
+  'High Control':  '#b58900',
+  'Concerning':    '#6c71c4',
+  'Mildly Culty':  '#2aa198',
+  'Healthy Group': '#859900',
+};
 
-const TIER_COLORS = { 'Cult':'#c02020','Cult Dynamics':'#c04040','High Control':'#b07030','Concerning':'#a09040','Mildly Culty':'#6a9840','Healthy Group':'#30a060' };
+const CHAIN_COLORS = {
+  'White supremacist formations':        '#c02020',
+  'Religious-political-media formations':'#b58900',
+  'High-control religious formations':   '#cb4b16',
+  'Surveillance infrastructure formation':'#6c71c4',
+};
 
-const NODE_W = 110, NODE_H = 52, COL_W = 150, ROW_H = 80, PAD = 28;
+const REL_LABELS = {
+  'ideological_heir':       'Ideological heir',
+  'tactical_evolution':     'Tactical evolution',
+  'media_pipeline':         'Media pipeline',
+  'institutional_successor':'Institutional successor',
+  'founded_by':             'Founded by',
+  'documented_influence':   'Documented influence',
+};
 
-function ChainViz({ chain, selected, onSelect }) {
-  const maxX = Math.max(...chain.nodes.map(n=>n.x));
-  const maxY = Math.max(...chain.nodes.map(n=>n.y));
-  const W = PAD*2 + (maxX+1)*COL_W;
-  const H = PAD*2 + (maxY+1)*ROW_H + 20;
+export default function LineageClient({ nodes = [], edges = [] }) {
+  const containerRef  = useRef(null);
+  const graphRef      = useRef(null);
+  const [loaded,      setLoaded]      = useState(false);
+  const [error,       setError]       = useState(false);
+  const [selected,    setSelected]    = useState(null);
+  const [chainFilter, setChainFilter] = useState(null);
+  const [highlight,   setHighlight]   = useState(null); // hovered node id
 
-  const nodePos = (n) => ({
-    cx: PAD + n.x*COL_W + NODE_W/2,
-    cy: PAD + n.y*ROW_H + NODE_H/2,
-    x: PAD + n.x*COL_W,
-    y: PAD + n.y*ROW_H,
-  });
+  const chains = [...new Set(edges.map(e => e.chain_name).filter(Boolean))];
+
+  // Filtered graph data
+  const filteredEdges = chainFilter
+    ? edges.filter(e => e.chain_name === chainFilter)
+    : edges;
+  const activeNodeSlugs = new Set([
+    ...filteredEdges.map(e => e.source_slug),
+    ...filteredEdges.map(e => e.target_slug),
+  ]);
+  const filteredNodes = nodes.filter(n => activeNodeSlugs.has(n.slug));
+
+  const graphData = {
+    nodes: filteredNodes.map(n => ({
+      id:    n.slug,
+      name:  n.name,
+      tier:  n.composite_tier,
+      score: parseFloat(n.composite_score || 0),
+      category: n.category,
+      color: TIER_COLORS[n.composite_tier] || '#888',
+      val:   Math.max(1, parseFloat(n.composite_score || 0) / 20),
+    })),
+    links: filteredEdges.map(e => ({
+      source:      e.source_slug,
+      target:      e.target_slug,
+      chain:       e.chain_name,
+      rel:         e.relationship_type,
+      strength:    parseFloat(e.strength || 0.8),
+      color:       CHAIN_COLORS[e.chain_name] || '#888',
+      notes:       e.notes,
+    })),
+  };
+
+  // Load ForceGraph2D dynamically
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const script = document.createElement('script');
+    script.src = 'https://unpkg.com/force-graph@1.51.4/dist/force-graph.min.js';
+    script.async = true;
+    script.onload  = () => setLoaded(true);
+    script.onerror = () => setError(true);
+    document.head.appendChild(script);
+    return () => { if (graphRef.current) { graphRef.current._destructor?.(); graphRef.current = null; } };
+  }, []);
+
+  const initGraph = useCallback(() => {
+    if (!containerRef.current || !window.ForceGraph || !loaded) return;
+    if (graphRef.current) { graphRef.current._destructor?.(); }
+
+    const Graph = window.ForceGraph()(containerRef.current)
+      .graphData(graphData)
+      .backgroundColor('rgba(0,0,0,0)')
+      .nodeRelSize(5)
+      .nodeVal(n => n.val)
+      .nodeColor(n => highlight
+        ? (n.id === highlight ||
+           graphData.links.some(l =>
+             (l.source?.id || l.source) === highlight && (l.target?.id || l.target) === n.id ||
+             (l.target?.id || l.target) === highlight && (l.source?.id || l.source) === n.id
+           )
+           ? n.color
+           : 'rgba(100,100,100,0.2)')
+        : n.color)
+      .nodeLabel(n => `<div style="background:rgba(18,14,10,0.95);border:1px solid rgba(200,168,75,0.4);padding:8px 12px;font-family:monospace;font-size:11px;color:#f4f0e8;max-width:220px">
+        <div style="font-weight:700;margin-bottom:4px">${n.name}</div>
+        <div style="color:${n.color}">${n.tier}</div>
+        <div style="color:rgba(212,206,196,0.5)">${n.score.toFixed(0)}% composite</div>
+      </div>`)
+      .nodeCanvasObject((node, ctx, scale) => {
+        const r = Math.max(3, node.val * 2.5);
+        const isHighlighted = !highlight || node.id === highlight ||
+          graphData.links.some(l =>
+            (l.source?.id || l.source) === highlight && (l.target?.id || l.target) === node.id ||
+            (l.target?.id || l.target) === highlight && (l.source?.id || l.source) === node.id
+          );
+        const alpha = highlight ? (isHighlighted ? 0.92 : 0.1) : 0.85;
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, r, 0, 2 * Math.PI);
+        ctx.fillStyle = node.color + Math.round(alpha * 255).toString(16).padStart(2,'0');
+        ctx.fill();
+        if (node.id === selected?.id) {
+          ctx.strokeStyle = 'rgba(200,168,75,0.9)';
+          ctx.lineWidth = 2 / scale;
+          ctx.stroke();
+        }
+        if (scale > 2.5) {
+          ctx.fillStyle = `rgba(244,240,232,${alpha * 0.8})`;
+          ctx.font = `${Math.min(12, 3 / scale)}px sans-serif`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(node.name.split(' ')[0], node.x, node.y + r + 4/scale);
+        }
+      })
+      .linkColor(l => {
+        const baseColor = l.color || '#888';
+        return highlight
+          ? ((l.source?.id || l.source) === highlight || (l.target?.id || l.target) === highlight
+            ? baseColor + 'dd'
+            : 'rgba(100,100,100,0.1)')
+          : baseColor + 'aa';
+      })
+      .linkWidth(l => (l.strength || 0.8) * 2.5)
+      .linkDirectionalArrowLength(6)
+      .linkDirectionalArrowRelPos(1)
+      .linkDirectionalParticles(l => highlight &&
+        ((l.source?.id || l.source) === highlight || (l.target?.id || l.target) === highlight) ? 3 : 0)
+      .linkDirectionalParticleWidth(2)
+      .linkDirectionalParticleColor(l => l.color || '#888')
+      .linkLabel(l => `<div style="background:rgba(18,14,10,0.95);border:1px solid rgba(212,206,196,0.2);padding:6px 10px;font-family:monospace;font-size:10px;color:#f4f0e8;max-width:200px">
+        <div style="color:rgba(200,168,75,0.8);margin-bottom:2px">${REL_LABELS[l.rel] || l.rel}</div>
+        <div style="color:rgba(212,206,196,0.6)">${l.notes || ''}</div>
+      </div>`)
+      .onNodeClick(node => setSelected(node === selected ? null : node))
+      .onNodeHover(node => setHighlight(node ? node.id : null))
+      .d3Force('charge', null)
+      .d3AlphaDecay(0.02)
+      .d3VelocityDecay(0.3);
+
+    // Custom charge force — stronger repulsion
+    Graph.d3Force('charge', { strength: () => -300, initialize() {}, force(alpha) {
+      const ns = Graph.graphData().nodes;
+      for (let i = 0; i < ns.length; i++) {
+        for (let j = i + 1; j < ns.length; j++) {
+          const dx = ns[j].x - ns[i].x, dy = ns[j].y - ns[i].y;
+          const dist = Math.sqrt(dx*dx + dy*dy) || 1;
+          const f = -300 * alpha / (dist * dist);
+          ns[i].vx += f * dx / dist;
+          ns[i].vy += f * dy / dist;
+          ns[j].vx -= f * dx / dist;
+          ns[j].vy -= f * dy / dist;
+        }
+      }
+    }});
+
+    graphRef.current = Graph;
+  }, [loaded, graphData, selected, highlight]);
+
+  useEffect(() => { if (loaded) initGraph(); }, [loaded, filteredEdges.length, chainFilter]);
+
+  useEffect(() => {
+    if (!graphRef.current || !loaded) return;
+    graphRef.current.graphData(graphData);
+  }, [highlight, selected]);
 
   return (
-    <div style={{marginBottom:'2.5rem'}}>
-      <div style={{display:'flex',alignItems:'center',gap:'0.75rem',marginBottom:'0.75rem'}}>
-        <div style={{width:12,height:12,background:chain.color,borderRadius:2}}/>
-        <div style={{fontFamily:'var(--serif)',fontSize:'1rem',fontWeight:700,color:'var(--paper)'}}>{chain.label}</div>
-      </div>
-      <div style={{overflowX:'auto'}}>
-        <svg viewBox={`0 0 ${W} ${H}`} style={{width:'100%',minWidth:W,maxWidth:W,display:'block'}}>
-          {/* Edges */}
-          {chain.edges.map(([fromId,toId],i) => {
-            const from = chain.nodes.find(n=>n.id===fromId);
-            const to = chain.nodes.find(n=>n.id===toId);
-            if (!from||!to) return null;
-            const fp = nodePos(from), tp = nodePos(to);
-            const x1 = fp.x+NODE_W, y1 = fp.cy;
-            const x2 = tp.x, y2 = tp.cy;
-            const mx = (x1+x2)/2;
-            return (
-              <g key={i}>
-                <path d={`M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`}
-                  fill="none" stroke={`rgba(${hexRgb(chain.color)},0.4)`} strokeWidth="1.5"
-                  markerEnd="url(#arr)"/>
-              </g>
-            );
-          })}
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
 
-          {/* Arrow marker */}
-          <defs>
-            <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-              <path d="M2 1L8 5L2 9" fill="none" stroke="rgba(212,206,196,0.4)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </marker>
-          </defs>
-
-          {/* Nodes */}
-          {chain.nodes.map(node => {
-            const {x,y,cx,cy} = nodePos(node);
-            const tc = TIER_COLORS[node.tier]||'#888';
-            const isSel = selected?.id===node.id&&selected?.chainId===chain.id;
-            return (
-              <g key={node.id} style={{cursor:'pointer'}}
-                onClick={()=>onSelect(isSel?null:{...node,chainId:chain.id})}>
-                {isSel&&<rect x={x-3} y={y-3} width={NODE_W+6} height={NODE_H+6} rx={5}
-                  fill="none" stroke="rgba(200,168,75,0.7)" strokeWidth="1.5"/>}
-                <rect x={x} y={y} width={NODE_W} height={NODE_H} rx={4}
-                  fill={`rgba(${hexRgb(tc)},${isSel?0.2:0.1})`}
-                  stroke={`rgba(${hexRgb(tc)},${isSel?0.9:0.4})`} strokeWidth={isSel?1.5:1}/>
-                {/* Score bar */}
-                <rect x={x+4} y={y+NODE_H-7} width={(NODE_W-8)*(node.score/100)} height={3} rx={1.5}
-                  fill={`rgba(${hexRgb(tc)},0.7)`}/>
-                <rect x={x+4} y={y+NODE_H-7} width={NODE_W-8} height={3} rx={1.5}
-                  fill="none" stroke={`rgba(${hexRgb(tc)},0.25)`} strokeWidth="1"/>
-                {/* Name */}
-                <text x={cx} y={y+13} textAnchor="middle" fill="var(--paper)" fontSize={9.5} fontFamily="monospace" fontWeight="600">
-                  {node.name.length>18?node.name.slice(0,16)+'…':node.name}
-                </text>
-                {/* Years */}
-                <text x={cx} y={y+25} textAnchor="middle" fill="rgba(212,206,196,0.45)" fontSize={8} fontFamily="monospace">
-                  {node.years}
-                </text>
-                {/* Score */}
-                <text x={cx} y={y+36} textAnchor="middle" fill={tc} fontSize={9} fontFamily="monospace" fontWeight="700">
-                  {node.score}%
-                </text>
-              </g>
-            );
-          })}
-        </svg>
-      </div>
-    </div>
-  );
-}
-
-function hexRgb(hex) {
-  const r=/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  return r?`${parseInt(r[1],16)},${parseInt(r[2],16)},${parseInt(r[3],16)}`:'128,128,128';
-}
-
-export default function LineageClient() {
-  const [selected, setSelected] = useState(null);
-
-  return (
-    <div style={{minHeight:'100vh'}}>
-      <div style={{borderBottom:'1px solid rgba(212,206,196,0.1)',padding:'2rem 0 1.5rem',background:'var(--ink)',position:'sticky',top:'60px',zIndex:50}}>
+      {/* Header */}
+      <div style={{ borderBottom: '1px solid rgba(212,206,196,0.1)', padding: '1.25rem 0 0.9rem', background: 'var(--ink)', position: 'sticky', top: '60px', zIndex: 50 }}>
         <div className="container--wide">
-          <div>
-            <span style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.15em',textTransform:'uppercase',color:'var(--gold)'}}>
-              <Link href="/explore" style={{color:'var(--gold)'}}>Explorer</Link> —
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.75rem' }}>
+            <div>
+              <span style={{ fontFamily: 'var(--mono)', fontSize: '0.6rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--gold)' }}>
+                <a href="/explore" style={{ color: 'var(--gold)' }}>Explorer</a> —
+              </span>
+              <h1 style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(1.2rem,2.5vw,1.8rem)', color: 'var(--paper)', display: 'inline', marginLeft: '0.4rem' }}>
+                Formation Lineage
+              </h1>
+            </div>
+            <span style={{ fontFamily: 'var(--mono)', fontSize: '0.65rem', color: 'var(--muted)' }}>
+              {filteredNodes.length} orgs · {filteredEdges.length} edges
             </span>
-            <h1 style={{fontFamily:'var(--serif)',fontSize:'clamp(1.3rem,3vw,2rem)',color:'var(--paper)',display:'inline',marginLeft:'0.4rem'}}>Etiological Chains</h1>
           </div>
-          <p style={{fontFamily:'var(--mono)',fontSize:'0.68rem',color:'var(--muted)',marginTop:'0.6rem',lineHeight:1.6,maxWidth:700}}>
-            Documented formation lineages — organizational genealogies where the later formation explicitly inherited institutional architecture, leadership networks, or ideological framework from the prior one. Node width reflects composite score. Click any node for detail.
-          </p>
+
+          {/* Chain filters */}
+          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
+            <button onClick={() => setChainFilter(null)}
+              style={{ fontFamily: 'var(--mono)', fontSize: '0.62rem', padding: '0.3rem 0.65rem',
+                background: !chainFilter ? 'rgba(200,168,75,0.12)' : 'transparent',
+                border: `1px solid ${!chainFilter ? 'rgba(200,168,75,0.5)' : 'rgba(212,206,196,0.2)'}`,
+                color: !chainFilter ? 'var(--gold)' : 'var(--muted)', cursor: 'pointer' }}>
+              All chains
+            </button>
+            {chains.map(c => (
+              <button key={c} onClick={() => setChainFilter(chainFilter === c ? null : c)}
+                style={{ fontFamily: 'var(--mono)', fontSize: '0.58rem', padding: '0.25rem 0.55rem',
+                  background: chainFilter === c ? `${CHAIN_COLORS[c]}18` : 'transparent',
+                  border: `1px solid ${chainFilter === c ? CHAIN_COLORS[c] : 'rgba(212,206,196,0.15)'}`,
+                  color: chainFilter === c ? CHAIN_COLORS[c] : 'var(--muted)', cursor: 'pointer' }}>
+                {c}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      <div className="container--wide" style={{paddingTop:'2rem',paddingBottom:'4rem'}}>
-        {/* Score legend */}
-        <div style={{display:'flex',gap:'1.5rem',marginBottom:'2rem',flexWrap:'wrap'}}>
-          {Object.entries(TIER_COLORS).map(([t,c])=>(
-            <div key={t} style={{display:'flex',alignItems:'center',gap:'5px'}}>
-              <div style={{width:10,height:10,background:c,borderRadius:2}}/>
-              <span style={{fontFamily:'var(--mono)',fontSize:'0.62rem',color:'var(--muted)'}}>{t}</span>
+      {/* Graph + sidebar */}
+      <div style={{ display: 'grid', gridTemplateColumns: selected ? '1fr 280px' : '1fr', flex: 1, minHeight: 540 }}>
+        <div style={{ position: 'relative', background: 'rgba(244,240,232,0.015)' }}>
+          {error ? (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+              <p style={{ fontFamily: 'var(--mono)', fontSize: '0.8rem', color: 'var(--muted)' }}>Failed to load graph library</p>
             </div>
-          ))}
+          ) : (
+            <>
+              <div ref={containerRef} style={{ width: '100%', height: '100%', minHeight: 540 }} />
+              {!loaded && (
+                <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(18,14,10,0.85)' }}>
+                  <span style={{ fontFamily: 'var(--mono)', fontSize: '0.75rem', color: 'var(--gold)', letterSpacing: '0.2em' }}>LOADING GRAPH…</span>
+                </div>
+              )}
+            </>
+          )}
         </div>
 
-        {CHAINS.map(chain=>(
-          <ChainViz key={chain.id} chain={chain} selected={selected} onSelect={setSelected}/>
-        ))}
-
-        {/* Selected node detail */}
-        {selected&&(
-          <div style={{marginTop:'1rem',padding:'1.25rem',background:'rgba(244,240,232,0.03)',border:`1px solid rgba(${hexRgb(TIER_COLORS[selected.tier]||'#888')},0.3)`,maxWidth:480}}>
-            <div style={{display:'flex',justifyContent:'space-between',marginBottom:'0.75rem'}}>
-              <div style={{fontFamily:'var(--serif)',fontSize:'1.05rem',fontWeight:700,color:'var(--paper)'}}>{selected.name}</div>
-              <button onClick={()=>setSelected(null)} style={{background:'transparent',border:'none',color:'var(--muted)',cursor:'pointer',fontFamily:'var(--mono)',fontSize:'0.7rem'}}>✕</button>
+        {/* Node detail sidebar */}
+        {selected && (
+          <div style={{ background: 'var(--ink)', borderLeft: '1px solid rgba(212,206,196,0.1)', padding: '1.5rem', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ fontFamily: 'var(--mono)', fontSize: '0.58rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--gold)' }}>Selected</span>
+              <button onClick={() => setSelected(null)} style={{ background: 'transparent', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontSize: '1rem' }}>✕</button>
             </div>
-            <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'0.75rem'}}>
-              {[['Years',selected.years],['Composite',`${selected.score}%`],['Tier',selected.tier]].map(([k,v])=>(
-                <div key={k}>
-                  <div style={{fontFamily:'var(--mono)',fontSize:'0.58rem',color:'var(--muted)',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'0.2rem'}}>{k}</div>
-                  <div style={{fontFamily:'var(--mono)',fontSize:'0.82rem',color:k==='Tier'?TIER_COLORS[v]:'var(--gold)'}}>{v}</div>
-                </div>
-              ))}
+            <div>
+              <p style={{ fontFamily: 'var(--mono)', fontSize: '0.58rem', color: 'var(--muted)', marginBottom: '0.25rem' }}>{selected.category}</p>
+              <h2 style={{ fontFamily: 'var(--serif)', fontSize: '1rem', fontWeight: 700, color: 'var(--paper)', lineHeight: 1.3 }}>{selected.name}</h2>
             </div>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.35rem 0.65rem', background: `${TIER_COLORS[selected.tier] || '#888'}18`, border: `1px solid ${TIER_COLORS[selected.tier] || '#888'}40` }}>
+              <div style={{ width: 7, height: 7, borderRadius: '50%', background: TIER_COLORS[selected.tier] || '#888' }} />
+              <span style={{ fontFamily: 'var(--mono)', fontSize: '0.62rem', color: TIER_COLORS[selected.tier] || '#888' }}>{selected.tier}</span>
+              <span style={{ fontFamily: 'var(--mono)', fontSize: '0.7rem', color: 'var(--paper)', fontWeight: 700 }}>{selected.score.toFixed(0)}%</span>
+            </div>
+            {/* Outgoing edges */}
+            {(() => {
+              const out = edges.filter(e => e.source_slug === selected.id);
+              const inc = edges.filter(e => e.target_slug === selected.id);
+              return (
+                <>
+                  {inc.length > 0 && (
+                    <div>
+                      <p style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--muted)', marginBottom: '0.4rem' }}>Influenced by</p>
+                      {inc.map((e, i) => {
+                        const src = nodes.find(n => n.slug === e.source_slug);
+                        return <div key={i} style={{ padding: '0.4rem 0.5rem', background: 'rgba(244,240,232,0.03)', border: '1px solid rgba(212,206,196,0.08)', marginBottom: '0.25rem' }}>
+                          <div style={{ fontFamily: 'var(--mono)', fontSize: '0.65rem', color: 'var(--gold)' }}>{src?.name || e.source_slug}</div>
+                          <div style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', color: 'var(--muted)' }}>{REL_LABELS[e.relationship_type] || e.relationship_type}</div>
+                        </div>;
+                      })}
+                    </div>
+                  )}
+                  {out.length > 0 && (
+                    <div>
+                      <p style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--muted)', marginBottom: '0.4rem' }}>Influenced</p>
+                      {out.map((e, i) => {
+                        const tgt = nodes.find(n => n.slug === e.target_slug);
+                        return <div key={i} style={{ padding: '0.4rem 0.5rem', background: 'rgba(244,240,232,0.03)', border: '1px solid rgba(212,206,196,0.08)', marginBottom: '0.25rem' }}>
+                          <div style={{ fontFamily: 'var(--mono)', fontSize: '0.65rem', color: 'var(--gold)' }}>{tgt?.name || e.target_slug}</div>
+                          <div style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', color: 'var(--muted)' }}>{REL_LABELS[e.relationship_type] || e.relationship_type}</div>
+                        </div>;
+                      })}
+                    </div>
+                  )}
+                </>
+              );
+            })()}
+            <a href={`/org/${selected.id}`} target="_blank" rel="noopener noreferrer"
+              style={{ display: 'block', textAlign: 'center', padding: '0.55rem', background: 'rgba(200,168,75,0.08)', border: '1px solid rgba(200,168,75,0.3)', color: 'var(--gold)', fontFamily: 'var(--mono)', fontSize: '0.65rem', textTransform: 'uppercase', textDecoration: 'none' }}>
+              Full Assessment →
+            </a>
           </div>
         )}
+      </div>
 
-        <div style={{marginTop:'2.5rem',padding:'1.1rem',background:'rgba(244,240,232,0.02)',border:'1px solid rgba(212,206,196,0.08)',maxWidth:700}}>
-          <p style={{fontFamily:'var(--mono)',fontSize:'0.67rem',color:'rgba(212,206,196,0.4)',margin:0,lineHeight:1.7}}>
-            Lineages reflect documented formation inheritance — leadership recruitment, organizational templates, funding networks, or explicit doctrinal adoption. Scores are composite cultiness percentages. The surveillance pipeline (V4.0) is a new analytical category introduced in the May 2026 methodology revision.
-          </p>
+      {/* Legend */}
+      <div style={{ borderTop: '1px solid rgba(212,206,196,0.08)', padding: '0.75rem 0' }}>
+        <div className="container--wide">
+          <div style={{ display: 'flex', gap: '1.25rem', flexWrap: 'wrap', alignItems: 'center' }}>
+            {Object.entries(REL_LABELS).map(([k, v]) => (
+              <div key={k} style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                <div style={{ width: 18, height: 2, background: 'rgba(212,206,196,0.4)' }} />
+                <span style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', color: 'rgba(212,206,196,0.4)' }}>{v}</span>
+              </div>
+            ))}
+            <span style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', color: 'rgba(212,206,196,0.25)', marginLeft: 'auto' }}>
+              Node size = composite score · Hover to trace connections · Click to select
+            </span>
+          </div>
         </div>
       </div>
     </div>
