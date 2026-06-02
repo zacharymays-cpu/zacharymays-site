@@ -517,7 +517,7 @@ export default function ExploreClient({ initialOrgs=[] }) {
                 Compass →
               </Link>
               <div style={{display:'flex',gap:'0.5rem',flexWrap:'wrap'}}>
-                {[['Heatmap','/explore/heatmap'],['Distributions','/explore/distributions'],['Correlations','/explore/correlations'],['Lineage','/explore/lineage'],['Compare','/explore/compare']].map(([l,href])=>(
+                {[['Heatmap','/explore/heatmap'],['Distributions','/explore/distributions'],['Correlations','/explore/correlations'],['Lineage','/explore/lineage'],['Compare','/explore/compare'],['Map','/explore/map']].map(([l,href])=>(
                   <Link key={l} href={href} style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.08em',textTransform:'uppercase',padding:'0.35rem 0.65rem',border:'1px solid rgba(212,206,196,0.2)',color:'var(--muted)',textDecoration:'none'}}>{l}</Link>
                 ))}
               </div>
