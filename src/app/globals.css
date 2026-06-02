@@ -457,10 +457,10 @@ a:hover { color: var(--paper); }
   }
   .explore-sidebar-inner {
     display: none;
+    padding-top: 1rem;
   }
   .explore-sidebar-inner.open {
     display: block;
-    padding-top: 1rem;
   }
   .explore-filter-toggle {
     display: flex;
