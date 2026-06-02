@@ -78,6 +78,54 @@ function CriterionRow({ code, score, bodyText }) {
   );
 }
 
+// ── Mini Political Compass ────────────────────────────────────────────────────
+function MiniCompass({ econ, auth, quadrant, tierColor }) {
+  const SIZE = 160;
+  const PAD = 16;
+  const INNER = SIZE - PAD*2;
+  const cx = (v) => PAD + ((v+5)/10)*INNER;
+  const cy = (v) => PAD + ((5-v)/10)*INNER;
+  const dotX = cx(econ), dotY = cy(auth);
+
+  return (
+    <svg viewBox={`0 0 ${SIZE} ${SIZE}`} style={{width:'100%',maxWidth:SIZE,display:'block',margin:'0 auto'}}>
+      {/* Quadrant fills */}
+      <rect x={PAD} y={PAD} width={INNER/2} height={INNER/2} fill="rgba(139,32,32,0.07)"/>
+      <rect x={PAD+INNER/2} y={PAD} width={INNER/2} height={INNER/2} fill="rgba(120,100,30,0.07)"/>
+      <rect x={PAD} y={PAD+INNER/2} width={INNER/2} height={INNER/2} fill="rgba(42,107,74,0.06)"/>
+      <rect x={PAD+INNER/2} y={PAD+INNER/2} width={INNER/2} height={INNER/2} fill="rgba(42,107,74,0.04)"/>
+      {/* Axes */}
+      <line x1={PAD} y1={SIZE/2} x2={SIZE-PAD} y2={SIZE/2} stroke="rgba(212,206,196,0.2)" strokeWidth="0.75"/>
+      <line x1={SIZE/2} y1={PAD} x2={SIZE/2} y2={SIZE-PAD} stroke="rgba(212,206,196,0.2)" strokeWidth="0.75"/>
+      {/* Grid */}
+      {[-3,0,3].map(v=>(
+        <g key={v}>
+          <line x1={cx(v)} y1={PAD} x2={cx(v)} y2={SIZE-PAD} stroke="rgba(212,206,196,0.05)" strokeWidth="0.5"/>
+          <line x1={PAD} y1={cy(v)} x2={SIZE-PAD} y2={cy(v)} stroke="rgba(212,206,196,0.05)" strokeWidth="0.5"/>
+        </g>
+      ))}
+      {/* Corner labels */}
+      <text x={PAD+2} y={PAD+9} fill="rgba(212,206,196,0.18)" fontSize={6} fontFamily="monospace">AUTH L</text>
+      <text x={SIZE-PAD-2} y={PAD+9} textAnchor="end" fill="rgba(212,206,196,0.18)" fontSize={6} fontFamily="monospace">AUTH R</text>
+      <text x={PAD+2} y={SIZE-PAD-3} fill="rgba(212,206,196,0.18)" fontSize={6} fontFamily="monospace">LIB L</text>
+      <text x={SIZE-PAD-2} y={SIZE-PAD-3} textAnchor="end" fill="rgba(212,206,196,0.18)" fontSize={6} fontFamily="monospace">LIB R</text>
+      {/* Org dot */}
+      <circle cx={dotX} cy={dotY} r={6} fill={tierColor||'#888'} fillOpacity={0.85}
+        stroke="rgba(255,255,255,0.3)" strokeWidth="1"/>
+      <circle cx={dotX} cy={dotY} r={10} fill={tierColor||'#888'} fillOpacity={0.15}/>
+      {/* Axis value labels */}
+      <text x={SIZE/2} y={SIZE-2} textAnchor="middle" fill="rgba(212,206,196,0.3)" fontSize={7} fontFamily="monospace">
+        Econ {econ>0?'+':''}{econ}
+      </text>
+      <text x={2} y={SIZE/2+3} textAnchor="start" fill="rgba(212,206,196,0.3)" fontSize={7} fontFamily="monospace"
+        transform={`rotate(-90,2,${SIZE/2})`}>
+        Auth {auth>0?'+':''}{auth}
+      </text>
+    </svg>
+  );
+}
+
+
 // ── Radar / Spider Chart ──────────────────────────────────────────────────────
 function RadarChart({ scores }) {
   const CRITERIA = ['C1','C2','C3','C4','C5','C6','C7','C8','C9','C10'];
@@ -147,7 +195,7 @@ function RadarChart({ scores }) {
 
 
 // ── Detail Modal ─────────────────────────────────────────────────────────────
-function DetailModal({ org, criterionScores, loading, onClose }) {
+function DetailModal({ org, criterionScores, politicalPos, loading, onClose }) {
   const scores = criterionScores[org?.id] || {};
   const tierColor = TIER_COLORS[org?.composite_tier] || '#888';
   const composite = org ? parseFloat(org.composite_score).toFixed(1) : '—';
@@ -247,15 +295,28 @@ function DetailModal({ org, criterionScores, loading, onClose }) {
           </div>
 
           
-          {/* Radar chart */}
+          {/* Criterion profile + political compass */}
           {!loading && Object.keys(scores).length > 0 && (
-            <div style={{marginBottom:'1.75rem',padding:'1rem',background:'rgba(244,240,232,0.02)',border:'1px solid rgba(212,206,196,0.08)'}}>
-              <div style={{fontFamily:'var(--mono)',fontSize:'0.58rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--gold)',marginBottom:'0.75rem',textAlign:'center'}}>Criterion Profile</div>
-              <RadarChart scores={scores} />
-              <div style={{display:'flex',justifyContent:'space-between',marginTop:'0.5rem',paddingTop:'0.5rem',borderTop:'1px solid rgba(212,206,196,0.07)'}}>
-                <span style={{fontFamily:'var(--mono)',fontSize:'0.58rem',color:'rgba(212,206,196,0.3)'}}>1 inner</span>
-                <span style={{fontFamily:'var(--mono)',fontSize:'0.58rem',color:'rgba(212,206,196,0.3)'}}>10 outer · N/A = center</span>
+            <div style={{marginBottom:'1.75rem',display:'grid',gridTemplateColumns:politicalPos?'1fr 1fr':'1fr',gap:'0.75rem'}}>
+              {/* Radar */}
+              <div style={{padding:'1rem',background:'rgba(244,240,232,0.02)',border:'1px solid rgba(212,206,196,0.08)'}}>
+                <div style={{fontFamily:'var(--mono)',fontSize:'0.58rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--gold)',marginBottom:'0.6rem',textAlign:'center'}}>Criterion Profile</div>
+                <RadarChart scores={scores} />
+                <div style={{display:'flex',justifyContent:'space-between',marginTop:'0.4rem',paddingTop:'0.4rem',borderTop:'1px solid rgba(212,206,196,0.07)'}}>
+                  <span style={{fontFamily:'var(--mono)',fontSize:'0.55rem',color:'rgba(212,206,196,0.25)'}}>1 inner</span>
+                  <span style={{fontFamily:'var(--mono)',fontSize:'0.55rem',color:'rgba(212,206,196,0.25)'}}>10 outer · N/A=center</span>
+                </div>
               </div>
+              {/* Political compass */}
+              {politicalPos&&(
+                <div style={{padding:'1rem',background:'rgba(244,240,232,0.02)',border:'1px solid rgba(212,206,196,0.08)'}}>
+                  <div style={{fontFamily:'var(--mono)',fontSize:'0.58rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--gold)',marginBottom:'0.6rem',textAlign:'center'}}>Political Position</div>
+                  <MiniCompass econ={politicalPos.econ} auth={politicalPos.auth} quadrant={politicalPos.quadrant} tierColor={TIER_COLORS[org.composite_tier]}/>
+                  <div style={{textAlign:'center',marginTop:'0.4rem',paddingTop:'0.4rem',borderTop:'1px solid rgba(212,206,196,0.07)'}}>
+                    <span style={{fontFamily:'var(--mono)',fontSize:'0.6rem',color:'rgba(212,206,196,0.4)'}}>{politicalPos.quadrant||'—'}</span>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -329,6 +390,7 @@ function hexToRgb(hex) {
 export default function ExploreClient({ initialOrgs=[] }) {
   const [orgs] = useState(initialOrgs);
   const [criterionScores, setCriterionScores] = useState({});
+  const [politicalScores, setPoliticalScores] = useState({});
   const [selected, setSelected] = useState(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -351,15 +413,23 @@ export default function ExploreClient({ initialOrgs=[] }) {
     setSelected(org);
     if (criterionScores[org.id]) return;
     setLoadingDetail(true);
-    fetch(`${SUPABASE_URL}/rest/v1/criterion_scores?org_id=eq.${org.id}&select=criterion,score,body_text&order=criterion`,
-      {headers:{apikey:ANON_KEY,Authorization:`Bearer ${ANON_KEY}`}})
-      .then(r=>r.json())
-      .then(data=>{
-        const map={};
-        data.forEach(d=>{map[d.criterion]={score:d.score!==null?parseFloat(d.score):null,bodyText:d.body_text||null};});
-        setCriterionScores(prev=>({...prev,[org.id]:map}));
-        setLoadingDetail(false);
-      }).catch(()=>setLoadingDetail(false));
+    const h = {headers:{apikey:ANON_KEY,Authorization:`Bearer ${ANON_KEY}`}};
+    Promise.all([
+      fetch(`${SUPABASE_URL}/rest/v1/criterion_scores?org_id=eq.${org.id}&select=criterion,score,body_text&order=criterion`, h).then(r=>r.json()),
+      fetch(`${SUPABASE_URL}/rest/v1/political_scores?org_id=eq.${org.id}&select=economic_axis,authority_axis,political_quadrant`, h).then(r=>r.json()),
+    ]).then(([cData, pData]) => {
+      const map={};
+      cData.forEach(d=>{map[d.criterion]={score:d.score!==null?parseFloat(d.score):null,bodyText:d.body_text||null};});
+      setCriterionScores(prev=>({...prev,[org.id]:map}));
+      if (pData[0]) {
+        setPoliticalScores(prev=>({...prev,[org.id]:{
+          econ: parseFloat(pData[0].economic_axis),
+          auth: parseFloat(pData[0].authority_axis),
+          quadrant: pData[0].political_quadrant,
+        }}));
+      }
+      setLoadingDetail(false);
+    }).catch(()=>setLoadingDetail(false));
   };
 
   const closeDetail = () => setSelected(null);
@@ -561,6 +631,7 @@ export default function ExploreClient({ initialOrgs=[] }) {
         <DetailModal
           org={selected}
           criterionScores={criterionScores}
+          politicalPos={politicalScores[selected.id]||null}
           loading={loadingDetail}
           onClose={closeDetail}
         />
