@@ -1,9 +1,6 @@
 'use client';
 import { useState, useMemo, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import maplibregl from 'maplibre-gl';
-import 'maplibre-gl/dist/maplibre-gl.css';
-
 const TIER_COLORS = {
   'Cult':          '#c02020',
   'Cult Dynamics': '#cb4b16',
@@ -112,6 +109,14 @@ export default function MapClient({ orgs=[], stateStats=[], foundingData=[], wit
     if (!mapContainer.current || mapRef.current) return;
 
     let map;
+    import('maplibre-gl').then(({ default: maplibregl }) => {
+    // Inject CSS once
+    if (!document.querySelector('link[href*="maplibre-gl"]')) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css';
+      document.head.appendChild(link);
+    }
     try {
       map = new maplibregl.Map({
         container: mapContainer.current,
@@ -248,6 +253,7 @@ export default function MapClient({ orgs=[], stateStats=[], foundingData=[], wit
     });
 
     return () => { if (map) { map.remove(); mapRef.current = null; } };
+    }).catch(err => setMapError('Failed to load map library: ' + err.message));
   }, []);
 
   // Sync data & layer visibility whenever deps change
