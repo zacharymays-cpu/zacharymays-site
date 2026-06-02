@@ -378,7 +378,7 @@ export default function CompassClient({ orgs=[], regimes=[], presidentialEras=[]
             </div>
           </div>
 
-          </div>{/* end 75% wrapper */}
+          </div>{/* end 75% grid wrapper */}
           </div>{/* end centering flex */}
 
           <div style={{marginTop:'2.5rem',padding:'1.25rem',background:'rgba(244,240,232,0.02)',border:'1px solid rgba(212,206,196,0.08)'}}>
@@ -388,7 +388,6 @@ export default function CompassClient({ orgs=[], regimes=[], presidentialEras=[]
               Scores reflect documented institutional behavior. Historical regimes (◆) and presidential eras (★) are reference anchors, not scored organizations.
             </p>
           </div>
-        </div>
       </section>
     </>
   );
