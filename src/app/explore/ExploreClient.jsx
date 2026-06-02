@@ -250,9 +250,7 @@ export default function ExploreClient({ initialOrgs = [] }) {
                     <th onClick={()=>handleSort('name')} style={{fontFamily:'var(--mono)',fontSize:'0.65rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--muted)',textAlign:'left',padding:'0.6rem 0.75rem',cursor:'pointer',userSelect:'none',whiteSpace:'nowrap'}}>
                       Organization <SortIcon col="name" />
                     </th>
-                    <th onClick={()=>handleSort('composite_tier')} style={{fontFamily:'var(--mono)',fontSize:'0.65rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--muted)',textAlign:'left',padding:'0.6rem 0.75rem',cursor:'pointer',userSelect:'none',whiteSpace:'nowrap'}}>
-                      Tier <SortIcon col="composite_tier" />
-                    </th>
+
                     <th onClick={()=>handleSort('composite_score')} style={{fontFamily:'var(--mono)',fontSize:'0.65rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--muted)',textAlign:'left',padding:'0.6rem 0.75rem',cursor:'pointer',userSelect:'none',whiteSpace:'nowrap'}}>
                       Score <SortIcon col="composite_score" />
                     </th>
@@ -270,9 +268,9 @@ export default function ExploreClient({ initialOrgs = [] }) {
                 <tbody>
                   {filtered.map((org,i) => (
                     <tr key={org.id} onClick={()=>loadDetail(org)}
-                      style={{borderBottom:'1px solid rgba(212,206,196,0.07)',background:selected?.id===org.id?'rgba(200,168,75,0.06)':i%2===0?'transparent':'rgba(244,240,232,0.015)',cursor:'pointer'}}>
+                      style={{borderBottom:'1px solid rgba(212,206,196,0.07)',borderLeft:`3px solid ${TIER_COLORS[org.composite_tier]||'transparent'}`,background:selected?.id===org.id?'rgba(200,168,75,0.06)':i%2===0?'transparent':'rgba(244,240,232,0.015)',cursor:'pointer'}}>
                       <td style={{padding:'0.65rem 0.75rem',color:'var(--paper)',fontSize:'0.88rem',fontFamily:'var(--serif)'}}>{org.name}</td>
-                      <td style={{padding:'0.65rem 0.75rem'}}><TierBadge tier={org.composite_tier} small /></td>
+
                       <td style={{padding:'0.65rem 0.75rem',fontFamily:'var(--mono)',fontSize:'0.82rem',color:'var(--paper)',whiteSpace:'nowrap'}}>{parseFloat(org.composite_score).toFixed(1)}%</td>
                       <td className="explore-table-hide-mobile" style={{padding:'0.65rem 0.75rem',fontFamily:'var(--mono)',fontSize:'0.82rem',color:'var(--muted)'}}>{org.youngs_score}/10</td>
                       <td className="explore-table-hide-mobile" style={{padding:'0.65rem 0.75rem',color:'var(--muted)',fontSize:'0.75rem',fontFamily:'var(--mono)',whiteSpace:'nowrap'}}>{org.category}</td>
@@ -280,7 +278,7 @@ export default function ExploreClient({ initialOrgs = [] }) {
                     </tr>
                   ))}
                   {filtered.length===0 && (
-                    <tr><td colSpan={6} style={{padding:'3rem',textAlign:'center',color:'var(--muted)',fontFamily:'var(--mono)',fontSize:'0.8rem'}}>No organizations match current filters.</td></tr>
+                    <tr><td colSpan={5} style={{padding:'3rem',textAlign:'center',color:'var(--muted)',fontFamily:'var(--mono)',fontSize:'0.8rem'}}>No organizations match current filters.</td></tr>
                   )}
                 </tbody>
               </table>
@@ -296,7 +294,10 @@ export default function ExploreClient({ initialOrgs = [] }) {
                 <div style={{marginBottom:'1.25rem',paddingRight:'2rem'}}>
                   <h2 style={{fontFamily:'var(--serif)',fontSize:'clamp(1.1rem,2.5vw,1.6rem)',color:'var(--paper)',marginBottom:'0.4rem'}}>{selected.name}</h2>
                   <div style={{fontFamily:'var(--mono)',fontSize:'0.7rem',color:'var(--muted)',letterSpacing:'0.06em',marginBottom:'0.6rem'}}>{selected.category} · {selected.trajectory}</div>
-                  <TierBadge tier={selected.composite_tier} />
+                  <div style={{display:'flex',alignItems:'center',gap:'0.6rem'}}>
+                    <div style={{width:'10px',height:'10px',borderRadius:'50%',background:TIER_COLORS[selected.composite_tier]||'#555',flexShrink:0}} />
+                    <span style={{fontFamily:'var(--mono)',fontSize:'0.68rem',letterSpacing:'0.08em',textTransform:'uppercase',color:'var(--paper)'}}>{selected.composite_tier}</span>
+                  </div>
                 </div>
 
                 {/* Score summary */}
