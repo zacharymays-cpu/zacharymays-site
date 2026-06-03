@@ -5,11 +5,10 @@ const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsI
 
 export const metadata = {
   title: 'Geographic Map — The Cultiness Spectrum',
-  description: 'US map of organizational headquarters, state average scores, and founding city origins — colored by cultiness tier and sized by membership.',
+  description: 'US map of organizational headquarters, state average scores, founding city origins, and etiological chains — colored by cultiness tier.',
 };
 export const revalidate = 3600;
 
-// Founding city coordinates lookup
 const FOUNDING_COORDS = {
   "New York|NY":         [40.71, -74.01],  "Washington|DC":       [38.90, -77.04],
   "Chicago|IL":          [41.88, -87.63],  "San Francisco|CA":    [37.77, -122.42],
@@ -35,8 +34,7 @@ const headers = { apikey: ANON_KEY, Authorization: `Bearer ${ANON_KEY}` };
 const opts    = { headers, next: { revalidate: 3600 } };
 
 export default async function MapPage() {
-  const [orgsRes, stateRes, foundingRes] = await Promise.all([
-    // Org dots
+  const [orgsRes, stateRes, foundingRes, lineageRes, politicalRes] = await Promise.all([
     fetch(
       `${SUPABASE_URL}/rest/v1/organizations` +
       `?select=id,name,slug,category,composite_tier,composite_score,trajectory,` +
@@ -44,12 +42,10 @@ export default async function MapPage() {
       `&active=eq.true&scoring_status=eq.ACCEPTED&order=composite_score.desc`,
       opts
     ),
-    // State stats for choropleth
     fetch(
       `${SUPABASE_URL}/rest/v1/rpc/state_stats`,
       { method: 'POST', headers: { ...headers, 'Content-Type': 'application/json' }, body: '{}', next: { revalidate: 3600 } }
     ),
-    // Founding city aggregates
     fetch(
       `${SUPABASE_URL}/rest/v1/organizations` +
       `?select=founding_city,founding_state,composite_score,composite_tier` +
@@ -57,13 +53,43 @@ export default async function MapPage() {
       `&founding_city=not.eq.Various&founding_city=not.eq.Unknown&founding_state=not.is.null`,
       opts
     ),
+    // Lineage edges for chain overlay
+    fetch(
+      `${SUPABASE_URL}/rest/v1/org_lineage?select=source_slug,target_slug,chain_name,relationship_type,strength`,
+      opts
+    ),
+    // Political scores for quadrant filter
+    fetch(
+      `${SUPABASE_URL}/rest/v1/political_scores?select=economic_axis,authority_axis,political_quadrant,organizations(slug)`,
+      opts
+    ),
   ]);
 
-  const orgs        = await orgsRes.json().catch(() => []);
-  const stateRaw    = await stateRes.json().catch(() => []);
-  const foundingRaw = await foundingRes.json().catch(() => []);
+  const orgs         = await orgsRes.json().catch(() => []);
+  const stateRaw     = await stateRes.json().catch(() => []);
+  const foundingRaw  = await foundingRes.json().catch(() => []);
+  const lineageRaw   = await lineageRes.json().catch(() => []);
+  const politicalRaw = await politicalRes.json().catch(() => []);
 
-  // Aggregate founding data client-side (RPC fallback)
+  // Build slug → political axes lookup
+  const politicalMap = {};
+  (Array.isArray(politicalRaw) ? politicalRaw : []).forEach(p => {
+    if (p.organizations?.slug) {
+      politicalMap[p.organizations.slug] = {
+        econ: parseFloat(p.economic_axis || 0),
+        auth: parseFloat(p.authority_axis || 0),
+        quadrant: p.political_quadrant,
+      };
+    }
+  });
+
+  // Enrich orgs with political data
+  const enrichedOrgs = orgs.map(o => ({
+    ...o,
+    ...(politicalMap[o.slug] || {}),
+  }));
+
+  // Founding city aggregation
   const foundingMap = {};
   (Array.isArray(foundingRaw) ? foundingRaw : []).forEach(o => {
     const key = `${o.founding_city}|${o.founding_state}`;
@@ -87,7 +113,7 @@ export default async function MapPage() {
     .filter(Boolean)
     .sort((a, b) => b.count - a.count);
 
-  // State stats — try RPC result, fall back to client aggregation
+  // State stats
   let stateStats = Array.isArray(stateRaw) && stateRaw.length ? stateRaw : null;
   if (!stateStats) {
     const stateMap = {};
@@ -107,13 +133,15 @@ export default async function MapPage() {
   }
 
   const withGeo = orgs.filter(o => o.hq_lat && o.hq_lng).length;
+  const lineageEdges = Array.isArray(lineageRaw) ? lineageRaw : [];
 
   return (
     <MapWrapper
-      orgs={orgs}
+      orgs={enrichedOrgs}
       stateStats={stateStats}
       foundingData={foundingData}
       withGeo={withGeo}
+      lineageEdges={lineageEdges}
     />
   );
 }
