@@ -1,6 +1,4 @@
-import dynamic from 'next/dynamic';
-
-const MapClient = dynamic(() => import('./MapClient'), { ssr: false });
+import MapWrapper from './MapWrapper';
 
 const SUPABASE_URL = 'https://shgdrkrqjnwtlyxcdayp.supabase.co';
 const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNoZ2Rya3Jxam53dGx5eGNkYXlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzMzgwNjYsImV4cCI6MjA5NTkxNDA2Nn0.L5NPabtJGLFWb81SruP3XfjgFuycu4DhvaMJhInqWfo';
@@ -111,7 +109,7 @@ export default async function MapPage() {
   const withGeo = orgs.filter(o => o.hq_lat && o.hq_lng).length;
 
   return (
-    <MapClient
+    <MapWrapper
       orgs={orgs}
       stateStats={stateStats}
       foundingData={foundingData}
