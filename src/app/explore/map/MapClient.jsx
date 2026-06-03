@@ -114,7 +114,7 @@ export default function MapClient({ orgs=[], stateStats=[], foundingData=[], wit
       const link = document.createElement('link');
       link.id = 'maplibre-css';
       link.rel = 'stylesheet';
-      link.href = 'https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.css';
+      link.href = 'https://cdn.jsdelivr.net/npm/maplibre-gl@5.24.0/dist/maplibre-gl.css';
       document.head.appendChild(link);
     }
     try {
