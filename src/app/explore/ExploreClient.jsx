@@ -1,5 +1,6 @@
 'use client';
 import { useState, useMemo, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 const SUPABASE_URL = 'https://shgdrkrqjnwtlyxcdayp.supabase.co';
@@ -411,11 +412,10 @@ function hexToRgb(hex) {
 
 // ── Main Explorer ─────────────────────────────────────────────────────────────
 export default function ExploreClient({ initialOrgs=[] }) {
+  const router = useRouter();
   const [orgs] = useState(initialOrgs);
   const [criterionScores, setCriterionScores] = useState({});
   const [politicalScores, setPoliticalScores] = useState({});
-  const [selected, setSelected] = useState(null);
-  const [loadingDetail, setLoadingDetail] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [search, setSearch] = useState('');
   const [tierFilter, setTierFilter] = useState([]);
@@ -431,31 +431,6 @@ export default function ExploreClient({ initialOrgs=[] }) {
     orgs.forEach(o => { counts[o.category] = (counts[o.category]||0)+1; });
     return Object.entries(counts).sort((a,b) => b[1]-a[1]);
   }, [orgs]);
-
-  const openDetail = (org) => {
-    setSelected(org);
-    if (criterionScores[org.id]) return;
-    setLoadingDetail(true);
-    const h = {headers:{apikey:ANON_KEY,Authorization:`Bearer ${ANON_KEY}`}};
-    Promise.all([
-      fetch(`${SUPABASE_URL}/rest/v1/criterion_scores?org_id=eq.${org.id}&select=criterion,score,body_text&order=criterion`, h).then(r=>r.json()),
-      fetch(`${SUPABASE_URL}/rest/v1/political_scores?org_id=eq.${org.id}&select=economic_axis,authority_axis,political_quadrant`, h).then(r=>r.json()),
-    ]).then(([cData, pData]) => {
-      const map={};
-      cData.forEach(d=>{map[d.criterion]={score:d.score!==null?parseFloat(d.score):null,bodyText:d.body_text||null};});
-      setCriterionScores(prev=>({...prev,[org.id]:map}));
-      if (pData[0]) {
-        setPoliticalScores(prev=>({...prev,[org.id]:{
-          econ: parseFloat(pData[0].economic_axis),
-          auth: parseFloat(pData[0].authority_axis),
-          quadrant: pData[0].political_quadrant,
-        }}));
-      }
-      setLoadingDetail(false);
-    }).catch(()=>setLoadingDetail(false));
-  };
-
-  const closeDetail = () => setSelected(null);
 
   const toggle = (val,state,setter) =>
     setter(state.includes(val)?state.filter(v=>v!==val):[...state,val]);
@@ -623,7 +598,7 @@ export default function ExploreClient({ initialOrgs=[] }) {
                 </thead>
                 <tbody>
                   {filtered.map((org,i)=>(
-                    <tr key={org.id} onClick={()=>window.open('/org/'+(org.slug||org.id),'_blank')}
+                    <tr key={org.id} onClick={()=>router.push('/org/'+(org.slug||org.id))}
                       className={TIER_CLASS[org.composite_tier]||''}
                       style={{borderBottom:'1px solid rgba(212,206,196,0.07)',
                         background:i%2===0?'transparent':'rgba(244,240,232,0.012)',
@@ -648,17 +623,6 @@ export default function ExploreClient({ initialOrgs=[] }) {
           </div>
         </div>
       </div>
-
-      {/* Modal */}
-      {selected&&(
-        <DetailModal
-          org={selected}
-          criterionScores={criterionScores}
-          politicalPos={politicalScores[selected.id]||null}
-          loading={loadingDetail}
-          onClose={closeDetail}
-        />
-      )}
     </div>
   );
 }
