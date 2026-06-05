@@ -1,5 +1,6 @@
 import CompareClient from './CompareClient';
 import Link from 'next/link';
+import ExploreNav from '../../../components/ExploreNav';
 
 const SUPABASE_URL = 'https://shgdrkrqjnwtlyxcdayp.supabase.co';
 const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNoZ2Rya3Jxam53dGx5eGNkYXlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzMzgwNjYsImV4cCI6MjA5NTkxNDA2Nn0.L5NPabtJGLFWb81SruP3XfjgFuycu4DhvaMJhInqWfo';
@@ -25,5 +26,5 @@ export default async function ComparePage() {
     scoreMap[s.org_id][s.criterion] = s.score !== null ? parseFloat(s.score) : null;
   }
 
-  return <CompareClient orgs={orgs} scoreMap={scoreMap} />;
+  return (<><ExploreNav /><CompareClient orgs={orgs} scoreMap={scoreMap} /></>);
 }

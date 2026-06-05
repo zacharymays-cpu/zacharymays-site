@@ -226,11 +226,11 @@ export default async function OrgPage({ params }) {
 
       <section style={{ padding: '3rem 0' }}>
         <div className="container--wide">
-          {/* ── Two-column layout ──────────────────────────────────────── */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: '4rem', alignItems: 'start' }}>
+          {/* ── Stacked: charts row under the header, then full-width content ── */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
 
-            {/* ── LEFT: main content ─────────────────────────────────── */}
-            <div>
+            {/* ── Main content (full width, below the charts) ─────────── */}
+            <div style={{ order: 2 }}>
 
               {/* Summary */}
               {org.summary_text && (
@@ -364,8 +364,8 @@ export default async function OrgPage({ params }) {
               </p>
             </div>
 
-            {/* ── RIGHT: sidebar charts ──────────────────────────────── */}
-            <div style={{ position: 'sticky', top: '100px', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {/* ── Charts row (full width, under the header) ───────────── */}
+            <div style={{ order: 1, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem', alignItems: 'start' }}>
 
               {/* Score summary cards */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px' }}>
