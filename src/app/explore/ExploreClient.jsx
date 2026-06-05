@@ -499,25 +499,29 @@ export default function ExploreClient({ initialOrgs=[] }) {
                 Dataset Explorer
               </h1>
             </div>
-            <div style={{display:'flex',gap:'1.5rem',alignItems:'center'}}>
-              <div style={{textAlign:'center'}}>
-                <div style={{fontFamily:'var(--serif)',fontSize:'1.4rem',fontWeight:700,color:'var(--gold)',lineHeight:1}}>{filtered.length}</div>
-                <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'var(--muted)'}}>Showing</div>
-              </div>
-              <div style={{textAlign:'center'}}>
-                <div style={{fontFamily:'var(--serif)',fontSize:'1.4rem',fontWeight:700,color:'var(--paper)',lineHeight:1}}>{orgs.length}</div>
-                <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'var(--muted)'}}>Total</div>
-              </div>
-              {pendingCount>0&&(
-                <div style={{textAlign:'center'}} title="Organizations imported but not yet scored">
-                  <div style={{fontFamily:'var(--serif)',fontSize:'1.4rem',fontWeight:700,color:'var(--muted)',lineHeight:1}}>{pendingCount}</div>
-                  <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'var(--muted)'}}>Pending</div>
+            <div style={{display:'flex',gap:'1.5rem',alignItems:'center',flexWrap:'wrap',flex:'1 1 100%',justifyContent:'space-between'}}>
+              {/* Stats — left */}
+              <div style={{display:'flex',gap:'1.5rem',alignItems:'center'}}>
+                <div style={{textAlign:'center'}}>
+                  <div style={{fontFamily:'var(--serif)',fontSize:'1.4rem',fontWeight:700,color:'var(--gold)',lineHeight:1}}>{filtered.length}</div>
+                  <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'var(--muted)'}}>Showing</div>
                 </div>
-              )}
-              <Link href="/compass" className="explore-compass-link" style={{fontFamily:'var(--mono)',fontSize:'0.68rem',letterSpacing:'0.1em',textTransform:'uppercase',padding:'0.45rem 0.9rem',border:'1px solid rgba(200,168,75,0.4)',color:'var(--gold)',textDecoration:'none'}}>
-                Compass →
-              </Link>
-              <div style={{display:'flex',gap:'0.5rem',flexWrap:'wrap'}}>
+                <div style={{textAlign:'center'}}>
+                  <div style={{fontFamily:'var(--serif)',fontSize:'1.4rem',fontWeight:700,color:'var(--paper)',lineHeight:1}}>{orgs.length}</div>
+                  <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'var(--muted)'}}>Total</div>
+                </div>
+                {pendingCount>0&&(
+                  <div style={{textAlign:'center'}} title="Organizations imported but not yet scored">
+                    <div style={{fontFamily:'var(--serif)',fontSize:'1.4rem',fontWeight:700,color:'var(--muted)',lineHeight:1}}>{pendingCount}</div>
+                    <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'var(--muted)'}}>Pending</div>
+                  </div>
+                )}
+              </div>
+              {/* Chart switcher — right */}
+              <div style={{display:'flex',gap:'0.5rem',flexWrap:'wrap',alignItems:'center',justifyContent:'flex-end'}}>
+                <Link href="/compass" className="explore-compass-link" style={{fontFamily:'var(--mono)',fontSize:'0.68rem',letterSpacing:'0.1em',textTransform:'uppercase',padding:'0.45rem 0.9rem',border:'1px solid rgba(200,168,75,0.4)',color:'var(--gold)',textDecoration:'none'}}>
+                  Compass →
+                </Link>
                 {[
                   ['Heatmap','/explore/heatmap','Every organization scored criterion-by-criterion'],
                   ['Distributions','/explore/distributions','Score spread within each category'],
