@@ -35,6 +35,7 @@ const NAV_ITEMS = [
       { href: '/cultiness/methodology',     label: 'Scoring Methodology' },
       { href: '/cultiness/ai-methodology',  label: 'AI & Scoring' },
       { href: '/cultiness/findings',        label: 'Key Findings' },
+      { href: '/findings',                  label: 'Distribution Analysis' },
       { href: '/cultiness/dataset',         label: 'Dataset Overview' },
     ],
   },
@@ -42,7 +43,7 @@ const NAV_ITEMS = [
   { href: '/donate', label: 'Support' },
 ];
 
-function Dropdown({ item, path }) {
+function Dropdown({ item, path, onNavigate }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
   const isActive = item.items?.some(i => path === i.href || path.startsWith(i.href + '/'));
@@ -75,7 +76,7 @@ function Dropdown({ item, path }) {
                 href={child.href}
                 role="menuitem"
                 className={path === child.href || path.startsWith(child.href + '/') ? 'active' : ''}
-                onClick={() => setOpen(false)}>
+                onClick={() => { setOpen(false); onNavigate?.(); }}>
                 {child.label}
               </Link>
             </li>
@@ -97,15 +98,24 @@ export default function Nav() {
           <Link href="/" className="nav__brand" onClick={() => setMobileOpen(false)}>
             Zachary S. Mays
           </Link>
-          <ul className="nav__links">
+          <button
+            className={`nav__hamburger${mobileOpen ? ' open' : ''}`}
+            onClick={() => setMobileOpen(o => !o)}
+            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={mobileOpen}
+            aria-controls="primary-nav">
+            <span /><span /><span />
+          </button>
+          <ul id="primary-nav" className={`nav__links${mobileOpen ? ' open' : ''}`}>
             {NAV_ITEMS.map(item =>
               item.items ? (
-                <Dropdown key={item.label} item={item} path={path} />
+                <Dropdown key={item.label} item={item} path={path} onNavigate={() => setMobileOpen(false)} />
               ) : (
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className={path === item.href || path.startsWith(item.href + '/') ? 'active' : ''}>
+                    className={path === item.href || path.startsWith(item.href + '/') ? 'active' : ''}
+                    onClick={() => setMobileOpen(false)}>
                     {item.label}
                   </Link>
                 </li>

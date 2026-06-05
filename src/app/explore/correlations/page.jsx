@@ -7,7 +7,7 @@ export const revalidate = 3600;
 
 export default async function CorrelationsPage() {
   const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/organizations?select=id,name,category,composite_tier,composite_score`,
+    `${SUPABASE_URL}/rest/v1/organizations?select=id,name,category,composite_tier,composite_score&active=eq.true&scoring_status=eq.ACCEPTED`,
     { headers: { apikey: ANON_KEY, Authorization: `Bearer ${ANON_KEY}` }, next: { revalidate: 3600 } }
   );
   const orgs = await res.json();

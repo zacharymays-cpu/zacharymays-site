@@ -8,7 +8,7 @@ export const revalidate = 3600;
 
 export default async function ComparePage() {
   const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/organizations?select=id,name,category,composite_tier,composite_score,youngs_score,trajectory&order=name`,
+    `${SUPABASE_URL}/rest/v1/organizations?select=id,name,category,composite_tier,composite_score,youngs_score,trajectory&active=eq.true&scoring_status=eq.ACCEPTED&order=name`,
     { headers: { apikey: ANON_KEY, Authorization: `Bearer ${ANON_KEY}` }, next: { revalidate: 3600 } }
   );
   const orgs = await res.json();

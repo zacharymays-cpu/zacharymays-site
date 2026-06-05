@@ -203,6 +203,7 @@ export default function FindingsPage() {
 
           <div style={{marginTop: '3rem', display: 'flex', gap: '1rem', flexWrap: 'wrap'}}>
             <Link href="/cultiness/dataset" className="btn-primary">Explore the Dataset</Link>
+            <Link href="/findings" className="btn-secondary">Live Distribution Analysis</Link>
             <Link href="/cultiness/methodology" className="btn-secondary">Review the Methodology</Link>
           </div>
 

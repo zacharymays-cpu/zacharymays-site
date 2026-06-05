@@ -222,6 +222,29 @@ a:hover { color: var(--paper); }
   padding-left: calc(1.1rem - 2px);
 }
 
+/* ── Mobile nav toggle (hidden on desktop) ───────────────── */
+.nav__hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  margin: -6px;
+}
+.nav__hamburger span {
+  display: block;
+  width: 22px;
+  height: 1.5px;
+  background: var(--muted);
+  transition: transform 0.2s, opacity 0.2s;
+}
+.nav__hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+.nav__hamburger.open span:nth-child(2) { opacity: 0; }
+.nav__hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
 /* ── Footer ──────────────────────────────────────────────── */
 .footer {
   border-top: 1px solid rgba(212,206,196,0.15);
@@ -378,10 +401,54 @@ a:hover { color: var(--paper); }
   align-items: start;
 }
 
-@media (max-width: 700px) {
+@media (max-width: 760px) {
   .bio-layout { grid-template-columns: 1fr; gap: 2rem; }
-  .nav__links { gap: 1.5rem; }
-  .nav__links a { font-size: 0.68rem; }
+
+  .nav__inner { position: relative; }
+  .nav__hamburger { display: flex; }
+
+  /* Collapse the link bar into a drawer below the nav row */
+  .nav__links {
+    display: none;
+    position: absolute;
+    top: calc(100% + 1.5rem);
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    background: rgba(22,19,16,0.98);
+    backdrop-filter: blur(16px);
+    border-top: 1px solid rgba(212,206,196,0.12);
+    border-bottom: 1px solid rgba(212,206,196,0.12);
+    padding: 0.5rem 0;
+    z-index: 200;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.5);
+  }
+  .nav__links.open { display: flex; }
+  .nav__links > li { width: 100%; }
+  .nav__links > li > a,
+  .nav__dropdown-trigger {
+    width: 100%;
+    padding: 0.7rem 2rem;
+    font-size: 0.8rem;
+  }
+  .nav__dropdown-wrap { width: 100%; }
+  .nav__dropdown-trigger { justify-content: space-between; }
+
+  /* Dropdowns expand inline instead of floating */
+  .nav__dropdown {
+    position: static;
+    transform: none;
+    min-width: 0;
+    border: none;
+    box-shadow: none;
+    backdrop-filter: none;
+    background: transparent;
+    padding: 0 0 0.5rem 0;
+  }
+  .nav__dropdown::before { display: none; }
+  .nav__dropdown a { padding: 0.5rem 3rem; font-size: 0.72rem; }
 }
 
 .bio-portrait {
