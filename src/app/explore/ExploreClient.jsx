@@ -478,7 +478,7 @@ export default function ExploreClient({ initialOrgs=[] }) {
     else{setSortBy(col);setSortDir('desc');}
   };
   const SortIcon=({col})=>sortBy!==col
-    ?<span style={{color:'rgba(212,206,196,0.2)'}}>↕</span>
+    ?<span style={{color:'rgba(212,206,196,0.45)'}}>↕</span>
     :<span style={{color:'var(--gold)'}}>{sortDir==='asc'?'↑':'↓'}</span>;
 
   return (
@@ -514,14 +514,24 @@ export default function ExploreClient({ initialOrgs=[] }) {
                 Compass →
               </Link>
               <div style={{display:'flex',gap:'0.5rem',flexWrap:'wrap'}}>
-                {[['Heatmap','/explore/heatmap'],['Distributions','/explore/distributions'],['Correlations','/explore/correlations'],['Lineage','/explore/lineage'],['Sunburst','/explore/sunburst'],['Flow','/explore/sankey'],['Compare','/explore/compare'],['Map','/explore/map']].map(([l,href])=>(
-                  <Link key={l} href={href} style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.08em',textTransform:'uppercase',padding:'0.35rem 0.65rem',border:'1px solid rgba(212,206,196,0.2)',color:'var(--muted)',textDecoration:'none'}}>{l}</Link>
+                {[
+                  ['Heatmap','/explore/heatmap','Every organization scored criterion-by-criterion'],
+                  ['Distributions','/explore/distributions','Score spread within each category'],
+                  ['Correlations','/explore/correlations','How the ten criteria move together'],
+                  ['Lineage','/explore/lineage','Formation and influence chains between groups'],
+                  ['Sunburst','/explore/sunburst','Tiers broken down by category'],
+                  ['Flow','/explore/sankey','How each category flows into cultiness tiers'],
+                  ['Compare','/explore/compare','Put two organizations head-to-head'],
+                  ['Map','/explore/map','Geographic distribution of organizations'],
+                ].map(([l,href,desc])=>(
+                  <Link key={l} href={href} title={desc} aria-label={`${l} — ${desc}`} style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.08em',textTransform:'uppercase',padding:'0.35rem 0.65rem',border:'1px solid rgba(212,206,196,0.2)',color:'var(--muted)',textDecoration:'none'}}>{l}</Link>
                 ))}
               </div>
             </div>
           </div>
           <div style={{marginTop:'1.25rem'}}>
             <input type="text" placeholder="Search organizations or categories..." value={search}
+              aria-label="Search organizations or categories"
               onChange={e=>setSearch(e.target.value)}
               style={{width:'100%',maxWidth:'480px',background:'rgba(244,240,232,0.04)',border:'1px solid rgba(212,206,196,0.2)',color:'var(--paper)',fontFamily:'var(--body)',fontSize:'0.9rem',padding:'0.6rem 1rem',outline:'none'}}/>
           </div>
@@ -584,8 +594,8 @@ export default function ExploreClient({ initialOrgs=[] }) {
                 <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--muted)',marginBottom:'0.5rem'}}>
                   Score: {scoreMin}%–{scoreMax}%
                 </div>
-                <input type="range" min="0" max="100" value={scoreMin} onChange={e=>setScoreMin(Math.min(Number(e.target.value),scoreMax-5))} style={{width:'100%',marginBottom:'0.35rem',accentColor:'var(--gold)'}}/>
-                <input type="range" min="0" max="100" value={scoreMax} onChange={e=>setScoreMax(Math.max(Number(e.target.value),scoreMin+5))} style={{width:'100%',accentColor:'var(--gold)'}}/>
+                <input type="range" min="0" max="100" value={scoreMin} aria-label={`Minimum composite score: ${scoreMin}%`} onChange={e=>setScoreMin(Math.min(Number(e.target.value),scoreMax-5))} style={{width:'100%',marginBottom:'0.35rem',accentColor:'var(--gold)'}}/>
+                <input type="range" min="0" max="100" value={scoreMax} aria-label={`Maximum composite score: ${scoreMax}%`} onChange={e=>setScoreMax(Math.max(Number(e.target.value),scoreMin+5))} style={{width:'100%',accentColor:'var(--gold)'}}/>
               </div>
 
               {hasFilters&&(
@@ -611,16 +621,23 @@ export default function ExploreClient({ initialOrgs=[] }) {
                 <thead style={{position:'sticky',top:0,background:'#1a1512',zIndex:1}}>
                   <tr style={{borderBottom:'1px solid rgba(212,206,196,0.2)'}}>
                     {[['name','Organization'],['composite_score','Score'],['youngs_score',"Young's"],['category','Category'],['trajectory','Trajectory']].map(([col,label])=>(
-                      <th key={col} onClick={()=>handleSort(col)} className={col==='category'||col==='trajectory'?'explore-table-hide-mobile':''} style={{fontFamily:'var(--mono)',fontSize:'0.65rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--muted)',textAlign:'left',padding:'0.6rem 0.75rem',cursor:'pointer',userSelect:'none',whiteSpace:'nowrap'}}>
+                      <th key={col} onClick={()=>handleSort(col)}
+                        onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();handleSort(col);}}}
+                        role="button" tabIndex={0} aria-label={`Sort by ${label}`}
+                        className={col==='category'||col==='trajectory'?'explore-table-hide-mobile':''} style={{fontFamily:'var(--mono)',fontSize:'0.65rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--muted)',textAlign:'left',padding:'0.6rem 0.75rem',cursor:'pointer',userSelect:'none',whiteSpace:'nowrap'}}>
                         {label} <SortIcon col={col}/>
                       </th>
                     ))}
-                    <th style={{fontFamily:'var(--mono)',fontSize:'0.6rem',color:'rgba(212,206,196,0.2)',padding:'0.6rem 0.75rem',textAlign:'right'}}>Detail</th>
+                    <th style={{fontFamily:'var(--mono)',fontSize:'0.6rem',color:'rgba(212,206,196,0.45)',padding:'0.6rem 0.75rem',textAlign:'right'}}>Detail</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filtered.map((org,i)=>(
-                    <tr key={org.id} onClick={()=>router.push('/org/'+(org.slug||org.id))}
+                    <tr key={org.id}
+                      onClick={()=>router.push('/org/'+(org.slug||org.id))}
+                      onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();router.push('/org/'+(org.slug||org.id));}}}
+                      role="button" tabIndex={0}
+                      aria-label={`View ${org.name} assessment`}
                       className={TIER_CLASS[org.composite_tier]||''}
                       style={{borderBottom:'1px solid rgba(212,206,196,0.07)',
                         background:i%2===0?'transparent':'rgba(244,240,232,0.012)',
@@ -634,7 +651,7 @@ export default function ExploreClient({ initialOrgs=[] }) {
                       <td style={{padding:'0.65rem 0.75rem',fontFamily:'var(--mono)',fontSize:'0.82rem',color:'var(--muted)'}}>{org.youngs_score==null?'—':`${org.youngs_score}/10`}</td>
                       <td className="explore-table-hide-mobile" style={{padding:'0.65rem 0.75rem',color:'var(--muted)',fontSize:'0.75rem',fontFamily:'var(--mono)',whiteSpace:'nowrap'}}>{org.category}</td>
                       <td className="explore-table-hide-mobile" style={{padding:'0.65rem 0.75rem',fontFamily:'var(--mono)',fontSize:'0.72rem',color:'var(--muted)',whiteSpace:'nowrap'}}>{org.trajectory}</td>
-                      <td style={{padding:'0.65rem 0.75rem',textAlign:'right',fontFamily:'var(--mono)',fontSize:'0.65rem',color:'rgba(200,168,75,0.35)'}}>→</td>
+                      <td style={{padding:'0.65rem 0.75rem',textAlign:'right',fontFamily:'var(--mono)',fontSize:'0.65rem',color:'rgba(200,168,75,0.6)'}}>→</td>
                     </tr>
                   ))}
                   {filtered.length===0&&(
