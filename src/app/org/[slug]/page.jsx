@@ -139,8 +139,12 @@ function RadarChart({ criteria, tierColor }) {
 function MiniCompass({ econ, auth, quadrant, tierColor }) {
   const W = 180, H = 180, PAD = 20
   const INNER = W - PAD * 2
-  const cx = PAD + ((parseFloat(econ) + 5) / 10) * INNER
-  const cy = PAD + ((5 - parseFloat(auth)) / 10) * INNER
+  // Inset the plottable range by the dot radius so extreme values (±5) keep the
+  // whole marker inside the grid instead of straddling the corner.
+  const DOT_R = 7
+  const PLOT = INNER - DOT_R * 2
+  const cx = PAD + DOT_R + ((parseFloat(econ) + 5) / 10) * PLOT
+  const cy = PAD + DOT_R + ((5 - parseFloat(auth)) / 10) * PLOT
   const tc = tierColor.replace(/rgba\(([^,]+,[^,]+,[^,]+),.+\)/, 'rgba($1,0.9)')
 
   return (
