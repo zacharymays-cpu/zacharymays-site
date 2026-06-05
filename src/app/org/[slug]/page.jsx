@@ -267,6 +267,34 @@ export default async function OrgPage({ params }) {
             {/* ── Main content (full width, below the charts) ─────────── */}
             <div style={{ order: 2 }}>
 
+              {/* Political position text row — kept adjacent to the compass in the charts row above */}
+              {ps && (
+                <div style={{ marginBottom: '3rem' }}>
+                  <div style={{ fontFamily: 'var(--mono)', fontSize: '0.62rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    Political Position
+                    <span style={{ flex: 1, height: 1, background: 'rgba(212,206,196,0.15)' }} />
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '2px' }}>
+                    {[
+                      { label: 'Economic Axis',  value: ps.economic_axis  > 0 ? `+${ps.economic_axis}` : ps.economic_axis,  sub: ps.economic_axis  > 0 ? 'Right' : ps.economic_axis < 0 ? 'Left' : 'Center' },
+                      { label: 'Authority Axis', value: ps.authority_axis > 0 ? `+${ps.authority_axis}` : ps.authority_axis, sub: ps.authority_axis > 0 ? 'Authoritarian' : ps.authority_axis < 0 ? 'Libertarian' : 'Neutral' },
+                      { label: 'Quadrant',       value: ps.political_quadrant ?? '—', sub: '' },
+                    ].map(({ label, value, sub }) => (
+                      <div key={label} style={{ background: 'rgba(244,240,232,0.025)', border: '1px solid rgba(212,206,196,0.08)', padding: '1.25rem', textAlign: 'center' }}>
+                        <div style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '0.35rem' }}>{label}</div>
+                        <div style={{ fontFamily: 'var(--serif)', fontSize: '1.3rem', fontWeight: 700, color: 'var(--paper)', lineHeight: 1 }}>{value}</div>
+                        {sub && <div style={{ fontFamily: 'var(--mono)', fontSize: '0.58rem', color: 'var(--muted)', marginTop: '0.25rem' }}>{sub}</div>}
+                      </div>
+                    ))}
+                  </div>
+                  {ps.scoring_notes && (
+                    <p style={{ fontSize: '0.85rem', color: 'rgba(212,206,196,0.75)', lineHeight: 1.7, marginTop: '0.75rem', marginBottom: 0 }}>
+                      {ps.scoring_notes}
+                    </p>
+                  )}
+                </div>
+              )}
+
               {/* Summary */}
               {org.summary_text && (
                 <div style={{ marginBottom: '3rem' }}>
@@ -373,34 +401,6 @@ export default async function OrgPage({ params }) {
                       )
                     })}
                   </div>
-                </div>
-              )}
-
-              {/* Political position text row */}
-              {ps && (
-                <div style={{ marginBottom: '3rem' }}>
-                  <div style={{ fontFamily: 'var(--mono)', fontSize: '0.62rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    Political Position
-                    <span style={{ flex: 1, height: 1, background: 'rgba(212,206,196,0.15)' }} />
-                  </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '2px' }}>
-                    {[
-                      { label: 'Economic Axis',  value: ps.economic_axis  > 0 ? `+${ps.economic_axis}` : ps.economic_axis,  sub: ps.economic_axis  > 0 ? 'Right' : ps.economic_axis < 0 ? 'Left' : 'Center' },
-                      { label: 'Authority Axis', value: ps.authority_axis > 0 ? `+${ps.authority_axis}` : ps.authority_axis, sub: ps.authority_axis > 0 ? 'Authoritarian' : ps.authority_axis < 0 ? 'Libertarian' : 'Neutral' },
-                      { label: 'Quadrant',       value: ps.political_quadrant ?? '—', sub: '' },
-                    ].map(({ label, value, sub }) => (
-                      <div key={label} style={{ background: 'rgba(244,240,232,0.025)', border: '1px solid rgba(212,206,196,0.08)', padding: '1.25rem', textAlign: 'center' }}>
-                        <div style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '0.35rem' }}>{label}</div>
-                        <div style={{ fontFamily: 'var(--serif)', fontSize: '1.3rem', fontWeight: 700, color: 'var(--paper)', lineHeight: 1 }}>{value}</div>
-                        {sub && <div style={{ fontFamily: 'var(--mono)', fontSize: '0.58rem', color: 'var(--muted)', marginTop: '0.25rem' }}>{sub}</div>}
-                      </div>
-                    ))}
-                  </div>
-                  {ps.scoring_notes && (
-                    <p style={{ fontSize: '0.85rem', color: 'rgba(212,206,196,0.75)', lineHeight: 1.7, marginTop: '0.75rem', marginBottom: 0 }}>
-                      {ps.scoring_notes}
-                    </p>
-                  )}
                 </div>
               )}
 
