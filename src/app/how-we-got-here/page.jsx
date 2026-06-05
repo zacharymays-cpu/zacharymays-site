@@ -1,3 +1,5 @@
+import OrgCount from '../../components/OrgCount';
+
 export const metadata = {
   title: 'How We Got Here',
   description: 'The Formation of a Population Built Not to Know — by Zachary S. Mays.',
@@ -59,8 +61,8 @@ export default function HowWeGotHerePage() {
             The book's analytical argument is grounded in the Cultiness Spectrum
             Dataset — a large-scale application of Daniella Mestyanek Young and
             Amy Reed's framework from{' '}
-            <em>The Culting of America</em> (Otterpine, 2026) across more than
-            370 American organizations. The dataset applies a dual-metric
+            <em>The Culting of America</em> (Otterpine, 2026) across{' '}
+            <OrgCount /> American organizations. The dataset applies a dual-metric
             scoring system across ten criteria, producing independent assessments
             that allow systematic comparison across institutional categories that
             are rarely examined together.

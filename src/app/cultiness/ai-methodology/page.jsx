@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import OrgCount from '../../../components/OrgCount';
 
 export const metadata = {
   title: 'AI-Enabled Scoring — The Cultiness Spectrum',
@@ -48,7 +49,7 @@ export default function AiMethodologyPage() {
           <div className="section__label">Why AI Was Used At All</div>
 
           <p>
-            The Cultiness Spectrum Dataset covers 370 organizations across
+            The Cultiness Spectrum Dataset covers <OrgCount /> organizations across
             every major category of American institutional life. Each
             organization requires assessment across ten criteria, with
             evidence-based body text, source citations, confidence ratings,
@@ -95,7 +96,7 @@ export default function AiMethodologyPage() {
             {[
               {
                 heading: 'Consistent application of the framework',
-                body: 'Applied the same ten criteria to the 370th organization with the same care and attention as the first. Human researchers drift — fatigue, changing intuitions, evolving interpretations of edge cases. The AI applies the documented methodology consistently because it has no memory of previous sessions and no accumulated fatigue. Each assessment starts fresh against the same standard.',
+                body: 'Applied the same ten criteria to the most recent organization with the same care and attention as the first. Human researchers drift — fatigue, changing intuitions, evolving interpretations of edge cases. The AI applies the documented methodology consistently because it has no memory of previous sessions and no accumulated fatigue. Each assessment starts fresh against the same standard.',
               },
               {
                 heading: 'Cross-ideological evenhandedness',

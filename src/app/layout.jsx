@@ -2,8 +2,22 @@ import './globals.css';
 import Nav from '../components/Nav';
 
 export const metadata = {
+  metadataBase: new URL('https://www.zacharymays.com'),
   title: { default: 'Zachary S. Mays', template: '%s — Zachary S. Mays' },
   description: 'Author and researcher. The Cultiness Spectrum dataset. How We Got Here. Assholes in History.',
+  alternates: { canonical: '/' },
+  openGraph: {
+    type: 'website',
+    siteName: 'Zachary S. Mays',
+    title: 'Zachary S. Mays',
+    description: 'Author and researcher. The Cultiness Spectrum — a systematic, evenhanded assessment of cult-adjacent dynamics across American organizations.',
+    url: 'https://www.zacharymays.com',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Zachary S. Mays',
+    description: 'The Cultiness Spectrum — a systematic, evenhanded assessment of cult-adjacent dynamics across American organizations.',
+  },
 };
 
 export default function RootLayout({ children }) {

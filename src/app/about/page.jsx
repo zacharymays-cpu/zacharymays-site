@@ -1,3 +1,5 @@
+import OrgCount from '../../components/OrgCount';
+
 export const metadata = {
   title: 'About the Author',
   description: 'Zachary S. Mays — U.S. Marine Corps veteran, researcher, and author.',
@@ -80,7 +82,7 @@ export default function AboutPage() {
                 <a href="https://uncultureyourself.com" target="_blank" rel="noopener noreferrer">
                   <em>The Culting of America</em>
                 </a>{' '}
-                across 370 American organizations — systematically,
+                across <OrgCount /> American organizations — systematically,
                 evenhandedly, and publicly. It is a free educational resource
                 and will remain one.
               </p>

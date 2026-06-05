@@ -1,3 +1,5 @@
+import OrgCount from '../../components/OrgCount';
+
 export const metadata = {
   title: 'Support the Project',
   description: 'Support the Cultiness Spectrum research project and the work of Zachary S. Mays.',
@@ -37,7 +39,7 @@ export default function DonatePage() {
             The questions <em>How We Got Here</em> raised about high-control
             organizations and America's odd comfort with them required more than
             argument. That became the Cultiness Spectrum Dataset — a systematic,
-            evenhanded application of the Young-Reed framework across 370 American
+            evenhanded application of the Young-Reed framework across <OrgCount /> American
             organizations, publicly available and free to use.
           </p>
 
@@ -89,7 +91,7 @@ export default function DonatePage() {
 
           <div style={{display: 'flex', flexDirection: 'column', gap: '0', margin: '1rem 0 2.5rem'}}>
             {[
-              { item: 'New organization assessments', desc: 'Each entry requires research, evidence review, scoring, and human validation. The dataset is at 370 organizations and growing.' },
+              { item: 'New organization assessments', desc: <>Each entry requires research, evidence review, scoring, and human validation. The dataset is at <OrgCount /> organizations and growing.</> },
               { item: 'Body text audit and revision', desc: 'Roughly 25% of existing entries have placeholder content pending evidence-based body text. This is ongoing work.' },
               { item: 'Methodology refinement', desc: 'Keeping the analytical framework current, internally consistent, and defensible as a research resource.' },
               { item: 'Infrastructure', desc: 'Hosting, database, and API costs for the public dataset and this site.' },
