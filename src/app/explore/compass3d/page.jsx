@@ -1,4 +1,5 @@
 import Compass3DWrapper from './Compass3DWrapper';
+import ExploreNav from '../../../components/ExploreNav';
 
 export const metadata = {
   title: '3D Political Compass — The Cultiness Spectrum',
@@ -6,5 +7,5 @@ export const metadata = {
 };
 
 export default function Compass3DPage() {
-  return <Compass3DWrapper />;
+  return (<><ExploreNav /><Compass3DWrapper /></>);
 }

@@ -1,4 +1,5 @@
 import LineageClient from './LineageClient';
+import ExploreNav from '../../../components/ExploreNav';
 
 const SUPABASE_URL = 'https://shgdrkrqjnwtlyxcdayp.supabase.co';
 const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNoZ2Rya3Jxam53dGx5eGNkYXlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzMzgwNjYsImV4cCI6MjA5NTkxNDA2Nn0.L5NPabtJGLFWb81SruP3XfjgFuycu4DhvaMJhInqWfo';
@@ -28,5 +29,5 @@ export default async function LineagePage() {
   ]);
   const lineageOrgs = orgs.filter(o => activeSlugs.has(o.slug));
 
-  return <LineageClient nodes={lineageOrgs} edges={edges} />;
+  return (<><ExploreNav /><LineageClient nodes={lineageOrgs} edges={edges} /></>);
 }

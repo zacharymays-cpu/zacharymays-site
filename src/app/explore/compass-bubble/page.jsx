@@ -1,4 +1,5 @@
 import BubbleWrapper from './BubbleWrapper';
+import ExploreNav from '../../../components/ExploreNav';
 
 export const metadata = {
   title: 'Bubble Compass — The Cultiness Spectrum',
@@ -6,5 +7,5 @@ export const metadata = {
 };
 
 export default function CompassBubblePage() {
-  return <BubbleWrapper />;
+  return (<><ExploreNav /><BubbleWrapper /></>);
 }
