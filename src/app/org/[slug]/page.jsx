@@ -23,7 +23,8 @@ async function getOrg(slug) {
       trajectory, summary_text,
       methodology_version, updated_at, active,
       political_scores ( economic_axis, authority_axis, political_quadrant, scoring_notes ),
-      criterion_scores ( criterion, score, confidence, na_rationale, body_text )
+      criterion_scores ( criterion, score, confidence, na_rationale, body_text,
+        evidence_sources ( source_type, title, author, publication, year, url, doi, factual_tier ) )
     `)
     .eq('slug', slug)
     .single()
@@ -181,6 +182,20 @@ export default async function OrgPage({ params }) {
   const criteria = [...(org.criterion_scores || [])]
     .sort((a, b) => parseInt(a.criterion.replace('C','')) - parseInt(b.criterion.replace('C','')))
 
+  // De-duplicate evidence sources across all criteria (each source is attached
+  // per-criterion, so the same reference recurs). Best factual tier first, then newest.
+  const sources = []
+  const seenSrc = new Set()
+  for (const cs of (org.criterion_scores || [])) {
+    for (const s of (cs.evidence_sources || [])) {
+      const key = (s.url || '') + '|' + (s.title || '') + '|' + (s.author || '')
+      if (seenSrc.has(key)) continue
+      seenSrc.add(key)
+      sources.push(s)
+    }
+  }
+  sources.sort((a, b) => (a.factual_tier ?? 9) - (b.factual_tier ?? 9) || (b.year ?? 0) - (a.year ?? 0))
+
   // political_scores can embed as an array (to-many) or a single object (to-one,
   // e.g. when a unique constraint on org_id exists). Handle both.
   const ps          = Array.isArray(org.political_scores) ? (org.political_scores[0] ?? null) : (org.political_scores ?? null)
@@ -193,7 +208,7 @@ export default async function OrgPage({ params }) {
   return (
     <>
       {/* ── Compact hero ────────────────────────────────────────────── */}
-      <section style={{ padding: '2.5rem 0 2rem', borderBottom: '1px solid rgba(212,206,196,0.1)' }}>
+      <section style={{ padding: '2.5rem 0 2rem', borderTop: `3px solid ${tierText}`, borderBottom: '1px solid rgba(212,206,196,0.1)' }}>
         <div className="container--wide">
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.6rem', flexWrap: 'wrap', marginBottom: '0.75rem' }}>
             <Link href="/explore" style={{ fontFamily: 'var(--mono)', fontSize: '0.6rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--gold)', textDecoration: 'none' }}>
@@ -207,21 +222,35 @@ export default async function OrgPage({ params }) {
           <h1 style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(1.8rem,4vw,3rem)', fontWeight: 700, color: 'var(--paper)', marginBottom: '1rem', lineHeight: 1.15 }}>
             {org.name}
           </h1>
-          <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
-            <span style={{ fontFamily: 'var(--mono)', fontSize: '0.68rem', letterSpacing: '0.1em', textTransform: 'uppercase', padding: '0.3rem 0.75rem', background: tierColor, color: tierText, border: `1px solid ${tierText}50` }}>
-              {org.composite_tier ?? 'Not Yet Scored'}
-            </span>
-            <span style={{ fontFamily: 'var(--mono)', fontSize: '0.68rem', letterSpacing: '0.1em', textTransform: 'uppercase', padding: '0.3rem 0.75rem', background: 'rgba(244,240,232,0.06)', color: 'rgba(212,206,196,0.85)', border: '1px solid rgba(212,206,196,0.28)' }}>
-              {TRAJ[org.trajectory] ?? org.trajectory}
-            </span>
-            <span style={{ fontFamily: 'var(--mono)', fontSize: '0.68rem', padding: '0.3rem 0.75rem', background: 'rgba(244,240,232,0.04)', color: tierText, border: `1px solid ${tierText}30`, fontWeight: 700 }}>
-              {compositePct}
-            </span>
+          {/* Scoreboard — composite as focal point */}
+          <div style={{ display: 'flex', alignItems: 'stretch', gap: '1.5rem', flexWrap: 'wrap', marginTop: '1.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.7rem' }}>
+              <span style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(2.6rem,7vw,3.6rem)', fontWeight: 700, color: tierText, lineHeight: 0.9 }}>{compositePct}</span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                <span style={{ fontFamily: 'var(--mono)', fontSize: '0.62rem', letterSpacing: '0.1em', textTransform: 'uppercase', padding: '0.2rem 0.5rem', background: tierColor, color: tierText, border: `1px solid ${tierText}55`, alignSelf: 'flex-start' }}>
+                  {org.composite_tier ?? 'Not Yet Scored'}
+                </span>
+                <span style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--muted)' }}>Composite Cultiness</span>
+              </div>
+            </div>
+
             {!isUnscored && (
-              <span style={{ fontFamily: 'var(--mono)', fontSize: '0.68rem', padding: '0.3rem 0.75rem', background: 'rgba(244,240,232,0.06)', color: 'rgba(212,206,196,0.85)', border: '1px solid rgba(212,206,196,0.28)' }}>
-                Young's {org.youngs_score}/10 · {org.youngs_band}
-              </span>
+              <>
+                <div style={{ width: 1, background: 'rgba(212,206,196,0.15)' }} />
+                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '0.3rem' }}>
+                  <span style={{ fontFamily: 'var(--serif)', fontSize: '1.5rem', fontWeight: 700, color: 'var(--paper)', lineHeight: 1 }}>
+                    {org.youngs_score}<span style={{ fontSize: '0.9rem', color: 'var(--muted)' }}>/10</span>
+                  </span>
+                  <span style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)' }}>Young's{org.youngs_band ? ` · ${org.youngs_band}` : ''}</span>
+                </div>
+              </>
             )}
+
+            <div style={{ width: 1, background: 'rgba(212,206,196,0.15)' }} />
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '0.3rem' }}>
+              <span style={{ fontFamily: 'var(--serif)', fontSize: '1.15rem', fontWeight: 700, color: 'var(--paper)', lineHeight: 1 }}>{TRAJ[org.trajectory] ?? org.trajectory ?? '—'}</span>
+              <span style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)' }}>Trajectory</span>
+            </div>
           </div>
         </div>
       </section>
@@ -255,7 +284,7 @@ export default async function OrgPage({ params }) {
                   const isNA = score === null || score === undefined
                   const sColor = isNA ? 'rgba(212,206,196,0.35)' : SCORE_COLOR(score)
                   return (
-                    <div key={criterion} style={{ background: 'rgba(244,240,232,0.025)', border: '1px solid rgba(212,206,196,0.08)', padding: '1.25rem 1.5rem' }}>
+                    <div key={criterion} style={{ background: 'rgba(244,240,232,0.025)', border: '1px solid rgba(212,206,196,0.08)', borderLeft: `3px solid ${sColor}`, padding: '1.25rem 1.25rem 1.25rem 1.5rem' }}>
                       {/* Header row */}
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: body_text || na_rationale ? '0.75rem' : 0, gap: '1rem', flexWrap: 'wrap' }}>
                         <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.6rem' }}>
@@ -300,6 +329,48 @@ export default async function OrgPage({ params }) {
                   )
                 })}
               </div>
+
+              {/* Sources & Evidence */}
+              {sources.length > 0 && (
+                <div style={{ marginBottom: '3rem' }}>
+                  <div style={{ fontFamily: 'var(--mono)', fontSize: '0.62rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    Sources &amp; Evidence
+                    <span style={{ flex: 1, height: 1, background: 'rgba(212,206,196,0.15)' }} />
+                  </div>
+                  <p style={{ fontSize: '0.82rem', color: 'var(--muted)', lineHeight: 1.7, marginBottom: '1.25rem' }}>
+                    {sources.length} documented {sources.length === 1 ? 'source' : 'sources'} underpinning this assessment, ordered by factual reliability.
+                  </p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                    {sources.map((s, i) => {
+                      const meta = [s.author, s.publication, s.year].filter(Boolean).join(' · ')
+                      return (
+                        <div key={i} style={{ background: 'rgba(244,240,232,0.025)', border: '1px solid rgba(212,206,196,0.08)', padding: '0.9rem 1.1rem', display: 'flex', gap: '1rem', alignItems: 'baseline', flexWrap: 'wrap' }}>
+                          <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center', flexShrink: 0, minWidth: '8.5rem' }}>
+                            <span style={{ fontFamily: 'var(--mono)', fontSize: '0.52rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--gold)', padding: '0.18rem 0.45rem', border: '1px solid rgba(200,168,75,0.3)', whiteSpace: 'nowrap' }}>
+                              {(s.source_type || 'source').replace(/_/g, ' ')}
+                            </span>
+                            {s.factual_tier != null && (
+                              <span title="Factual reliability tier (1 = highest)" style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', color: 'rgba(212,206,196,0.5)' }}>T{s.factual_tier}</span>
+                            )}
+                          </div>
+                          <div style={{ flex: 1, minWidth: '14rem' }}>
+                            <div style={{ fontFamily: 'var(--serif)', fontSize: '0.92rem', color: 'var(--paper)', lineHeight: 1.4 }}>
+                              {s.url ? (
+                                <a href={s.url} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--paper)', textDecoration: 'none', borderBottom: '1px solid rgba(200,168,75,0.3)' }}>
+                                  {s.title || s.url}<span style={{ color: 'var(--gold)', fontSize: '0.7rem' }}> ↗</span>
+                                </a>
+                              ) : (s.title || '—')}
+                            </div>
+                            {meta && (
+                              <div style={{ fontFamily: 'var(--mono)', fontSize: '0.62rem', color: 'var(--muted)', marginTop: '0.3rem' }}>{meta}</div>
+                            )}
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
 
               {/* Political position text row */}
               {ps && (
