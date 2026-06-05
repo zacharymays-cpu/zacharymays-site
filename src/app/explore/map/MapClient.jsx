@@ -23,25 +23,14 @@ const CHAIN_COLORS = {
 
 const QUADRANTS = ['Authoritarian Right','Authoritarian Left','Libertarian Right','Libertarian Left'];
 
-const MAP_STYLE = {
-  version: 8,
-  sources: {
-    'carto-dark': {
-      type: 'raster',
-      tiles: [
-        'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
-        'https://b.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
-      ],
-      tileSize: 512,
-      attribution: '© OpenStreetMap contributors © CARTO',
-      maxzoom: 19,
-    },
-  },
-  layers: [
-    { id: 'background', type: 'background', paint: { 'background-color': '#1a1410' } },
-    { id: 'basemap',    type: 'raster',     source: 'carto-dark', paint: { 'raster-opacity': 0.88 } },
-  ],
-};
+// Free, token-free VECTOR basemap (CARTO "dark-matter" GL style, OpenMapTiles
+// schema, © OpenStreetMap / © CARTO). Upgraded from CARTO raster tiles for
+// crisp retina labels and restylable vector layers. Data layers (states, chains,
+// orgs, founding) are appended on top in map.on('load') and don't depend on the
+// basemap, so this is a drop-in swap.
+// Revert: replace this URL with the previous inline raster style object using
+// 'https://{a|b}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png'.
+const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json';
 
 function scoreToFill(score) {
   if (score === null) return 'rgba(212,206,196,0.04)';
@@ -241,6 +230,10 @@ export default function MapClient({ orgs=[], stateStats=[], foundingData=[], wit
       });
 
       map.on('load', () => {
+        // Keep the warm brand background tone under the vector basemap.
+        if (map.getLayer('background')) {
+          map.setPaintProperty('background', 'background-color', '#1a1410');
+        }
         // ── State choropleth ──
         map.addSource('states', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
         map.addLayer({ id: 'state-fill', type: 'fill', source: 'states',
