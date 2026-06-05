@@ -186,6 +186,11 @@ export default async function OrgPage({ params }) {
   const criteria = [...(org.criterion_scores || [])]
     .sort((a, b) => parseInt(a.criterion.replace('C','')) - parseInt(b.criterion.replace('C','')))
 
+  // Strongest / weakest scored criteria, for the at-a-glance facts panel
+  const scoredCriteria = criteria.filter(c => c.score != null)
+  const strongest = scoredCriteria.length ? scoredCriteria.reduce((a, b) => (b.score > a.score ? b : a)) : null
+  const weakest   = scoredCriteria.length ? scoredCriteria.reduce((a, b) => (b.score < a.score ? b : a)) : null
+
   // De-duplicate evidence sources across all criteria (each source is attached
   // per-criterion, so the same reference recurs). Best factual tier first, then newest.
   const sources = []
@@ -444,18 +449,39 @@ export default async function OrgPage({ params }) {
             {/* ── Charts row (full width, under the header) ───────────── */}
             <div style={{ order: 1, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem', alignItems: 'start' }}>
 
-              {/* Score summary cards */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px' }}>
-                {[
-                  { label: 'Composite', value: compositePct,                                       sub: org.composite_tier ?? 'Not yet scored' },
-                  { label: "Young's",   value: org.youngs_score != null ? `${org.youngs_score}/10` : '—', sub: org.youngs_band ?? '—' },
-                ].map(({ label, value, sub }) => (
-                  <div key={label} style={{ background: 'rgba(244,240,232,0.03)', border: '1px solid rgba(212,206,196,0.12)', padding: '1rem 0.75rem', textAlign: 'center' }}>
-                    <div style={{ fontFamily: 'var(--mono)', fontSize: '0.52rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(212,206,196,0.65)', marginBottom: '0.3rem' }}>{label}</div>
-                    <div style={{ fontFamily: 'var(--serif)', fontSize: '1.6rem', fontWeight: 700, color: tierText, lineHeight: 1 }}>{value}</div>
-                    <div style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', color: 'rgba(212,206,196,0.65)', marginTop: '0.25rem' }}>{sub}</div>
+              {/* Score summary + at-a-glance facts (fills the column beside the taller charts) */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px' }}>
+                  {[
+                    { label: 'Composite', value: compositePct,                                       sub: org.composite_tier ?? 'Not yet scored' },
+                    { label: "Young's",   value: org.youngs_score != null ? `${org.youngs_score}/10` : '—', sub: org.youngs_band ?? '—' },
+                  ].map(({ label, value, sub }) => (
+                    <div key={label} style={{ background: 'rgba(244,240,232,0.03)', border: '1px solid rgba(212,206,196,0.12)', padding: '1rem 0.75rem', textAlign: 'center' }}>
+                      <div style={{ fontFamily: 'var(--mono)', fontSize: '0.52rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(212,206,196,0.65)', marginBottom: '0.3rem' }}>{label}</div>
+                      <div style={{ fontFamily: 'var(--serif)', fontSize: '1.6rem', fontWeight: 700, color: tierText, lineHeight: 1 }}>{value}</div>
+                      <div style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', color: 'rgba(212,206,196,0.65)', marginTop: '0.25rem' }}>{sub}</div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* At a glance */}
+                <div style={{ background: 'rgba(244,240,232,0.02)', border: '1px solid rgba(212,206,196,0.12)', padding: '1rem' }}>
+                  <div style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(212,206,196,0.65)', marginBottom: '0.6rem', textAlign: 'center' }}>
+                    At a Glance
                   </div>
-                ))}
+                  {[
+                    { label: 'Category',   value: org.category },
+                    { label: 'Scope',      value: org.membership_scope },
+                    { label: 'Trajectory', value: TRAJ[org.trajectory] ?? org.trajectory },
+                    { label: 'Strongest',  value: strongest ? `${CRITERIA[strongest.criterion]} (${strongest.score})` : null },
+                    { label: 'Weakest',    value: weakest   ? `${CRITERIA[weakest.criterion]} (${weakest.score})`   : null },
+                  ].filter(r => r.value).map(({ label, value }) => (
+                    <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '0.75rem', padding: '0.5rem 0', borderTop: '1px solid rgba(212,206,196,0.08)' }}>
+                      <span style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(212,206,196,0.5)', flexShrink: 0 }}>{label}</span>
+                      <span style={{ fontFamily: 'var(--mono)', fontSize: '0.68rem', color: 'rgba(212,206,196,0.85)', textAlign: 'right' }}>{value}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
 
               {/* Political compass — always shown */}
