@@ -7,7 +7,9 @@ const SUPABASE_URL = 'https://shgdrkrqjnwtlyxcdayp.supabase.co';
 const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNoZ2Rya3Jxam53dGx5eGNkYXlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzMzgwNjYsImV4cCI6MjA5NTkxNDA2Nn0.L5NPabtJGLFWb81SruP3XfjgFuycu4DhvaMJhInqWfo';
 
 const TIER_COLORS = {
-  'Super Culty':'#c02020','Kinda Culty':'#b07030','Not Culty':'#30a060',
+  // Brightened for contrast against the warm-dark #272320 background — the
+  // previous values (esp. the #b07030 amber) sat almost on the background tone.
+  'Super Culty':'#e8574d','Kinda Culty':'#d99b3e','Not Culty':'#5cb878',
 };
 const TIER_CLASS = {
   'Super Culty':'tier-super-culty','Kinda Culty':'tier-kinda-culty','Not Culty':'tier-not-culty',
@@ -626,7 +628,7 @@ export default function ExploreClient({ initialOrgs=[] }) {
                       <th key={col} onClick={()=>handleSort(col)}
                         onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();handleSort(col);}}}
                         role="button" tabIndex={0} aria-label={`Sort by ${label}`}
-                        className={col==='category'||col==='trajectory'?'explore-table-hide-mobile':''} style={{fontFamily:'var(--mono)',fontSize:'0.65rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--muted)',textAlign:'left',padding:'0.6rem 0.75rem',cursor:'pointer',userSelect:'none',whiteSpace:'nowrap'}}>
+                        className={col==='category'||col==='trajectory'?'explore-table-hide-mobile':''} style={{fontFamily:'var(--mono)',fontSize:'0.65rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'rgba(212,206,196,0.72)',textAlign:'left',padding:'0.6rem 0.75rem',cursor:'pointer',userSelect:'none',whiteSpace:'nowrap'}}>
                         {label} <SortIcon col={col}/>
                       </th>
                     ))}
@@ -645,19 +647,19 @@ export default function ExploreClient({ initialOrgs=[] }) {
                         background:i%2===0?'transparent':'rgba(244,240,232,0.012)',
                         cursor:'pointer',transition:'background 0.1s'}}>
                       <td style={{padding:'0.65rem 0.75rem',color:'var(--paper)',fontSize:'0.88rem',fontFamily:'var(--serif)'}}>{org.name}</td>
-                      <td style={{padding:'0.65rem 0.75rem',fontFamily:'var(--mono)',fontSize:'0.82rem',fontWeight:600,color:TIER_COLORS[org.composite_tier]||'var(--paper)',whiteSpace:'nowrap'}}>
+                      <td style={{padding:'0.65rem 0.75rem',fontFamily:'var(--mono)',fontSize:'0.82rem',fontWeight:600,color:'var(--paper)',whiteSpace:'nowrap'}}>
                         {Number.isNaN(parseFloat(org.composite_score))
                           ? <span style={{color:'rgba(212,206,196,0.35)',fontStyle:'italic',fontSize:'0.72rem',letterSpacing:'0.04em',fontWeight:400}}>Pending</span>
                           : `${parseFloat(org.composite_score).toFixed(1)}%`}
                       </td>
                       <td style={{padding:'0.65rem 0.75rem',whiteSpace:'nowrap'}}>
                         {org.composite_tier
-                          ? <span style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.06em',textTransform:'uppercase',padding:'0.24rem 0.5rem',borderRadius:'2px',color:TIER_COLORS[org.composite_tier],background:`rgba(${hexToRgb(TIER_COLORS[org.composite_tier])},0.13)`,border:`1px solid rgba(${hexToRgb(TIER_COLORS[org.composite_tier])},0.45)`}}>{org.composite_tier}</span>
+                          ? <span style={{fontFamily:'var(--mono)',fontSize:'0.6rem',fontWeight:600,letterSpacing:'0.06em',textTransform:'uppercase',padding:'0.24rem 0.5rem',borderRadius:'2px',color:'#1c1814',background:TIER_COLORS[org.composite_tier],border:`1px solid ${TIER_COLORS[org.composite_tier]}`}}>{org.composite_tier}</span>
                           : <span style={{fontFamily:'var(--mono)',fontSize:'0.62rem',fontStyle:'italic',color:'rgba(212,206,196,0.3)'}}>Pending</span>}
                       </td>
-                      <td style={{padding:'0.65rem 0.75rem',fontFamily:'var(--mono)',fontSize:'0.82rem',color:'var(--muted)'}}>{org.youngs_score==null?'—':`${org.youngs_score}/10`}</td>
-                      <td className="explore-table-hide-mobile" style={{padding:'0.65rem 0.75rem',color:'var(--muted)',fontSize:'0.75rem',fontFamily:'var(--mono)',whiteSpace:'nowrap'}}>{org.category}</td>
-                      <td className="explore-table-hide-mobile" style={{padding:'0.65rem 0.75rem',fontFamily:'var(--mono)',fontSize:'0.72rem',color:'var(--muted)',whiteSpace:'nowrap'}}>{org.trajectory}</td>
+                      <td style={{padding:'0.65rem 0.75rem',fontFamily:'var(--mono)',fontSize:'0.82rem',color:'rgba(212,206,196,0.8)'}}>{org.youngs_score==null?'—':`${org.youngs_score}/10`}</td>
+                      <td className="explore-table-hide-mobile" style={{padding:'0.65rem 0.75rem',color:'rgba(212,206,196,0.8)',fontSize:'0.75rem',fontFamily:'var(--mono)',whiteSpace:'nowrap'}}>{org.category}</td>
+                      <td className="explore-table-hide-mobile" style={{padding:'0.65rem 0.75rem',fontFamily:'var(--mono)',fontSize:'0.72rem',color:'rgba(212,206,196,0.8)',whiteSpace:'nowrap'}}>{org.trajectory}</td>
                       <td style={{padding:'0.65rem 0.75rem',textAlign:'right',fontFamily:'var(--mono)',fontSize:'0.65rem',color:'rgba(200,168,75,0.6)'}}>→</td>
                     </tr>
                   ))}
