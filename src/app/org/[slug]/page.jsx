@@ -181,7 +181,9 @@ export default async function OrgPage({ params }) {
   const criteria = [...(org.criterion_scores || [])]
     .sort((a, b) => parseInt(a.criterion.replace('C','')) - parseInt(b.criterion.replace('C','')))
 
-  const ps          = org.political_scores?.[0] ?? null
+  // political_scores can embed as an array (to-many) or a single object (to-one,
+  // e.g. when a unique constraint on org_id exists). Handle both.
+  const ps          = Array.isArray(org.political_scores) ? (org.political_scores[0] ?? null) : (org.political_scores ?? null)
   const isUnscored  = Number.isNaN(parseFloat(org.composite_score))
   const compositePct = isUnscored ? 'Pending' : `${parseFloat(org.composite_score).toFixed(0)}%`
   const tierColor   = TIER_BG[org.composite_tier]   ?? 'rgba(212,206,196,0.1)'
