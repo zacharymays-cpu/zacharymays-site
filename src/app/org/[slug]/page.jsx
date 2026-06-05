@@ -34,9 +34,12 @@ async function getOrg(slug) {
 export async function generateMetadata({ params }) {
   const org = await getOrg(params.slug)
   if (!org) return { title: 'Organization Not Found' }
+  const scored = !Number.isNaN(parseFloat(org.composite_score))
   return {
     title: `${org.name} — Cultiness Spectrum`,
-    description: `${org.name} scored ${org.composite_score}% (${org.composite_tier}). Young's Score: ${org.youngs_score}/10.`,
+    description: scored
+      ? `${org.name} scored ${parseFloat(org.composite_score).toFixed(0)}% (${org.composite_tier}). Young's Score: ${org.youngs_score}/10.`
+      : `${org.name} — assessment pending in the Cultiness Spectrum dataset.`,
   }
 }
 
@@ -185,6 +188,8 @@ export default async function OrgPage({ params }) {
     .sort((a, b) => parseInt(a.criterion.replace('C','')) - parseInt(b.criterion.replace('C','')))
 
   const ps          = org.political_scores?.[0] ?? null
+  const isUnscored  = Number.isNaN(parseFloat(org.composite_score))
+  const compositePct = isUnscored ? 'Pending' : `${parseFloat(org.composite_score).toFixed(0)}%`
   const tierColor   = TIER_BG[org.composite_tier]   ?? 'rgba(212,206,196,0.1)'
   const tierText    = TIER_TEXT[org.composite_tier]  ?? 'var(--muted)'
   const lastUpdated = new Date(org.updated_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
@@ -208,17 +213,19 @@ export default async function OrgPage({ params }) {
           </h1>
           <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
             <span style={{ fontFamily: 'var(--mono)', fontSize: '0.68rem', letterSpacing: '0.1em', textTransform: 'uppercase', padding: '0.3rem 0.75rem', background: tierColor, color: tierText, border: `1px solid ${tierText}50` }}>
-              {org.composite_tier}
+              {org.composite_tier ?? 'Not Yet Scored'}
             </span>
             <span style={{ fontFamily: 'var(--mono)', fontSize: '0.68rem', letterSpacing: '0.1em', textTransform: 'uppercase', padding: '0.3rem 0.75rem', background: 'rgba(244,240,232,0.06)', color: 'rgba(212,206,196,0.85)', border: '1px solid rgba(212,206,196,0.28)' }}>
               {TRAJ[org.trajectory] ?? org.trajectory}
             </span>
             <span style={{ fontFamily: 'var(--mono)', fontSize: '0.68rem', padding: '0.3rem 0.75rem', background: 'rgba(244,240,232,0.04)', color: tierText, border: `1px solid ${tierText}30`, fontWeight: 700 }}>
-              {parseFloat(org.composite_score).toFixed(0)}%
+              {compositePct}
             </span>
-            <span style={{ fontFamily: 'var(--mono)', fontSize: '0.68rem', padding: '0.3rem 0.75rem', background: 'rgba(244,240,232,0.06)', color: 'rgba(212,206,196,0.85)', border: '1px solid rgba(212,206,196,0.28)' }}>
-              Young's {org.youngs_score}/10 · {org.youngs_band}
-            </span>
+            {!isUnscored && (
+              <span style={{ fontFamily: 'var(--mono)', fontSize: '0.68rem', padding: '0.3rem 0.75rem', background: 'rgba(244,240,232,0.06)', color: 'rgba(212,206,196,0.85)', border: '1px solid rgba(212,206,196,0.28)' }}>
+                Young's {org.youngs_score}/10 · {org.youngs_band}
+              </span>
+            )}
           </div>
         </div>
       </section>
@@ -369,8 +376,8 @@ export default async function OrgPage({ params }) {
               {/* Score summary cards */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px' }}>
                 {[
-                  { label: 'Composite', value: `${parseFloat(org.composite_score).toFixed(0)}%`, sub: org.composite_tier },
-                  { label: "Young's",   value: `${org.youngs_score}/10`,                          sub: org.youngs_band },
+                  { label: 'Composite', value: compositePct,                                       sub: org.composite_tier ?? 'Not yet scored' },
+                  { label: "Young's",   value: org.youngs_score != null ? `${org.youngs_score}/10` : '—', sub: org.youngs_band ?? '—' },
                 ].map(({ label, value, sub }) => (
                   <div key={label} style={{ background: 'rgba(244,240,232,0.03)', border: '1px solid rgba(212,206,196,0.12)', padding: '1rem 0.75rem', textAlign: 'center' }}>
                     <div style={{ fontFamily: 'var(--mono)', fontSize: '0.52rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(212,206,196,0.65)', marginBottom: '0.3rem' }}>{label}</div>
