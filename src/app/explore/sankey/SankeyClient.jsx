@@ -2,15 +2,12 @@
 import { useEffect, useRef, useState } from 'react';
 
 const TIER_COLORS = {
-  'Cult':          '#c02020',
-  'Cult Dynamics': '#cb4b16',
-  'High Control':  '#b58900',
-  'Concerning':    '#6c71c4',
-  'Mildly Culty':  '#2aa198',
-  'Healthy Group': '#859900',
+  'Super Culty':  '#c02020',
+  'Kinda Culty':  '#b58900',
+  'Not Culty':    '#859900',
 };
 
-const TIER_ORDER = ['Cult','Cult Dynamics','High Control','Concerning','Mildly Culty','Healthy Group'];
+const TIER_ORDER = ['Super Culty','Kinda Culty','Not Culty'];
 
 export default function SankeyClient({ data = [] }) {
   const svgRef = useRef(null);

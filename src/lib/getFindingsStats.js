@@ -5,7 +5,7 @@
 const SUPABASE_URL = 'https://shgdrkrqjnwtlyxcdayp.supabase.co';
 const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNoZ2Rya3Jxam53dGx5eGNkYXlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzMzgwNjYsImV4cCI6MjA5NTkxNDA2Nn0.L5NPabtJGLFWb81SruP3XfjgFuycu4DhvaMJhInqWfo';
 
-export const TIER_ORDER = ['Cult', 'Cult Dynamics', 'High Control', 'Concerning', 'Mildly Culty', 'Healthy Group'];
+export const TIER_ORDER = ['Super Culty', 'Kinda Culty', 'Not Culty'];
 
 export async function getFindingsStats() {
   try {

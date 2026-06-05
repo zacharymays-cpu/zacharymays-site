@@ -4,14 +4,11 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 const TIER_COLORS = {
-  'Cult':          '#c02020',
-  'Cult Dynamics': '#cb4b16',
-  'High Control':  '#b58900',
-  'Concerning':    '#6c71c4',
-  'Mildly Culty':  '#2aa198',
-  'Healthy Group': '#859900',
+  'Super Culty':   '#c02020',
+  'Kinda Culty':   '#b58900',
+  'Not Culty':     '#859900',
 };
-const TIERS = ['Cult','Cult Dynamics','High Control','Concerning','Mildly Culty','Healthy Group'];
+const TIERS = ['Super Culty','Kinda Culty','Not Culty'];
 const SIZE_RADIUS = { micro:5, small:7, medium:10, large:14, mass:20 };
 
 const CHAIN_COLORS = {
@@ -121,7 +118,7 @@ export default function MapClient({ orgs=[], stateStats=[], foundingData=[], wit
         properties: {
           id: o.id, name: o.name, slug: o.slug, category: o.category,
           composite_score: parseFloat(o.composite_score || 0),
-          composite_tier:  o.composite_tier || 'Healthy Group',
+          composite_tier:  o.composite_tier || 'Not Culty',
           trajectory:      o.trajectory,
           hq_city: o.hq_city, hq_state: o.hq_state,
           size_tier: o.size_tier, membership_count: o.membership_count,
@@ -782,12 +779,9 @@ export default function MapClient({ orgs=[], stateStats=[], foundingData=[], wit
               </div>
               <div style={{ display:'grid', gap:'2px' }}>
                 {[
-                  ['Cult', selectedStateStats.cult, '#c02020'],
-                  ['Cult Dynamics', selectedStateStats.cult_dynamics, '#cb4b16'],
-                  ['High Control', selectedStateStats.high_control, '#b58900'],
-                  ['Concerning', selectedStateStats.concerning, '#6c71c4'],
-                  ['Mildly Culty', selectedStateStats.mildly_culty, '#2aa198'],
-                  ['Healthy Group', selectedStateStats.healthy_group, '#859900'],
+                  ['Super Culty', selectedStateStats.cult, '#c02020'],
+                  ['Kinda Culty', selectedStateStats.high_control, '#b58900'],
+                  ['Not Culty', selectedStateStats.healthy_group, '#859900'],
                 ].filter(([,v]) => v > 0).map(([label, count, color]) => (
                   <div key={label} style={{ display:'flex', alignItems:'center', gap:'0.5rem', padding:'0.3rem 0.5rem', background:'rgba(244,240,232,0.02)' }}>
                     <div style={{ width:7, height:7, borderRadius:'50%', background:color, flexShrink:0 }} />

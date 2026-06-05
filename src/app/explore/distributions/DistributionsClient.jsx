@@ -2,7 +2,7 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 
-const TIER_COLORS = { 'Cult':'#c02020','Cult Dynamics':'#c04040','High Control':'#b07030','Concerning':'#a09040','Mildly Culty':'#6a9840','Healthy Group':'#30a060' };
+const TIER_COLORS = { 'Super Culty':'#c02020','Kinda Culty':'#b07030','Not Culty':'#30a060' };
 
 function boxStats(scores) {
   if (!scores.length) return null;
@@ -52,9 +52,9 @@ export default function DistributionsClient({ orgs=[] }) {
   const cy = (i) => PAD_T + i * ROW_H + ROW_H / 2;
 
   function tierAtScore(s) {
-    if (s>=85) return 'Cult'; if (s>=71) return 'Cult Dynamics';
-    if (s>=56) return 'High Control'; if (s>=41) return 'Concerning';
-    if (s>=21) return 'Mildly Culty'; return 'Healthy Group';
+    if (s>=71) return 'Super Culty';
+    if (s>=41) return 'Kinda Culty';
+    return 'Not Culty';
   }
 
   return (
@@ -114,7 +114,7 @@ export default function DistributionsClient({ orgs=[] }) {
           <svg viewBox={`0 0 ${W} ${H}`} style={{width:'100%',maxWidth:W,display:'block',fontFamily:'monospace'}}>
 
             {/* Tier threshold background strips */}
-            {[[0,21,'Healthy Group'],[21,41,'Mildly Culty'],[41,56,'Concerning'],[56,71,'High Control'],[71,85,'Cult Dynamics'],[85,100,'Cult']].map(([x0,x1,t])=>(
+            {[[0,41,'Not Culty'],[41,71,'Kinda Culty'],[71,100,'Super Culty']].map(([x0,x1,t])=>(
               <rect key={t} x={x(x0)} y={PAD_T-8} width={x(x1)-x(x0)} height={sorted.length*ROW_H+16}
                 fill={TIER_COLORS[t]} fillOpacity={0.05}/>
             ))}

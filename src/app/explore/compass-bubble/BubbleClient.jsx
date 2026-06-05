@@ -5,14 +5,11 @@ import Link from 'next/link';
 const SUPABASE_URL = 'https://shgdrkrqjnwtlyxcdayp.supabase.co';
 const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNoZ2Rya3Jxam53dGx5eGNkYXlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzMzgwNjYsImV4cCI6MjA5NTkxNDA2Nn0.L5NPabtJGLFWb81SruP3XfjgFuycu4DhvaMJhInqWfo';
 
-const TIERS = ['Cult','Cult Dynamics','High Control','Concerning','Mildly Culty','Healthy Group'];
+const TIERS = ['Super Culty','Kinda Culty','Not Culty'];
 const TC = {
-  'Cult':          {fill:'#ff4466',stroke:'#cc1133',hi:'#ff99aa',bg:'rgba(255,68,102,0.1)',text:'#cc1133'},
-  'Cult Dynamics': {fill:'#ff7733',stroke:'#cc4400',hi:'#ffaa77',bg:'rgba(255,119,51,0.1)',text:'#cc4400'},
-  'High Control':  {fill:'#e6a800',stroke:'#b38200',hi:'#ffdd66',bg:'rgba(230,168,0,0.1)', text:'#9b6f00'},
-  'Concerning':    {fill:'#7c5cbf',stroke:'#5a3a9e',hi:'#ccbbff',bg:'rgba(124,92,191,0.1)',text:'#5a3a9e'},
-  'Mildly Culty':  {fill:'#1aaa80',stroke:'#117755',hi:'#66ffcc',bg:'rgba(26,170,128,0.1)',text:'#117755'},
-  'Healthy Group': {fill:'#1a8fbf',stroke:'#116688',hi:'#66ddff',bg:'rgba(26,143,191,0.1)',text:'#116688'},
+  'Super Culty':   {fill:'#ff4466',stroke:'#cc1133',hi:'#ff99aa',bg:'rgba(255,68,102,0.1)',text:'#cc1133'},
+  'Kinda Culty':   {fill:'#e6a800',stroke:'#b38200',hi:'#ffdd66',bg:'rgba(230,168,0,0.1)', text:'#9b6f00'},
+  'Not Culty':     {fill:'#1a8fbf',stroke:'#116688',hi:'#66ddff',bg:'rgba(26,143,191,0.1)',text:'#116688'},
 };
 
 export default function BubbleClient() {
@@ -38,7 +35,7 @@ export default function BubbleClient() {
             name:  d.organizations.name,
             slug:  d.organizations.slug,
             cat:   d.organizations.category,
-            tier:  d.organizations.composite_tier || 'Healthy Group',
+            tier:  d.organizations.composite_tier || 'Not Culty',
             score: parseFloat(d.organizations.composite_score || 0),
             econ:  parseFloat(d.economic_axis),
             auth:  parseFloat(d.authority_axis),

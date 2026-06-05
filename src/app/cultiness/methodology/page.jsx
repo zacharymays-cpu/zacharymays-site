@@ -118,7 +118,7 @@ export default function MethodologyPage() {
               {
                 label: 'Composite Cultiness Score',
                 sub: 'Formula-based 0–100%',
-                body: 'Formula: (Breadth ÷ 10) × (Mean Intensity ÷ 10) × 100. Breadth = criteria with non-N/A scores. Mean Intensity = average of those scores. Adds two dimensions the binary instrument cannot capture: intensity variance and breadth-intensity interaction. Produces six tiers from Healthy Group through Cult.',
+                body: 'Formula: (Breadth ÷ 10) × (Mean Intensity ÷ 10) × 100. Breadth = criteria with non-N/A scores. Mean Intensity = average of those scores. Adds two dimensions the binary instrument cannot capture: intensity variance and breadth-intensity interaction. Produces three tiers from Not Culty through Super Culty.',
               },
             ].map((item, i) => (
               <div key={i} style={{background: 'var(--ink)', padding: '2rem'}}>
@@ -135,12 +135,9 @@ export default function MethodologyPage() {
 
           <div style={{margin: '1.5rem 0'}}>
             {[
-              { range: '0–20%',   tier: 'Healthy Group',  color: '#2a6b4a' },
-              { range: '21–40%',  tier: 'Mildly Culty',   color: '#5a7a3a' },
-              { range: '41–55%',  tier: 'Concerning',      color: '#7a6a2a' },
-              { range: '56–70%',  tier: 'High Control',   color: '#7a4a1a' },
-              { range: '71–84%',  tier: 'Cult Dynamics',  color: '#8b2020' },
-              { range: '≥85%',    tier: 'Cult',           color: '#6b1010' },
+              { range: '0–40%',    tier: 'Not Culty',    color: '#2a6b4a' },
+              { range: '41–70%',   tier: 'Kinda Culty',  color: '#7a4a1a' },
+              { range: '71–100%',  tier: 'Super Culty',  color: '#6b1010' },
             ].map((t, i) => (
               <div key={i} style={{
                 display: 'grid',

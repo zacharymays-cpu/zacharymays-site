@@ -4,8 +4,8 @@ import Link from 'next/link';
 
 const CRITERIA = ['C1','C2','C3','C4','C5','C6','C7','C8','C9','C10'];
 const C_NAMES = { C1:'Leadership',C2:'Sacred Assumptions',C3:'Mission',C4:'Individuality',C5:'Isolation',C6:'Vernacular',C7:'Us/Them',C8:'Labor',C9:'Exit Costs',C10:'Ends/Means' };
-const TIERS = ['Cult','Cult Dynamics','High Control','Concerning','Mildly Culty','Healthy Group'];
-const TIER_COLORS = { 'Cult':'#c02020','Cult Dynamics':'#c04040','High Control':'#b07030','Concerning':'#a09040','Mildly Culty':'#6a9840','Healthy Group':'#30a060' };
+const TIERS = ['Super Culty','Kinda Culty','Not Culty'];
+const TIER_COLORS = { 'Super Culty':'#c02020','Kinda Culty':'#b07030','Not Culty':'#30a060' };
 
 function scoreColor(v) {
   if (v === null || v === undefined) return 'rgba(212,206,196,0.05)';

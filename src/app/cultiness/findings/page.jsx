@@ -8,23 +8,20 @@ export const metadata = {
 
 // Tier display metadata (composite-score band + color); counts come live.
 const TIER_META = {
-  'Cult':          { range: '≥85%',   color: '#6b1010' },
-  'Cult Dynamics': { range: '71–84%', color: '#8b2020' },
-  'High Control':  { range: '56–70%', color: '#7a4a1a' },
-  'Concerning':    { range: '41–55%', color: '#7a6a2a' },
-  'Mildly Culty':  { range: '21–40%', color: '#5a7a3a' },
-  'Healthy Group': { range: '0–20%',  color: '#2a6b4a' },
+  'Super Culty': { range: '71–100%', color: '#6b1010' },
+  'Kinda Culty': { range: '41–70%',  color: '#7a4a1a' },
+  'Not Culty':   { range: '0–40%',   color: '#2a6b4a' },
 };
 
 // Shown only if the live stats fetch fails (rare; values cached hourly).
 const FALLBACK = {
   r: 0.67, n: 492, scored: 492,
   tiers: [
-    { tier: 'Cult', pct: 9.8 }, { tier: 'Cult Dynamics', pct: 16.9 },
-    { tier: 'High Control', pct: 21.1 }, { tier: 'Concerning', pct: 15.4 },
-    { tier: 'Mildly Culty', pct: 24.6 }, { tier: 'Healthy Group', pct: 12.2 },
+    { tier: 'Super Culty', pct: 26.6 },
+    { tier: 'Kinda Culty', pct: 36.6 },
+    { tier: 'Not Culty', pct: 36.8 },
   ],
-  largest: { tier: 'Mildly Culty', pct: 24.6 },
+  largest: { tier: 'Not Culty', pct: 36.8 },
 };
 
 const BENCHMARKS = [
@@ -96,7 +93,7 @@ export default async function FindingsPage() {
           <div className="section__label">Tier Distribution</div>
 
           <p style={{color: 'var(--muted)', marginBottom: '2rem', fontSize: '0.9rem'}}>
-            How the {scored} scored organizations distribute across the six composite tiers:
+            How the {scored} scored organizations distribute across the three composite tiers:
           </p>
 
           <div style={{display: 'flex', flexDirection: 'column', gap: '0.5rem', margin: '0 0 2rem'}}>

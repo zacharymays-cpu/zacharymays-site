@@ -678,9 +678,6 @@ a:hover { color: var(--paper); }
 }
 
 /* ── Tier row left-border colors ── */
-tr.tier-cult          { border-left: 3px solid #6b1010; }
-tr.tier-cult-dynamics { border-left: 3px solid #8b2020; }
-tr.tier-high-control  { border-left: 3px solid #7a4a1a; }
-tr.tier-concerning    { border-left: 3px solid #7a6a2a; }
-tr.tier-mildly-culty  { border-left: 3px solid #4a6a2a; }
-tr.tier-healthy-group { border-left: 3px solid #2a6b4a; }
+tr.tier-super-culty { border-left: 3px solid #6b1010; }
+tr.tier-kinda-culty { border-left: 3px solid #7a4a1a; }
+tr.tier-not-culty   { border-left: 3px solid #2a6b4a; }

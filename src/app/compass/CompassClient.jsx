@@ -3,14 +3,11 @@ import { useState, useMemo, useRef, useEffect } from 'react';
 import Link from 'next/link';
 
 const TIER_COLORS = {
-  'Cult':          '#c02020',
-  'Cult Dynamics': '#c04040',
-  'High Control':  '#b07030',
-  'Concerning':    '#a09040',
-  'Mildly Culty':  '#6a9840',
-  'Healthy Group': '#30a060',
+  'Super Culty':  '#c02020',
+  'Kinda Culty':  '#b07030',
+  'Not Culty':    '#30a060',
 };
-const TIERS       = ['Cult','Cult Dynamics','High Control','Concerning','Mildly Culty','Healthy Group'];
+const TIERS       = ['Super Culty','Kinda Culty','Not Culty'];
 const TRAJECTORIES= ['Stable','Escalating','Declining','Defunct'];
 const QUADRANTS   = ['Authoritarian Left','Authoritarian Right','Libertarian Left','Libertarian Right'];
 

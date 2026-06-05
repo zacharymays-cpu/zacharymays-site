@@ -45,20 +45,14 @@ export async function generateMetadata({ params }) {
 
 // ── Helpers ───────────────────────────────────────────────────────────────
 const TIER_TEXT = {
-  'Cult':          '#dc322f',
-  'Cult Dynamics': '#cb4b16',
-  'High Control':  '#b58900',
-  'Concerning':    '#6c71c4',
-  'Mildly Culty':  '#2aa198',
-  'Healthy Group': '#859900',
+  'Super Culty': '#dc322f',
+  'Kinda Culty': '#b58900',
+  'Not Culty':   '#859900',
 }
 const TIER_BG = {
-  'Cult':          'rgba(220,50,47,0.12)',
-  'Cult Dynamics': 'rgba(203,75,22,0.12)',
-  'High Control':  'rgba(181,137,0,0.12)',
-  'Concerning':    'rgba(108,113,196,0.12)',
-  'Mildly Culty':  'rgba(42,161,152,0.12)',
-  'Healthy Group': 'rgba(133,153,0,0.12)',
+  'Super Culty': 'rgba(220,50,47,0.12)',
+  'Kinda Culty': 'rgba(181,137,0,0.12)',
+  'Not Culty':   'rgba(133,153,0,0.12)',
 }
 
 const SCORE_COLOR = (s) => {

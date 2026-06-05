@@ -42,16 +42,13 @@ export async function fetchCategories() {
 }
 
 export const TIER_COLORS = {
-  'Cult':          '#6b1010',
-  'Cult Dynamics': '#8b2020',
-  'High Control':  '#7a4a1a',
-  'Concerning':    '#7a6a2a',
-  'Mildly Culty':  '#5a7a3a',
-  'Healthy Group': '#2a6b4a',
+  'Super Culty':  '#6b1010',
+  'Kinda Culty':  '#7a4a1a',
+  'Not Culty':    '#2a6b4a',
 };
 
 export const TIER_ORDER = [
-  'Cult', 'Cult Dynamics', 'High Control', 'Concerning', 'Mildly Culty', 'Healthy Group'
+  'Super Culty', 'Kinda Culty', 'Not Culty'
 ];
 
 export const CRITERIA_NAMES = {

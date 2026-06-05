@@ -2,25 +2,18 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 
-const TIER_ORDER = ['Cult','Cult Dynamics','High Control','Concerning','Mildly Culty','Healthy Group'];
+const TIER_ORDER = ['Super Culty','Kinda Culty','Not Culty'];
 const TIER_COLORS = {
-  'Cult':          '#c02020',
-  'Cult Dynamics': '#c04040',
-  'High Control':  '#b07030',
-  'Concerning':    '#a09040',
-  'Mildly Culty':  '#6a9840',
-  'Healthy Group': '#30a060',
+  'Super Culty':  '#c02020',
+  'Kinda Culty':  '#b07030',
+  'Not Culty':    '#30a060',
 };
 const TIER_RANGES = {
-  'Cult':'85–100%','Cult Dynamics':'71–84%','High Control':'56–70%',
-  'Concerning':'41–55%','Mildly Culty':'21–40%','Healthy Group':'0–20%',
+  'Super Culty':'71–100%','Kinda Culty':'41–70%','Not Culty':'0–40%',
 };
 const TIER_THRESH = [
-  {x:20,label:'Healthy Group'},
-  {x:40,label:'Mildly Culty'},
-  {x:55,label:'Concerning'},
-  {x:70,label:'High Control'},
-  {x:85,label:'Cult'},
+  {x:41,label:'Kinda Culty'},
+  {x:71,label:'Super Culty'},
 ];
 const ANNOTATIONS = [
   {score:19, label:'NAACP 19%'},
@@ -74,12 +67,9 @@ export default function FindingsClient({ orgs=[] }) {
     for (let i = 0; i < 100; i += 5) {
       const center = i + 2.5;
       const count = scores.filter(s => s >= i && s < i+5).length;
-      let tier = 'Healthy Group';
-      if (center >= 85) tier = 'Cult';
-      else if (center >= 71) tier = 'Cult Dynamics';
-      else if (center >= 56) tier = 'High Control';
-      else if (center >= 41) tier = 'Concerning';
-      else if (center >= 21) tier = 'Mildly Culty';
+      let tier = 'Not Culty';
+      if (center >= 71) tier = 'Super Culty';
+      else if (center >= 41) tier = 'Kinda Culty';
       b.push({start:i, center, count, tier});
     }
     return b;
@@ -100,9 +90,8 @@ export default function FindingsClient({ orgs=[] }) {
   const chartMaxY = useMemo(() => Math.max(maxCount, maxNormalY) * 1.15, [maxCount, maxNormalY]);
 
   // Headline stats
-  const above56 = scores.filter(s=>s>=56).length;
+  const above41 = scores.filter(s=>s>=41).length;
   const above71 = scores.filter(s=>s>=71).length;
-  const above85 = scores.filter(s=>s>=85).length;
   const pct = (n) => `${(100*n/scores.length).toFixed(0)}%`;
 
   // Instrument variance
@@ -157,9 +146,9 @@ export default function FindingsClient({ orgs=[] }) {
         <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'1rem',marginBottom:'3rem'}}>
           {[
             ['Organizations', scores.length, ''],
-            ['High Control or above', pct(above56), '≥ 56%'],
-            ['Cult Dynamics or above', pct(above71), '≥ 71%'],
-            ['Cult tier', pct(above85), '≥ 85%'],
+            ['Super Culty', pct(above71), '71–100%'],
+            ['Kinda Culty', pct(above41-above71), '41–70%'],
+            ['Not Culty', pct(scores.length-above41), '0–40%'],
           ].map(([label,value,sub])=>(
             <div key={label} style={{padding:'1.25rem',background:'rgba(244,240,232,0.03)',border:'1px solid rgba(212,206,196,0.12)'}}>
               <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.14em',textTransform:'uppercase',color:'var(--muted)',marginBottom:'0.4rem'}}>{label}</div>
@@ -183,8 +172,7 @@ export default function FindingsClient({ orgs=[] }) {
 
               {/* Tier background shading */}
               {[
-                [0,20,'Healthy Group'],[20,40,'Mildly Culty'],[40,55,'Concerning'],
-                [55,70,'High Control'],[70,85,'Cult Dynamics'],[85,100,'Cult'],
+                [0,41,'Not Culty'],[41,71,'Kinda Culty'],[71,100,'Super Culty'],
               ].map(([x0,x1,tier])=>(
                 <rect key={tier}
                   x={histX(x0)} y={HIST_PAD.t}

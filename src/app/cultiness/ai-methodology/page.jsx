@@ -112,7 +112,7 @@ export default function AiMethodologyPage() {
               },
               {
                 heading: 'Calibration anchor consistency',
-                body: 'The system prompt includes reference anchors across the full scoring spectrum — from 100% Cult tier to 5% Healthy Group. This gives the model a comparative reference frame that helps prevent score inflation or compression over large batches. The anchors are drawn directly from the database and updated when methodology changes.',
+                body: 'The system prompt includes reference anchors across the full scoring spectrum — from 100% Super Culty to 5% Not Culty. This gives the model a comparative reference frame that helps prevent score inflation or compression over large batches. The anchors are drawn directly from the database and updated when methodology changes.',
               },
             ].map((item, i) => (
               <div key={i} style={{
