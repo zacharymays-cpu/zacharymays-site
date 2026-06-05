@@ -222,7 +222,8 @@ function RadarChart({ scores }) {
 function DetailModal({ org, criterionScores, politicalPos, loading, onClose }) {
   const scores = criterionScores[org?.id] || {};
   const tierColor = TIER_COLORS[org?.composite_tier] || '#888';
-  const composite = org ? parseFloat(org.composite_score).toFixed(1) : '—';
+  const compositeNum = org ? parseFloat(org.composite_score) : NaN;
+  const composite = Number.isNaN(compositeNum) ? null : compositeNum.toFixed(1);
 
   // Close on Escape
   useEffect(() => {
@@ -307,8 +308,8 @@ function DetailModal({ org, criterionScores, politicalPos, loading, onClose }) {
           {/* Score cards */}
           <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'1px',background:'rgba(212,206,196,0.08)',marginBottom:'1.75rem'}}>
             {[
-              {label:'Composite',value:`${composite}%`,color:'var(--gold)'},
-              {label:"Young's",value:`${org.youngs_score}/10`,color:'var(--paper)'},
+              {label:'Composite',value:composite!=null?`${composite}%`:'Pending',color:composite!=null?'var(--gold)':'var(--muted)'},
+              {label:"Young's",value:org.youngs_score!=null?`${org.youngs_score}/10`:'—',color:'var(--paper)'},
               {label:"Young's Band",value:org.youngs_band||'—',color:'var(--muted)'},
             ].map((s,i)=>(
               <div key={i} style={{background:'#1c1814',padding:'1rem 0.75rem',textAlign:'center'}}>
@@ -432,6 +433,11 @@ export default function ExploreClient({ initialOrgs=[] }) {
     return Object.entries(counts).sort((a,b) => b[1]-a[1]);
   }, [orgs]);
 
+  const pendingCount = useMemo(
+    () => orgs.filter(o => Number.isNaN(parseFloat(o.composite_score))).length,
+    [orgs]
+  );
+
   const toggle = (val,state,setter) =>
     setter(state.includes(val)?state.filter(v=>v!==val):[...state,val]);
 
@@ -445,12 +451,22 @@ export default function ExploreClient({ initialOrgs=[] }) {
       if(trajFilter.length&&!trajFilter.includes(o.trajectory)) return false;
       if(categoryFilter.length&&!categoryFilter.includes(o.category)) return false;
       const s=parseFloat(o.composite_score);
-      if(s<scoreMin||s>scoreMax) return false;
+      if(Number.isNaN(s)){
+        // Unscored (Pending) orgs only appear when the score range is at its default span.
+        if(scoreMin>0||scoreMax<100) return false;
+      } else if(s<scoreMin||s>scoreMax) return false;
       return true;
     });
     return [...result].sort((a,b)=>{
       let av=a[sortBy],bv=b[sortBy];
-      if(typeof av==='string'){av=av.toLowerCase();bv=bv.toLowerCase();}
+      if(sortBy==='composite_score'||sortBy==='youngs_score'){
+        // Numeric sort; unscored (null/NaN) values sink to the bottom regardless of direction.
+        av=parseFloat(av); bv=parseFloat(bv);
+        const aNan=Number.isNaN(av), bNan=Number.isNaN(bv);
+        if(aNan&&bNan) return 0;
+        if(aNan) return 1;
+        if(bNan) return -1;
+      } else if(typeof av==='string'){av=av.toLowerCase();bv=(bv||'').toLowerCase();}
       if(av<bv) return sortDir==='asc'?-1:1;
       if(av>bv) return sortDir==='asc'?1:-1;
       return 0;
@@ -488,6 +504,12 @@ export default function ExploreClient({ initialOrgs=[] }) {
                 <div style={{fontFamily:'var(--serif)',fontSize:'1.4rem',fontWeight:700,color:'var(--paper)',lineHeight:1}}>{orgs.length}</div>
                 <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'var(--muted)'}}>Total</div>
               </div>
+              {pendingCount>0&&(
+                <div style={{textAlign:'center'}} title="Organizations imported but not yet scored">
+                  <div style={{fontFamily:'var(--serif)',fontSize:'1.4rem',fontWeight:700,color:'var(--muted)',lineHeight:1}}>{pendingCount}</div>
+                  <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'var(--muted)'}}>Pending</div>
+                </div>
+              )}
               <Link href="/compass" className="explore-compass-link" style={{fontFamily:'var(--mono)',fontSize:'0.68rem',letterSpacing:'0.1em',textTransform:'uppercase',padding:'0.45rem 0.9rem',border:'1px solid rgba(200,168,75,0.4)',color:'var(--gold)',textDecoration:'none'}}>
                 Compass →
               </Link>
@@ -604,8 +626,12 @@ export default function ExploreClient({ initialOrgs=[] }) {
                         background:i%2===0?'transparent':'rgba(244,240,232,0.012)',
                         cursor:'pointer',transition:'background 0.1s'}}>
                       <td style={{padding:'0.65rem 0.75rem',color:'var(--paper)',fontSize:'0.88rem',fontFamily:'var(--serif)'}}>{org.name}</td>
-                      <td style={{padding:'0.65rem 0.75rem',fontFamily:'var(--mono)',fontSize:'0.82rem',color:'var(--paper)',whiteSpace:'nowrap'}}>{parseFloat(org.composite_score).toFixed(1)}%</td>
-                      <td style={{padding:'0.65rem 0.75rem',fontFamily:'var(--mono)',fontSize:'0.82rem',color:'var(--muted)'}}>{org.youngs_score}/10</td>
+                      <td style={{padding:'0.65rem 0.75rem',fontFamily:'var(--mono)',fontSize:'0.82rem',color:'var(--paper)',whiteSpace:'nowrap'}}>
+                        {Number.isNaN(parseFloat(org.composite_score))
+                          ? <span style={{color:'rgba(212,206,196,0.35)',fontStyle:'italic',fontSize:'0.72rem',letterSpacing:'0.04em'}}>Pending</span>
+                          : `${parseFloat(org.composite_score).toFixed(1)}%`}
+                      </td>
+                      <td style={{padding:'0.65rem 0.75rem',fontFamily:'var(--mono)',fontSize:'0.82rem',color:'var(--muted)'}}>{org.youngs_score==null?'—':`${org.youngs_score}/10`}</td>
                       <td className="explore-table-hide-mobile" style={{padding:'0.65rem 0.75rem',color:'var(--muted)',fontSize:'0.75rem',fontFamily:'var(--mono)',whiteSpace:'nowrap'}}>{org.category}</td>
                       <td className="explore-table-hide-mobile" style={{padding:'0.65rem 0.75rem',fontFamily:'var(--mono)',fontSize:'0.72rem',color:'var(--muted)',whiteSpace:'nowrap'}}>{org.trajectory}</td>
                       <td style={{padding:'0.65rem 0.75rem',textAlign:'right',fontFamily:'var(--mono)',fontSize:'0.65rem',color:'rgba(200,168,75,0.35)'}}>→</td>
