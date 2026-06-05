@@ -1,5 +1,26 @@
 import './globals.css';
+import { Playfair_Display, Libre_Baskerville, DM_Mono } from 'next/font/google';
 import Nav from '../components/Nav';
+
+const playfair = Playfair_Display({
+  subsets: ['latin'],
+  style: ['normal', 'italic'],
+  variable: '--font-serif',
+  display: 'swap',
+});
+const baskerville = Libre_Baskerville({
+  subsets: ['latin'],
+  weight: ['400', '700'],
+  style: 'normal',
+  variable: '--font-body',
+  display: 'swap',
+});
+const dmMono = DM_Mono({
+  subsets: ['latin'],
+  weight: ['300', '400', '500'],
+  variable: '--font-mono',
+  display: 'swap',
+});
 
 export const metadata = {
   metadataBase: new URL('https://www.zacharymays.com'),
@@ -22,7 +43,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${playfair.variable} ${baskerville.variable} ${dmMono.variable}`}>
       <body>
         <Nav />
         <main>{children}</main>
