@@ -6,14 +6,11 @@ const SUPABASE_URL = 'https://shgdrkrqjnwtlyxcdayp.supabase.co';
 const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNoZ2Rya3Jxam53dGx5eGNkYXlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzMzgwNjYsImV4cCI6MjA5NTkxNDA2Nn0.L5NPabtJGLFWb81SruP3XfjgFuycu4DhvaMJhInqWfo';
 
 const TC = {
-  'Cult':          {fill:'#ff4466', stroke:'#cc1133', hi:'#ff99aa'},
-  'Cult Dynamics': {fill:'#ff7733', stroke:'#cc4400', hi:'#ffaa77'},
-  'High Control':  {fill:'#e6a800', stroke:'#b38200', hi:'#ffdd66'},
-  'Concerning':    {fill:'#7c5cbf', stroke:'#5a3a9e', hi:'#ccbbff'},
-  'Mildly Culty':  {fill:'#1aaa80', stroke:'#117755', hi:'#66ffcc'},
-  'Healthy Group': {fill:'#1a8fbf', stroke:'#116688', hi:'#66ddff'},
+  'Super Culty':   {fill:'#ff4466', stroke:'#cc1133', hi:'#ff99aa'},
+  'Kinda Culty':   {fill:'#e6a800', stroke:'#b38200', hi:'#ffdd66'},
+  'Not Culty':     {fill:'#1a8fbf', stroke:'#116688', hi:'#66ddff'},
 };
-const TIERS = ['Cult','Cult Dynamics','High Control','Concerning','Mildly Culty','Healthy Group'];
+const TIERS = ['Super Culty','Kinda Culty','Not Culty'];
 
 export default function Compass3DClient() {
   const canvasRef = useRef(null);
@@ -44,7 +41,7 @@ export default function Compass3DClient() {
             name:  d.organizations.name,
             slug:  d.organizations.slug,
             cat:   d.organizations.category,
-            tier:  d.organizations.composite_tier || 'Healthy Group',
+            tier:  d.organizations.composite_tier || 'Not Culty',
             score: parseFloat(d.organizations.composite_score || 0),
             econ:  parseFloat(d.economic_axis),
             auth:  parseFloat(d.authority_axis),
@@ -208,7 +205,7 @@ export default function Compass3DClient() {
       if (localShowStems) {
         sorted.forEach(({px,py,org}) => {
           const p0=project(org.econ,org.auth,0);
-          const c=TC[org.tier]||TC['Healthy Group'];
+          const c=TC[org.tier]||TC['Not Culty'];
           ctx.beginPath(); ctx.moveTo(p0.px,p0.py); ctx.lineTo(px,py);
           ctx.strokeStyle=c.fill+'28'; ctx.lineWidth=0.8; ctx.stroke();
           ctx.beginPath(); ctx.arc(p0.px,p0.py,2,0,Math.PI*2);
@@ -218,7 +215,7 @@ export default function Compass3DClient() {
 
       ptsRef.current = [];
       sorted.forEach(({px,py,scale,org}) => {
-        const c=TC[org.tier]||TC['Healthy Group'];
+        const c=TC[org.tier]||TC['Not Culty'];
         const r=Math.max(4,7*(0.65+(org.score/100)*0.5)*Math.max(0.5,scale));
         drawDot(px,py,r,c);
         if (org.score>=85) {

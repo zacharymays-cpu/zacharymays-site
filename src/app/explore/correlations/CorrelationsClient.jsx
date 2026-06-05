@@ -79,7 +79,7 @@ export default function CorrelationsClient({ orgs=[], scoreMap={} }) {
     setSelected(sel => sel?.a===a&&sel?.b===b ? null : {a, b, r, pairs});
   };
 
-  const TIER_COLORS = { 'Cult':'#c02020','Cult Dynamics':'#c04040','High Control':'#b07030','Concerning':'#a09040','Mildly Culty':'#6a9840','Healthy Group':'#30a060' };
+  const TIER_COLORS = { 'Super Culty':'#c02020','Kinda Culty':'#b07030','Not Culty':'#30a060' };
 
   return (
     <div style={{minHeight:'100vh'}}>

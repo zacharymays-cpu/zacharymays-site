@@ -95,7 +95,7 @@ export default async function MapPage() {
     const key = `${o.founding_city}|${o.founding_state}`;
     if (!foundingMap[key]) foundingMap[key] = { city: o.founding_city, state: o.founding_state, scores: [], high: 0 };
     foundingMap[key].scores.push(parseFloat(o.composite_score || 0));
-    if (['Cult','Cult Dynamics'].includes(o.composite_tier)) foundingMap[key].high++;
+    if (['Super Culty'].includes(o.composite_tier)) foundingMap[key].high++;
   });
 
   const foundingData = Object.entries(foundingMap)
@@ -122,7 +122,7 @@ export default async function MapPage() {
       if (!stateMap[o.hq_state]) stateMap[o.hq_state] = { hq_state: o.hq_state, scores: [], cult: 0, cult_dynamics: 0, high_control: 0, concerning: 0, mildly_culty: 0, healthy_group: 0 };
       const s = stateMap[o.hq_state];
       s.scores.push(parseFloat(o.composite_score || 0));
-      const tierKey = { 'Cult':'cult','Cult Dynamics':'cult_dynamics','High Control':'high_control','Concerning':'concerning','Mildly Culty':'mildly_culty','Healthy Group':'healthy_group' }[o.composite_tier];
+      const tierKey = { 'Super Culty':'cult','Kinda Culty':'high_control','Not Culty':'healthy_group' }[o.composite_tier];
       if (tierKey) s[tierKey]++;
     });
     stateStats = Object.values(stateMap).map(s => ({

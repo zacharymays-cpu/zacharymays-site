@@ -1,8 +1,27 @@
 import Link from 'next/link';
+import { getFindingsStats, TIER_ORDER } from '../../../lib/getFindingsStats';
 
 export const metadata = {
   title: 'Findings — The Cultiness Spectrum',
-  description: 'What systematic application of the Young-Reed framework across 370 American organizations reveals about institutional formation and cult-adjacent dynamics.',
+  description: 'What systematic application of the Young-Reed framework across hundreds of American organizations reveals about institutional formation and cult-adjacent dynamics.',
+};
+
+// Tier display metadata (composite-score band + color); counts come live.
+const TIER_META = {
+  'Super Culty': { range: '71–100%', color: '#6b1010' },
+  'Kinda Culty': { range: '41–70%',  color: '#7a4a1a' },
+  'Not Culty':   { range: '0–40%',   color: '#2a6b4a' },
+};
+
+// Shown only if the live stats fetch fails (rare; values cached hourly).
+const FALLBACK = {
+  r: 0.67, n: 492, scored: 492,
+  tiers: [
+    { tier: 'Super Culty', pct: 26.6 },
+    { tier: 'Kinda Culty', pct: 36.6 },
+    { tier: 'Not Culty', pct: 36.8 },
+  ],
+  largest: { tier: 'Not Culty', pct: 36.8 },
 };
 
 const BENCHMARKS = [
@@ -16,7 +35,15 @@ const BENCHMARKS = [
   { orgs: 'Scientology (100%) vs. Presbyterian Church USA (11%)', note: 'Same religious category, opposite institutional architectures' },
 ];
 
-export default function FindingsPage() {
+export default async function FindingsPage() {
+  const stats = await getFindingsStats();
+  const r = stats?.r != null ? stats.r : FALLBACK.r;
+  const n = stats?.n ?? FALLBACK.n;
+  const scored = stats?.scored ?? FALLBACK.scored;
+  const tierData = stats?.tiers ?? FALLBACK.tiers;
+  const largest = stats?.largest ?? FALLBACK.largest;
+  const maxPct = Math.max(...tierData.map(t => t.pct), 1);
+
   return (
     <>
       <section className="hero">
@@ -28,7 +55,7 @@ export default function FindingsPage() {
           <h1 className="hero__title animate-up-2">What the<br />Data Shows</h1>
           <p className="hero__subtitle animate-up-3">
             Selected findings from systematic application of the
-            Young-Reed framework across 370 American organizations.
+            Young-Reed framework across {scored} scored American organizations.
           </p>
         </div>
       </section>
@@ -39,9 +66,9 @@ export default function FindingsPage() {
           <div className="section__label">The Headline Finding</div>
 
           <p style={{fontSize: '1.1rem', color: 'var(--cream)', lineHeight: 1.8}}>
-            The correlation between authority-axis political position and
-            composite cultiness score across 370 American organizations
-            is <strong style={{color: 'var(--gold)'}}>r = 0.703</strong>.
+            Across the {n} organizations with a scored political position, the
+            correlation between authority-axis position and composite cultiness
+            score is <strong style={{color: 'var(--gold)'}}>r = {r.toFixed(3)}</strong>.
           </p>
 
           <p>
@@ -66,46 +93,42 @@ export default function FindingsPage() {
           <div className="section__label">Tier Distribution</div>
 
           <p style={{color: 'var(--muted)', marginBottom: '2rem', fontSize: '0.9rem'}}>
-            How 370 active organizations distribute across the six composite tiers:
+            How the {scored} scored organizations distribute across the three composite tiers:
           </p>
 
           <div style={{display: 'flex', flexDirection: 'column', gap: '0.5rem', margin: '0 0 2rem'}}>
-            {[
-              { tier: 'Cult',          pct: 7.6,  range: '≥85%',   color: '#6b1010' },
-              { tier: 'Cult Dynamics', pct: 9.5,  range: '71–84%', color: '#8b2020' },
-              { tier: 'High Control',  pct: 23.8, range: '56–70%', color: '#7a4a1a' },
-              { tier: 'Concerning',    pct: 29.7, range: '41–55%', color: '#7a6a2a' },
-              { tier: 'Mildly Culty',  pct: 18.9, range: '21–40%', color: '#5a7a3a' },
-              { tier: 'Healthy Group', pct: 10.5, range: '0–20%',  color: '#2a6b4a' },
-            ].map((t, i) => (
+            {tierData.map((t, i) => {
+              const meta = TIER_META[t.tier] || { color: '#888' };
+              return (
               <div key={i} style={{display: 'grid', gridTemplateColumns: '140px 1fr 50px', gap: '1rem', alignItems: 'center'}}>
                 <div style={{
                   fontFamily: 'var(--mono)', fontSize: '0.7rem',
                   letterSpacing: '0.08em', textTransform: 'uppercase',
                   color: 'var(--paper)', padding: '0.25rem 0.6rem',
-                  background: t.color,
+                  background: meta.color,
                 }}>{t.tier}</div>
                 <div style={{
                   height: '8px', background: 'rgba(212,206,196,0.1)',
                   borderRadius: '1px', overflow: 'hidden',
                 }}>
                   <div style={{
-                    height: '100%', width: `${t.pct * (100/30)}%`,
-                    background: t.color, transition: 'width 0.3s',
+                    height: '100%', width: `${(t.pct / maxPct) * 100}%`,
+                    background: meta.color, transition: 'width 0.3s',
                   }} />
                 </div>
                 <div style={{
                   fontFamily: 'var(--mono)', fontSize: '0.75rem',
                   color: 'var(--muted)', textAlign: 'right',
-                }}>{t.pct}%</div>
+                }}>{t.pct.toFixed(1)}%</div>
               </div>
-            ))}
+              );
+            })}
           </div>
 
           <p style={{color: 'var(--muted)', fontSize: '0.88rem', fontStyle: 'italic'}}>
-            Concerning is the largest single tier, accounting for nearly
-            30% of assessed organizations. The majority of American
-            institutional life sits in the Concerning-to-High-Control range.
+            {largest.tier} is the largest single tier, accounting for
+            {' '}{largest.pct.toFixed(0)}% of scored organizations. These figures
+            update as new assessments are completed.
           </p>
 
           <hr className="rule" />

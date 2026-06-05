@@ -7,14 +7,12 @@ const SUPABASE_URL = 'https://shgdrkrqjnwtlyxcdayp.supabase.co';
 const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNoZ2Rya3Jxam53dGx5eGNkYXlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzMzgwNjYsImV4cCI6MjA5NTkxNDA2Nn0.L5NPabtJGLFWb81SruP3XfjgFuycu4DhvaMJhInqWfo';
 
 const TIER_COLORS = {
-  'Cult':'#c02020','Cult Dynamics':'#c04040','High Control':'#b07030',
-  'Concerning':'#a09040','Mildly Culty':'#6a9840','Healthy Group':'#30a060',
+  'Super Culty':'#c02020','Kinda Culty':'#b07030','Not Culty':'#30a060',
 };
 const TIER_CLASS = {
-  'Cult':'tier-cult','Cult Dynamics':'tier-cult-dynamics','High Control':'tier-high-control',
-  'Concerning':'tier-concerning','Mildly Culty':'tier-mildly-culty','Healthy Group':'tier-healthy-group',
+  'Super Culty':'tier-super-culty','Kinda Culty':'tier-kinda-culty','Not Culty':'tier-not-culty',
 };
-const TIERS = ['Cult','Cult Dynamics','High Control','Concerning','Mildly Culty','Healthy Group'];
+const TIERS = ['Super Culty','Kinda Culty','Not Culty'];
 const TRAJECTORIES = ['Stable','Escalating','Declining','Defunct'];
 const CRITERIA = ['C1','C2','C3','C4','C5','C6','C7','C8','C9','C10'];
 const CRITERIA_DETAIL = {

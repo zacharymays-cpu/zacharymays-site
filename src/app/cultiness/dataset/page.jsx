@@ -105,8 +105,8 @@ export default function DatasetPage() {
             The dataset includes 38 calibration anchors — historical and
             international organizations used to bracket the scoring spectrum
             and ensure consistency across assessment sessions. Anchors span
-            from organizations scoring at the Cult ceiling (100% composite,
-            10/10 Young's) to the Healthy Group floor (5% composite, 0/10
+            from organizations scoring at the Super Culty ceiling (100% composite,
+            10/10 Young's) to the Not Culty floor (5% composite, 0/10
             Young's). They are audited against current methodology after
             each versioned methodology update.
           </p>
@@ -114,7 +114,7 @@ export default function DatasetPage() {
           <p>
             Calibration anchors include both extreme cases (Aum Shinrikyo,
             Peoples Temple, the Khmer Rouge) and reference floor cases
-            (Costco, at 5% composite, serves as the Healthy Group anchor —
+            (Costco, at 5% composite, serves as the Not Culty anchor —
             demonstrating what high institutional loyalty and strong employee
             satisfaction look like in the complete absence of formation-system
             architecture).
