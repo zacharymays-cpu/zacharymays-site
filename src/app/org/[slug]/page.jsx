@@ -264,8 +264,8 @@ export default async function OrgPage({ params }) {
           {/* ── Stacked: charts row under the header, then full-width content ── */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
 
-            {/* ── Main content (full width, below the charts) ─────────── */}
-            <div style={{ order: 2 }}>
+            {/* ── Main content (capped reading measure, below the charts) ─ */}
+            <div style={{ order: 2, width: '100%', maxWidth: 860, alignSelf: 'center' }}>
 
               {/* Political position text row — kept adjacent to the compass in the charts row above */}
               {ps && (
