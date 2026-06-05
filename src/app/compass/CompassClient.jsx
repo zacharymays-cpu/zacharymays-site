@@ -30,7 +30,7 @@ const star = (x, y, R) => {
   return `M${pts.join('L')}Z`;
 };
 
-export default function CompassClient({ orgs=[], regimes=[], presidentialEras=[] }) {
+export default function CompassClient({ orgs=[], regimes=[], presidentialEras=[], r=0.67 }) {
   const [hovered, setHovered]       = useState(null);
   const [selected, setSelected]     = useState(null);
   const [tierFilter, setTierFilter] = useState([]);
@@ -383,7 +383,7 @@ export default function CompassClient({ orgs=[], regimes=[], presidentialEras=[]
 
           <div style={{marginTop:'2.5rem',padding:'1.25rem',background:'rgba(244,240,232,0.02)',border:'1px solid rgba(212,206,196,0.08)'}}>
             <p style={{fontFamily:'var(--mono)',fontSize:'0.67rem',color:'var(--muted)',margin:0,lineHeight:1.7}}>
-              <span style={{color:'var(--gold)'}}>r = 0.703</span> correlation between authority-axis position and composite cultiness score across the full dataset.
+              <span style={{color:'var(--gold)'}}>r = {(typeof r === 'number' ? r : 0.67).toFixed(3)}</span> correlation between authority-axis position and composite cultiness score across the full dataset.
               Economic axis: −5 Far Left to +5 Far Right. Authority axis: −5 Libertarian to +5 Authoritarian.
               Scores reflect documented institutional behavior. Historical regimes (◆) and presidential eras (★) are reference anchors, not scored organizations.
             </p>

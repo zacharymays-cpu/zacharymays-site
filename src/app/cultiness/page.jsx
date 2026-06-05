@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import OrgCount from '../../components/OrgCount';
+import Correlation from '../../components/Correlation';
 
 export const metadata = {
   title: 'The Cultiness Spectrum',
@@ -108,9 +109,9 @@ export default function CultinessPage() {
             margin: '1.5rem 0 2.5rem',
           }}>
             {[
-              { num: <OrgCount />, label: 'Active organizations assessed' },
-              { num: '38',         label: 'Calibration anchors' },
-              { num: 'r=0.703',    label: 'Authority-axis correlation' },
+              { num: <OrgCount />,                 label: 'Active organizations assessed' },
+              { num: '38',                         label: 'Calibration anchors' },
+              { num: <Correlation prefix="r=" />,  label: 'Authority-axis correlation' },
             ].map((stat, i) => (
               <div key={i} style={{
                 background: 'var(--ink)', padding: '2rem', textAlign: 'center',

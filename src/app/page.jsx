@@ -93,7 +93,7 @@ export default function HomePage() {
                 {href:'/explore',         label:'Dataset Explorer',    desc:'Search, filter, and browse the full dataset'},
                 {href:'/compass',         label:'Political Compass',   desc:'Organizations plotted by political and authority axes'},
                 {href:'/cultiness/methodology',    label:'Methodology',         desc:'How the scoring works, criteria, and N/A rules'},
-                {href:'/cultiness/findings',       label:'Key Findings',        desc:'r=0.703, tier distribution, benchmark comparisons'},
+                {href:'/cultiness/findings',       label:'Key Findings',        desc:'The headline correlation, tier distribution, and benchmark comparisons'},
               ].map((item,i) => (
                 <Link key={i} href={item.href} style={{
                   display:'block', padding:'1.25rem',
