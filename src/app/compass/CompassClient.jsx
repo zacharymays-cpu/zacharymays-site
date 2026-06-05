@@ -3,9 +3,9 @@ import { useState, useMemo, useRef, useEffect } from 'react';
 import Link from 'next/link';
 
 const TIER_COLORS = {
-  'Super Culty':  '#c02020',
-  'Kinda Culty':  '#b07030',
-  'Not Culty':    '#30a060',
+  'Super Culty':  '#e8574d',
+  'Kinda Culty':  '#d99b3e',
+  'Not Culty':    '#5cb878',
 };
 const TIERS       = ['Super Culty','Kinda Culty','Not Culty'];
 const TRAJECTORIES= ['Stable','Escalating','Declining','Defunct'];

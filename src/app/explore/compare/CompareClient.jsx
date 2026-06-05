@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 const CRITERIA = ['C1','C2','C3','C4','C5','C6','C7','C8','C9','C10'];
 const C_SHORT = { C1:'Leadership',C2:'Sacred Assump.',C3:'Mission',C4:'Individuality',C5:'Isolation',C6:'Vernacular',C7:'Us/Them',C8:'Labor',C9:'Exit Costs',C10:'Ends/Means' };
-const TIER_COLORS = { 'Super Culty':'#c02020','Kinda Culty':'#b07030','Not Culty':'#30a060' };
+const TIER_COLORS = { 'Super Culty':'#e8574d','Kinda Culty':'#d99b3e','Not Culty':'#5cb878' };
 
 // Pre-populated pairs that illustrate the book's core arguments
 const PRESET_PAIRS = [
@@ -53,7 +53,7 @@ const PRESET_PAIRS = [
 ];
 
 function scoreColor(side) {
-  return side === 'a' ? '#c04040' : '#3a8a6a';
+  return side === 'a' ? '#e8574d' : '#5cb878';
 }
 
 function CompositeBar({ score, side, maxScore=100 }) {

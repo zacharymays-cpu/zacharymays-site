@@ -7,9 +7,9 @@ const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsI
 
 const TIERS = ['Super Culty','Kinda Culty','Not Culty'];
 const TC = {
-  'Super Culty':   {fill:'#ff4466',stroke:'#cc1133',hi:'#ff99aa',bg:'rgba(255,68,102,0.1)',text:'#cc1133'},
-  'Kinda Culty':   {fill:'#e6a800',stroke:'#b38200',hi:'#ffdd66',bg:'rgba(230,168,0,0.1)', text:'#9b6f00'},
-  'Not Culty':     {fill:'#1a8fbf',stroke:'#116688',hi:'#66ddff',bg:'rgba(26,143,191,0.1)',text:'#116688'},
+  'Super Culty':   {fill:'#e8574d',stroke:'#cc1133',hi:'#ff99aa',bg:'rgba(255,68,102,0.1)',text:'#cc1133'},
+  'Kinda Culty':   {fill:'#d99b3e',stroke:'#b38200',hi:'#ffdd66',bg:'rgba(230,168,0,0.1)', text:'#9b6f00'},
+  'Not Culty':     {fill:'#5cb878',stroke:'#116688',hi:'#66ddff',bg:'rgba(26,143,191,0.1)',text:'#116688'},
 };
 
 export default function BubbleClient() {
