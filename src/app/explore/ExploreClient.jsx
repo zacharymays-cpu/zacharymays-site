@@ -464,6 +464,10 @@ export default function ExploreClient({ initialOrgs=[] }) {
         if(aNan&&bNan) return 0;
         if(aNan) return 1;
         if(bNan) return -1;
+      } else if(sortBy==='composite_tier'){
+        // Sort by tier rank (Super → Kinda → Not); unscored last.
+        const rank=t=>{const i=TIERS.indexOf(t);return i===-1?99:i;};
+        av=rank(av); bv=rank(bv);
       } else if(typeof av==='string'){av=av.toLowerCase();bv=(bv||'').toLowerCase();}
       if(av<bv) return sortDir==='asc'?-1:1;
       if(av>bv) return sortDir==='asc'?1:-1;
@@ -618,7 +622,7 @@ export default function ExploreClient({ initialOrgs=[] }) {
               <table style={{width:'100%',borderCollapse:'collapse',minWidth:'500px'}}>
                 <thead style={{position:'sticky',top:0,background:'#1a1512',zIndex:1}}>
                   <tr style={{borderBottom:'1px solid rgba(212,206,196,0.2)'}}>
-                    {[['name','Organization'],['composite_score','Score'],['youngs_score',"Young's"],['category','Category'],['trajectory','Trajectory']].map(([col,label])=>(
+                    {[['name','Organization'],['composite_score','Score'],['composite_tier','Tier'],['youngs_score',"Young's"],['category','Category'],['trajectory','Trajectory']].map(([col,label])=>(
                       <th key={col} onClick={()=>handleSort(col)}
                         onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();handleSort(col);}}}
                         role="button" tabIndex={0} aria-label={`Sort by ${label}`}
@@ -641,10 +645,15 @@ export default function ExploreClient({ initialOrgs=[] }) {
                         background:i%2===0?'transparent':'rgba(244,240,232,0.012)',
                         cursor:'pointer',transition:'background 0.1s'}}>
                       <td style={{padding:'0.65rem 0.75rem',color:'var(--paper)',fontSize:'0.88rem',fontFamily:'var(--serif)'}}>{org.name}</td>
-                      <td style={{padding:'0.65rem 0.75rem',fontFamily:'var(--mono)',fontSize:'0.82rem',color:'var(--paper)',whiteSpace:'nowrap'}}>
+                      <td style={{padding:'0.65rem 0.75rem',fontFamily:'var(--mono)',fontSize:'0.82rem',fontWeight:600,color:TIER_COLORS[org.composite_tier]||'var(--paper)',whiteSpace:'nowrap'}}>
                         {Number.isNaN(parseFloat(org.composite_score))
-                          ? <span style={{color:'rgba(212,206,196,0.35)',fontStyle:'italic',fontSize:'0.72rem',letterSpacing:'0.04em'}}>Pending</span>
+                          ? <span style={{color:'rgba(212,206,196,0.35)',fontStyle:'italic',fontSize:'0.72rem',letterSpacing:'0.04em',fontWeight:400}}>Pending</span>
                           : `${parseFloat(org.composite_score).toFixed(1)}%`}
+                      </td>
+                      <td style={{padding:'0.65rem 0.75rem',whiteSpace:'nowrap'}}>
+                        {org.composite_tier
+                          ? <span style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.06em',textTransform:'uppercase',padding:'0.24rem 0.5rem',borderRadius:'2px',color:TIER_COLORS[org.composite_tier],background:`rgba(${hexToRgb(TIER_COLORS[org.composite_tier])},0.13)`,border:`1px solid rgba(${hexToRgb(TIER_COLORS[org.composite_tier])},0.45)`}}>{org.composite_tier}</span>
+                          : <span style={{fontFamily:'var(--mono)',fontSize:'0.62rem',fontStyle:'italic',color:'rgba(212,206,196,0.3)'}}>Pending</span>}
                       </td>
                       <td style={{padding:'0.65rem 0.75rem',fontFamily:'var(--mono)',fontSize:'0.82rem',color:'var(--muted)'}}>{org.youngs_score==null?'—':`${org.youngs_score}/10`}</td>
                       <td className="explore-table-hide-mobile" style={{padding:'0.65rem 0.75rem',color:'var(--muted)',fontSize:'0.75rem',fontFamily:'var(--mono)',whiteSpace:'nowrap'}}>{org.category}</td>
@@ -653,7 +662,7 @@ export default function ExploreClient({ initialOrgs=[] }) {
                     </tr>
                   ))}
                   {filtered.length===0&&(
-                    <tr><td colSpan={6} style={{padding:'3rem',textAlign:'center',color:'var(--muted)',fontFamily:'var(--mono)',fontSize:'0.8rem'}}>No organizations match current filters.</td></tr>
+                    <tr><td colSpan={7} style={{padding:'3rem',textAlign:'center',color:'var(--muted)',fontFamily:'var(--mono)',fontSize:'0.8rem'}}>No organizations match current filters.</td></tr>
                   )}
                 </tbody>
               </table>
