@@ -186,11 +186,6 @@ export default async function OrgPage({ params }) {
   const criteria = [...(org.criterion_scores || [])]
     .sort((a, b) => parseInt(a.criterion.replace('C','')) - parseInt(b.criterion.replace('C','')))
 
-  // Strongest / weakest scored criteria, for the at-a-glance facts panel
-  const scoredCriteria = criteria.filter(c => c.score != null)
-  const strongest = scoredCriteria.length ? scoredCriteria.reduce((a, b) => (b.score > a.score ? b : a)) : null
-  const weakest   = scoredCriteria.length ? scoredCriteria.reduce((a, b) => (b.score < a.score ? b : a)) : null
-
   // De-duplicate evidence sources across all criteria (each source is attached
   // per-criterion, so the same reference recurs). Best factual tier first, then newest.
   const sources = []
@@ -446,98 +441,67 @@ export default async function OrgPage({ params }) {
               </p>
             </div>
 
-            {/* ── Charts row (full width, under the header) ───────────── */}
-            <div style={{ order: 1, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem', alignItems: 'start' }}>
-
-              {/* Score summary + at-a-glance facts (fills the column beside the taller charts) */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px' }}>
-                  {[
-                    { label: 'Composite', value: compositePct,                                       sub: org.composite_tier ?? 'Not yet scored' },
-                    { label: "Young's",   value: org.youngs_score != null ? `${org.youngs_score}/10` : '—', sub: org.youngs_band ?? '—' },
-                  ].map(({ label, value, sub }) => (
-                    <div key={label} style={{ background: 'rgba(244,240,232,0.03)', border: '1px solid rgba(212,206,196,0.12)', padding: '1rem 0.75rem', textAlign: 'center' }}>
-                      <div style={{ fontFamily: 'var(--mono)', fontSize: '0.52rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(212,206,196,0.65)', marginBottom: '0.3rem' }}>{label}</div>
-                      <div style={{ fontFamily: 'var(--serif)', fontSize: '1.6rem', fontWeight: 700, color: tierText, lineHeight: 1 }}>{value}</div>
-                      <div style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', color: 'rgba(212,206,196,0.65)', marginTop: '0.25rem' }}>{sub}</div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* At a glance */}
-                <div style={{ background: 'rgba(244,240,232,0.02)', border: '1px solid rgba(212,206,196,0.12)', padding: '1rem' }}>
-                  <div style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(212,206,196,0.65)', marginBottom: '0.6rem', textAlign: 'center' }}>
-                    At a Glance
-                  </div>
-                  {[
-                    { label: 'Category',   value: org.category },
-                    { label: 'Scope',      value: org.membership_scope },
-                    { label: 'Trajectory', value: TRAJ[org.trajectory] ?? org.trajectory },
-                    { label: 'Strongest',  value: strongest ? `${CRITERIA[strongest.criterion]} (${strongest.score})` : null },
-                    { label: 'Weakest',    value: weakest   ? `${CRITERIA[weakest.criterion]} (${weakest.score})`   : null },
-                  ].filter(r => r.value).map(({ label, value }) => (
-                    <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '0.75rem', padding: '0.5rem 0', borderTop: '1px solid rgba(212,206,196,0.08)' }}>
-                      <span style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(212,206,196,0.5)', flexShrink: 0 }}>{label}</span>
-                      <span style={{ fontFamily: 'var(--mono)', fontSize: '0.68rem', color: 'rgba(212,206,196,0.85)', textAlign: 'right' }}>{value}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
+            {/* ── Charts row: two evened panels under the header ───────── */}
+            <div style={{ order: 1, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1rem', alignItems: 'stretch' }}>
 
               {/* Political compass — always shown */}
-              <div style={{ background: 'rgba(244,240,232,0.02)', border: '1px solid rgba(212,206,196,0.12)', padding: '1rem' }}>
+              <div style={{ background: 'rgba(244,240,232,0.02)', border: '1px solid rgba(212,206,196,0.12)', padding: '1rem', display: 'flex', flexDirection: 'column' }}>
                 <div style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(212,206,196,0.65)', marginBottom: '0.75rem', textAlign: 'center' }}>
                   Political Compass
                 </div>
-                {ps ? (
-                  <>
-                    <MiniCompass
-                      econ={ps.economic_axis}
-                      auth={ps.authority_axis}
-                      quadrant={ps.political_quadrant}
-                      tierColor={tierColor}
-                    />
-                    <div style={{ display: 'flex', justifyContent: 'center', gap: '1.25rem', marginTop: '0.65rem' }}>
-                      <span style={{ fontFamily: 'var(--mono)', fontSize: '0.6rem', color: 'rgba(212,206,196,0.75)' }}>
-                        Econ {parseFloat(ps.economic_axis) > 0 ? '+' : ''}{ps.economic_axis}
-                      </span>
-                      <span style={{ fontFamily: 'var(--mono)', fontSize: '0.6rem', color: 'rgba(212,206,196,0.75)' }}>
-                        Auth {parseFloat(ps.authority_axis) > 0 ? '+' : ''}{ps.authority_axis}
-                      </span>
-                    </div>
-                    {ps.political_quadrant && (
-                      <div style={{ textAlign: 'center', marginTop: '0.3rem', fontFamily: 'var(--mono)', fontSize: '0.62rem', color: 'rgba(212,206,196,0.75)', letterSpacing: '0.06em' }}>
-                        {ps.political_quadrant}
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                  {ps ? (
+                    <>
+                      <MiniCompass
+                        econ={ps.economic_axis}
+                        auth={ps.authority_axis}
+                        quadrant={ps.political_quadrant}
+                        tierColor={tierColor}
+                      />
+                      <div style={{ display: 'flex', justifyContent: 'center', gap: '1.25rem', marginTop: '0.65rem' }}>
+                        <span style={{ fontFamily: 'var(--mono)', fontSize: '0.6rem', color: 'rgba(212,206,196,0.75)' }}>
+                          Econ {parseFloat(ps.economic_axis) > 0 ? '+' : ''}{ps.economic_axis}
+                        </span>
+                        <span style={{ fontFamily: 'var(--mono)', fontSize: '0.6rem', color: 'rgba(212,206,196,0.75)' }}>
+                          Auth {parseFloat(ps.authority_axis) > 0 ? '+' : ''}{ps.authority_axis}
+                        </span>
                       </div>
-                    )}
-                  </>
-                ) : (
-                  <div style={{ textAlign: 'center', padding: '1.5rem 0', fontFamily: 'var(--mono)', fontSize: '0.6rem', color: 'rgba(212,206,196,0.3)' }}>
-                    Political position not yet scored
-                  </div>
-                )}
+                      {ps.political_quadrant && (
+                        <div style={{ textAlign: 'center', marginTop: '0.3rem', fontFamily: 'var(--mono)', fontSize: '0.62rem', color: 'rgba(212,206,196,0.75)', letterSpacing: '0.06em' }}>
+                          {ps.political_quadrant}
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div style={{ textAlign: 'center', padding: '1.5rem 0', fontFamily: 'var(--mono)', fontSize: '0.6rem', color: 'rgba(212,206,196,0.3)' }}>
+                      Political position not yet scored
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Radar chart */}
-              <div style={{ background: 'rgba(244,240,232,0.02)', border: '1px solid rgba(212,206,196,0.12)', padding: '1rem' }}>
+              <div style={{ background: 'rgba(244,240,232,0.02)', border: '1px solid rgba(212,206,196,0.12)', padding: '1rem', display: 'flex', flexDirection: 'column' }}>
                 <div style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(212,206,196,0.65)', marginBottom: '0.75rem', textAlign: 'center' }}>
                   Criteria Profile
                 </div>
-                <RadarChart criteria={criteria} tierColor={tierColor} />
-                {/* Score legend */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px', marginTop: '0.75rem' }}>
-                  {criteria.map(({ criterion, score }) => {
-                    const isNA = score == null
-                    return (
-                      <div key={criterion} style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', padding: '0.15rem 0.25rem' }}>
-                        <div style={{ width: 6, height: 6, borderRadius: '50%', background: isNA ? 'rgba(212,206,196,0.2)' : SCORE_COLOR(score), flexShrink: 0 }} />
-                        <span style={{ fontFamily: 'var(--mono)', fontSize: '0.52rem', color: 'rgba(212,206,196,0.72)', flex: 1 }}>{criterion}</span>
-                        <span style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', color: isNA ? 'rgba(212,206,196,0.3)' : SCORE_COLOR(score), fontWeight: isNA ? 400 : 600 }}>
-                          {isNA ? 'N/A' : score}
-                        </span>
-                      </div>
-                    )
-                  })}
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                  <RadarChart criteria={criteria} tierColor={tierColor} />
+                  {/* Score legend */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px', marginTop: '0.75rem' }}>
+                    {criteria.map(({ criterion, score }) => {
+                      const isNA = score == null
+                      return (
+                        <div key={criterion} style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', padding: '0.15rem 0.25rem' }}>
+                          <div style={{ width: 6, height: 6, borderRadius: '50%', background: isNA ? 'rgba(212,206,196,0.2)' : SCORE_COLOR(score), flexShrink: 0 }} />
+                          <span style={{ fontFamily: 'var(--mono)', fontSize: '0.52rem', color: 'rgba(212,206,196,0.72)', flex: 1 }}>{criterion}</span>
+                          <span style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', color: isNA ? 'rgba(212,206,196,0.3)' : SCORE_COLOR(score), fontWeight: isNA ? 400 : 600 }}>
+                            {isNA ? 'N/A' : score}
+                          </span>
+                        </div>
+                      )
+                    })}
+                  </div>
                 </div>
               </div>
 
