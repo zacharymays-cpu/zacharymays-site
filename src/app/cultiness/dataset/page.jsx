@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import OrgCount from '../../../components/OrgCount';
 
 export const metadata = {
   title: 'The Dataset — The Cultiness Spectrum',
@@ -28,7 +29,7 @@ export default function DatasetPage() {
           </span>
           <h1 className="hero__title animate-up-2">What Was<br />Assessed</h1>
           <p className="hero__subtitle animate-up-3">
-            370 active American organizations. 38 calibration anchors.
+            <OrgCount /> active American organizations. 38 calibration anchors.
             Publicly available, openly documented, and ongoing.
           </p>
         </div>

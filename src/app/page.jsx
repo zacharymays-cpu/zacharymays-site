@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import OrgCount from '../components/OrgCount';
 
 export const metadata = {
   title: 'Zachary S. Mays — Author',
@@ -71,7 +72,7 @@ export default function HomePage() {
                 The Cultiness Spectrum
               </span>
               <h2 style={{fontFamily:'var(--serif)',fontSize:'clamp(1.8rem,3vw,2.8rem)',lineHeight:1.15,letterSpacing:'-0.02em',color:'var(--paper)',marginBottom:'1.25rem'}}>
-                370 American organizations.<br />One framework.
+                <OrgCount /> American organizations.<br />One framework.
               </h2>
               <p style={{fontSize:'0.95rem',color:'var(--muted)',lineHeight:1.75,marginBottom:'2rem'}}>
                 The empirical backbone of <em>How We Got Here</em> — a large-scale application of
@@ -89,7 +90,7 @@ export default function HomePage() {
             </div>
             <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'2px'}}>
               {[
-                {href:'/explore',         label:'Dataset Explorer',    desc:'Search, filter, and browse all 370 organizations'},
+                {href:'/explore',         label:'Dataset Explorer',    desc:'Search, filter, and browse the full dataset'},
                 {href:'/compass',         label:'Political Compass',   desc:'Organizations plotted by political and authority axes'},
                 {href:'/cultiness/methodology',    label:'Methodology',         desc:'How the scoring works, criteria, and N/A rules'},
                 {href:'/cultiness/findings',       label:'Key Findings',        desc:'r=0.703, tier distribution, benchmark comparisons'},

@@ -1,8 +1,9 @@
 import Link from 'next/link';
+import OrgCount from '../../components/OrgCount';
 
 export const metadata = {
   title: 'The Cultiness Spectrum',
-  description: 'An independent public research project applying the Young-Reed framework systematically across American institutions. 370 organizations assessed, openly documented, ongoing.',
+  description: 'An independent public research project applying the Young-Reed framework systematically across hundreds of American institutions, openly documented and ongoing.',
 };
 
 const NAV_ITEMS = [
@@ -107,9 +108,9 @@ export default function CultinessPage() {
             margin: '1.5rem 0 2.5rem',
           }}>
             {[
-              { num: '370',     label: 'Active organizations assessed' },
-              { num: '38',      label: 'Calibration anchors' },
-              { num: 'r=0.703', label: 'Authority-axis correlation' },
+              { num: <OrgCount />, label: 'Active organizations assessed' },
+              { num: '38',         label: 'Calibration anchors' },
+              { num: 'r=0.703',    label: 'Authority-axis correlation' },
             ].map((stat, i) => (
               <div key={i} style={{
                 background: 'var(--ink)', padding: '2rem', textAlign: 'center',
