@@ -106,15 +106,7 @@ export default function SankeyClient({ data = [] }) {
       {/* Header */}
       <div style={{ borderBottom: '1px solid rgba(212,206,196,0.1)', padding: '1.25rem 0 0.9rem', background: 'var(--ink)', position: 'sticky', top: '60px', zIndex: 50 }}>
         <div className="container--wide">
-          <div>
-            <span style={{ fontFamily: 'var(--mono)', fontSize: '0.6rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--gold)' }}>
-              <a href="/explore" style={{ color: 'var(--gold)' }}>Explorer</a> —
-            </span>
-            <h1 style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(1.2rem,2.5vw,1.8rem)', color: 'var(--paper)', display: 'inline', marginLeft: '0.4rem' }}>
-              Category → Tier Flow
-            </h1>
-          </div>
-          <p style={{ fontFamily: 'var(--mono)', fontSize: '0.62rem', color: 'var(--muted)', marginTop: '0.4rem' }}>
+          <p style={{ fontFamily: 'var(--mono)', fontSize: '0.62rem', color: 'var(--muted)', marginTop: 0 }}>
             How each organizational category distributes across cultiness tiers. Hover to trace a category or tier.
           </p>
         </div>

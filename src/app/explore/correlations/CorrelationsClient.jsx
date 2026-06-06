@@ -1,6 +1,5 @@
 'use client';
 import { useState, useMemo } from 'react';
-import Link from 'next/link';
 
 const CRITERIA = ['C1','C2','C3','C4','C5','C6','C7','C8','C9','C10'];
 const C_NAMES = { C1:'Charismatic Leadership',C2:'Sacred Assumptions',C3:'Transcendent Mission',C4:'Sublimation of Individuality',C5:'Isolation',C6:'Private Vernacular',C7:'Us-Versus-Them',C8:'Exploitation of Labor',C9:'High Exit Costs',C10:'Ends Justify the Means' };
@@ -85,15 +84,7 @@ export default function CorrelationsClient({ orgs=[], scoreMap={} }) {
     <div style={{minHeight:'100vh'}}>
       <div style={{borderBottom:'1px solid rgba(212,206,196,0.1)',padding:'2rem 0 1.5rem',background:'var(--ink)',position:'sticky',top:'60px',zIndex:50}}>
         <div className="container--wide">
-          <div style={{display:'flex',alignItems:'baseline',justifyContent:'space-between',flexWrap:'wrap',gap:'1rem'}}>
-            <div>
-              <span style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.15em',textTransform:'uppercase',color:'var(--gold)'}}>
-                <Link href="/explore" style={{color:'var(--gold)'}}>Explorer</Link> —
-              </span>
-              <h1 style={{fontFamily:'var(--serif)',fontSize:'clamp(1.3rem,3vw,2rem)',color:'var(--paper)',display:'inline',marginLeft:'0.4rem'}}>Criterion Correlations</h1>
-            </div>
-          </div>
-          <div style={{display:'flex',gap:'1rem',marginTop:'1rem',alignItems:'center'}}>
+          <div style={{display:'flex',gap:'1rem',alignItems:'center'}}>
             <label style={{display:'flex',alignItems:'center',gap:'0.5rem',cursor:'pointer'}}>
               <input type="checkbox" checked={includeComposite} onChange={e=>setIncludeComposite(e.target.checked)} style={{accentColor:'var(--gold)'}}/>
               <span style={{fontFamily:'var(--mono)',fontSize:'0.68rem',color:'var(--muted)'}}>Include composite score column</span>

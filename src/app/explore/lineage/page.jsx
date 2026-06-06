@@ -29,5 +29,5 @@ export default async function LineagePage() {
   ]);
   const lineageOrgs = orgs.filter(o => activeSlugs.has(o.slug));
 
-  return (<><ExploreNav /><LineageClient nodes={lineageOrgs} edges={edges} /></>);
+  return (<><ExploreNav title="Formation Lineage" /><LineageClient nodes={lineageOrgs} edges={edges} /></>);
 }

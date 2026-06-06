@@ -1,5 +1,4 @@
 import CompareClient from './CompareClient';
-import Link from 'next/link';
 import ExploreNav from '../../../components/ExploreNav';
 
 const SUPABASE_URL = 'https://shgdrkrqjnwtlyxcdayp.supabase.co';
@@ -26,5 +25,5 @@ export default async function ComparePage() {
     scoreMap[s.org_id][s.criterion] = s.score !== null ? parseFloat(s.score) : null;
   }
 
-  return (<><ExploreNav /><CompareClient orgs={orgs} scoreMap={scoreMap} /></>);
+  return (<><ExploreNav title="Head-to-Head Comparison" /><CompareClient orgs={orgs} scoreMap={scoreMap} /></>);
 }

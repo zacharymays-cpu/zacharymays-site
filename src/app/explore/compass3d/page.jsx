@@ -7,5 +7,5 @@ export const metadata = {
 };
 
 export default function Compass3DPage() {
-  return (<><ExploreNav /><Compass3DWrapper /></>);
+  return (<><ExploreNav title="3D Political Compass" /><Compass3DWrapper /></>);
 }

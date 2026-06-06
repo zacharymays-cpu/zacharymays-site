@@ -25,5 +25,5 @@ export default async function CorrelationsPage() {
     scoreMap[s.org_id][s.criterion] = s.score !== null ? parseFloat(s.score) : null;
   }
 
-  return (<><ExploreNav /><CorrelationsClient orgs={orgs} scoreMap={scoreMap} /></>);
+  return (<><ExploreNav title="Criterion Correlations" /><CorrelationsClient orgs={orgs} scoreMap={scoreMap} /></>);
 }

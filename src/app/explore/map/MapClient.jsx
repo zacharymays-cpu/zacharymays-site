@@ -1,6 +1,5 @@
 'use client';
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
-import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 const TIER_COLORS = {
@@ -460,18 +459,6 @@ export default function MapClient({ orgs=[], stateStats=[], foundingData=[], wit
         <div className="container--wide">
           <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between',
             flexWrap:'wrap', gap:'0.5rem', marginBottom:'0.75rem' }}>
-            <div style={{ display:'flex', alignItems:'baseline', gap:'0.5rem' }}>
-              <span style={{ fontFamily:'var(--mono)', fontSize:'0.6rem', letterSpacing:'0.15em',
-                textTransform:'uppercase', color:'var(--gold)' }}>
-                <Link href="/explore" style={{ color:'var(--gold)' }}>Explorer</Link>{' '}—{' '}
-                <Link href="/compass" style={{ color:'var(--gold)' }}>Compass</Link> —
-              </span>
-              <h1 style={{ fontFamily:'var(--serif)', fontSize:'clamp(1.2rem,2.5vw,1.8rem)',
-                color:'var(--paper)', display:'inline', marginLeft:'0.4rem' }}>
-                Geographic Map
-              </h1>
-            </div>
-
             {/* Search bar */}
             <div ref={searchRef} style={{ position:'relative', zIndex:60 }}>
               <div style={{ display:'flex', alignItems:'center', gap:'0.4rem',

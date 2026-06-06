@@ -7,5 +7,5 @@ export const metadata = {
 };
 
 export default function CompassBubblePage() {
-  return (<><ExploreNav /><BubbleWrapper /></>);
+  return (<><ExploreNav title="Bubble Compass" /><BubbleWrapper /></>);
 }

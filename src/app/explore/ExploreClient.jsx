@@ -1,7 +1,6 @@
 'use client';
 import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 
 const SUPABASE_URL = 'https://shgdrkrqjnwtlyxcdayp.supabase.co';
 const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNoZ2Rya3Jxam53dGx5eGNkYXlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzMzgwNjYsImV4cCI6MjA5NTkxNDA2Nn0.L5NPabtJGLFWb81SruP3XfjgFuycu4DhvaMJhInqWfo';
@@ -492,14 +491,6 @@ export default function ExploreClient({ initialOrgs=[] }) {
       <div style={{borderBottom:'1px solid rgba(212,206,196,0.1)',padding:'2rem 0 1.5rem',background:'var(--ink)',position:'sticky',top:'60px',zIndex:50}}>
         <div className="container--wide">
           <div className="explore-header-row">
-            <div>
-              <span style={{fontFamily:'var(--mono)',fontSize:'0.65rem',letterSpacing:'0.18em',textTransform:'uppercase',color:'var(--gold)'}}>
-                <Link href="/cultiness" style={{color:'var(--gold)'}}>The Cultiness Spectrum</Link>{' '}—{' '}
-              </span>
-              <h1 style={{fontFamily:'var(--serif)',fontSize:'clamp(1.4rem,3vw,2.2rem)',color:'var(--paper)',display:'inline',marginLeft:'0.4rem'}}>
-                Dataset Explorer
-              </h1>
-            </div>
             {/* Dataset stats — chart switcher lives in the shared <ExploreNav/> above */}
             <div style={{display:'flex',gap:'1.5rem',alignItems:'center'}}>
               <div style={{textAlign:'center'}}>

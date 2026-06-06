@@ -183,14 +183,6 @@ export default function LineageClient({ nodes = [], edges = [] }) {
       <div style={{ borderBottom: '1px solid rgba(212,206,196,0.1)', padding: '1.25rem 0 0.9rem', background: 'var(--ink)', position: 'sticky', top: '60px', zIndex: 50 }}>
         <div className="container--wide">
           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.75rem' }}>
-            <div>
-              <span style={{ fontFamily: 'var(--mono)', fontSize: '0.6rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--gold)' }}>
-                <a href="/explore" style={{ color: 'var(--gold)' }}>Explorer</a> —
-              </span>
-              <h1 style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(1.2rem,2.5vw,1.8rem)', color: 'var(--paper)', display: 'inline', marginLeft: '0.4rem' }}>
-                Formation Lineage
-              </h1>
-            </div>
             <span style={{ fontFamily: 'var(--mono)', fontSize: '0.65rem', color: 'var(--muted)' }}>
               {filteredNodes.length} orgs · {filteredEdges.length} edges
             </span>

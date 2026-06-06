@@ -138,7 +138,7 @@ export default async function MapPage() {
 
   return (
     <>
-      <ExploreNav />
+      <ExploreNav title="Geographic Map" />
       <MapWrapper
         orgs={enrichedOrgs}
         stateStats={stateStats}

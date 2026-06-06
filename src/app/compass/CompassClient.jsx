@@ -180,14 +180,6 @@ export default function CompassClient({ orgs=[], regimes=[], presidentialEras=[]
       <section style={{padding:'2.5rem 0 1.5rem',borderBottom:'1px solid rgba(212,206,196,0.1)'}}>
         <div className="container--wide">
           <div style={{display:'flex',alignItems:'baseline',justifyContent:'space-between',flexWrap:'wrap',gap:'0.5rem',marginBottom:'0.6rem'}}>
-            <div>
-              <span style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.15em',textTransform:'uppercase',color:'var(--gold)',marginRight:'0.5rem'}}>
-                <Link href="/explore" style={{color:'var(--gold)'}}>Dataset Explorer</Link>{' '}—
-              </span>
-              <span style={{fontFamily:'var(--serif)',fontSize:'clamp(1.3rem,2.5vw,1.9rem)',color:'var(--paper)',fontWeight:700}}>
-                Political Compass
-              </span>
-            </div>
             <span style={{fontFamily:'var(--mono)',fontSize:'0.62rem',color:'var(--muted)'}}>
               {orgs.length} organizations · {regimes.length} regimes ◆ · {presidentialEras.length} eras ★
             </span>
