@@ -454,8 +454,7 @@ export default function MapClient({ orgs=[], stateStats=[], foundingData=[], wit
     <div style={{ minHeight:'100vh', display:'flex', flexDirection:'column' }}>
 
       {/* ── Sticky header ── */}
-      <div style={{ borderBottom:'1px solid rgba(212,206,196,0.1)', padding:'1.25rem 0 0.9rem',
-        background:'var(--ink)', position:'sticky', top:'60px', zIndex:50 }}>
+      <div style={{ padding:'1.25rem 0 0.75rem' }}>
         <div className="container--wide">
           <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between',
             flexWrap:'wrap', gap:'0.5rem', marginBottom:'0.75rem' }}>

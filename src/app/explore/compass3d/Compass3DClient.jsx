@@ -254,8 +254,7 @@ export default function Compass3DClient() {
 
   return (
     <div style={{ minHeight:'100vh', display:'flex', flexDirection:'column' }}>
-      <div style={{ borderBottom:'1px solid rgba(212,206,196,0.1)', padding:'1.25rem 0 0.9rem',
-        background:'var(--ink)', position:'sticky', top:'60px', zIndex:50 }}>
+      <div style={{ padding:'1.25rem 0 0.75rem' }}>
         <div className="container--wide">
           <div style={{ display:'flex', gap:'1rem', flexWrap:'wrap', alignItems:'center' }}>
             <label style={{ display:'flex', alignItems:'center', gap:'0.4rem', cursor:'pointer',

@@ -162,7 +162,7 @@ export default function CompareClient({ orgs=[], scoreMap={} }) {
   return (
     <div style={{minHeight:'100vh'}} onClick={e=>{ if(!e.target.closest('.picker-a')) { setOpenA(false); } if(!e.target.closest('.picker-b')) { setOpenB(false); } }}>
       {/* Header */}
-      <div style={{borderBottom:'1px solid rgba(212,206,196,0.1)',padding:'2rem 0 1.5rem',background:'var(--ink)',position:'sticky',top:'60px',zIndex:50}}>
+      <div style={{padding:'1.25rem 0 0.75rem'}}>
         <div className="container--wide">
           <div style={{display:'flex',alignItems:'baseline',justifyContent:'space-between',flexWrap:'wrap',gap:'1rem',marginBottom:'1.25rem'}}>
             <span style={{fontFamily:'var(--mono)',fontSize:'0.65rem',color:'rgba(212,206,196,0.35)'}}>

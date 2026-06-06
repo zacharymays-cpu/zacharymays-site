@@ -104,7 +104,7 @@ export default function SankeyClient({ data = [] }) {
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
-      <div style={{ borderBottom: '1px solid rgba(212,206,196,0.1)', padding: '1.25rem 0 0.9rem', background: 'var(--ink)', position: 'sticky', top: '60px', zIndex: 50 }}>
+      <div style={{ padding: '1.25rem 0 0.75rem' }}>
         <div className="container--wide">
           <p style={{ fontFamily: 'var(--mono)', fontSize: '0.62rem', color: 'var(--muted)', marginTop: 0 }}>
             How each organizational category distributes across cultiness tiers. Hover to trace a category or tier.

@@ -55,7 +55,7 @@ export default function HeatmapClient({ orgs=[], scoreMap={} }) {
   return (
     <div style={{minHeight:'100vh'}}>
       {/* Header */}
-      <div style={{borderBottom:'1px solid rgba(212,206,196,0.1)',padding:'2rem 0 1.5rem',background:'var(--ink)',position:'sticky',top:'60px',zIndex:50}}>
+      <div style={{padding:'1.25rem 0 0.75rem'}}>
         <div className="container--wide">
           <div style={{display:'flex',alignItems:'baseline',justifyContent:'space-between',flexWrap:'wrap',gap:'1rem'}}>
             <div style={{fontFamily:'var(--mono)',fontSize:'0.68rem',color:'var(--muted)'}}>
