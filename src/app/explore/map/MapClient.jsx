@@ -378,8 +378,16 @@ export default function MapClient({ orgs=[], stateStats=[], foundingData=[], wit
         });
         map.on('click','clusters', e => {
           const f = e.features[0];
-          map.getSource('orgs').getClusterExpansionZoom(f.properties.cluster_id, (err, zoom) => {
-            if (!err) map.easeTo({ center:f.geometry.coordinates, zoom:zoom+0.5 });
+          const src = map.getSource('orgs');
+          const cid = f.properties.cluster_id;
+          const count = f.properties.point_count;
+          // List the orgs inside the cluster in the side panel (no forced zoom).
+          src.getClusterLeaves(cid, 1000, 0, (err, leaves) => {
+            if (err) return;
+            const items = (leaves || [])
+              .map(lf => lf.properties)
+              .sort((a, b) => (b.composite_score || 0) - (a.composite_score || 0));
+            setSelected({ type: 'cluster', count, items });
           });
         });
         map.on('mouseenter','clusters', () => { map.getCanvas().style.cursor = 'pointer'; });
@@ -746,11 +754,34 @@ export default function MapClient({ orgs=[], stateStats=[], foundingData=[], wit
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
               <span style={{ fontFamily:'var(--mono)', fontSize:'0.58rem', letterSpacing:'0.15em',
                 textTransform:'uppercase', color:'var(--gold)' }}>
-                {selected.type === 'org' ? 'Organization' : selected.type === 'state' ? 'State Summary' : 'Founding City'}
+                {selected.type === 'org' ? 'Organization'
+                  : selected.type === 'state' ? 'State Summary'
+                  : selected.type === 'cluster' ? `Cluster · ${selected.count} orgs`
+                  : 'Founding City'}
               </span>
               <button onClick={clearSelected}
                 style={{ background:'transparent', border:'none', color:'var(--muted)', cursor:'pointer', fontSize:'1rem' }}>✕</button>
             </div>
+
+            {selected.type === 'cluster' && (
+              <div style={{ display:'flex', flexDirection:'column', gap:'2px' }}>
+                {selected.items.map((it, i) => (
+                  <button key={it.slug || i} onClick={() => selectOrg(it)}
+                    style={{ display:'flex', alignItems:'center', gap:'0.5rem', textAlign:'left',
+                      padding:'0.5rem 0.6rem', background:'rgba(244,240,232,0.03)',
+                      border:'1px solid rgba(212,206,196,0.08)', cursor:'pointer' }}>
+                    <span style={{ width:8, height:8, borderRadius:'50%', flexShrink:0,
+                      background: TIER_COLORS[it.composite_tier] || '#888' }} />
+                    <span style={{ flex:1, fontFamily:'var(--serif)', fontSize:'0.82rem', color:'var(--paper)',
+                      whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{it.name}</span>
+                    <span style={{ fontFamily:'var(--mono)', fontSize:'0.62rem', fontWeight:700,
+                      color: TIER_COLORS[it.composite_tier] || '#888' }}>
+                      {Math.round(it.composite_score || 0)}%
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
 
             {selected.type === 'org' && <>
               <div>
