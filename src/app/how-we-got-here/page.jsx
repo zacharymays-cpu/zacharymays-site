@@ -24,8 +24,7 @@ export default function HowWeGotHerePage() {
           <div className="section__label">The Argument</div>
 
           <p style={{fontSize: '1.1rem', color: 'var(--cream)', lineHeight: 1.8}}>
-            The seventy-two million were not a failure of individual rationality.
-            They were a product.
+            They were not a failure of individual rationality. They were a product.
           </p>
 
           <p>
@@ -70,6 +69,11 @@ export default function HowWeGotHerePage() {
           </p>
 
           <p>
+            A megachurch and a media company and a federal agency score on the
+            same instrument. The divergence is informative. So is the overlap.
+          </p>
+
+          <p>
             The result is a body of evidence that allows the book's argument to
             move from historical claim to measurable pattern. The correlation
             between authority-axis position and composite cultiness score
@@ -91,7 +95,7 @@ export default function HowWeGotHerePage() {
 
           <hr className="rule" />
 
-          <div className="section__label">The Etiological Chains</div>
+          <div className="section__label">The Formation Pipelines</div>
 
           <p>
             The book documents three interlocking formation pipelines — not as
@@ -109,7 +113,7 @@ export default function HowWeGotHerePage() {
                 text: 'From the Powell Memo through the think-tank infrastructure, conservative talk radio, Fox News, the Daily Wire, and algorithmic media — a consent infrastructure built specifically to produce and maintain a population that could not be reached by counter-evidence.'
               },
               {
-                label: 'The Anti-Majoritarian Architecture',
+                label: 'The Structural Design',
                 text: 'The structural design that made all of the above possible: the mechanisms by which minority rule became institutionally sustainable, and the population psychology that made it politically viable.'
               }
             ].map((item, i) => (
@@ -144,12 +148,16 @@ export default function HowWeGotHerePage() {
             divergence is itself analytically meaningful.
           </p>
 
+          {/* TODO(dataset URL): linked to the on-site dataset explorer (/explore); swap if an external/download URL is preferred. */}
           <p>
-            The framework is publicly documented. The dataset is published.
-            The methodology is reproducible. The scores are anchored to
-            publicly verifiable, documented behaviors — court records,
-            regulatory findings, investigative journalism, academic scholarship.
-            Not reputation. Not impression. Documented behavior.
+            The framework is publicly documented. The dataset is published and
+            freely available in the <a href="/explore">dataset explorer</a>.
+          </p>
+
+          <p>
+            Written by a U.S. Marine Corps veteran whose career in logistics and
+            information systems gave him a direct view of what happens when
+            institutions fail to tell people what they need to hear.
           </p>
 
           <div style={{
