@@ -376,20 +376,6 @@ export default function MapClient({ orgs=[], stateStats=[], foundingData=[], wit
             selectOrg({ ...full, ...p });
           }
         });
-        map.on('click','clusters', e => {
-          const f = e.features[0];
-          const src = map.getSource('orgs');
-          const cid = f.properties.cluster_id;
-          const count = f.properties.point_count;
-          // List the orgs inside the cluster in the side panel (no forced zoom).
-          src.getClusterLeaves(cid, 1000, 0, (err, leaves) => {
-            if (err) return;
-            const items = (leaves || [])
-              .map(lf => lf.properties)
-              .sort((a, b) => (b.composite_score || 0) - (a.composite_score || 0));
-            setSelected({ type: 'cluster', count, items });
-          });
-        });
         map.on('mouseenter','clusters', () => { map.getCanvas().style.cursor = 'pointer'; });
         map.on('mouseleave','clusters', () => { map.getCanvas().style.cursor = ''; });
 
@@ -421,7 +407,23 @@ export default function MapClient({ orgs=[], stateStats=[], foundingData=[], wit
         map.on('mouseleave','founding-bubbles', () => { map.getCanvas().style.cursor = ''; });
         map.on('click', e => {
           const hits = map.queryRenderedFeatures(e.point, { layers:['org-dots','clusters','state-fill','founding-bubbles'] });
-          if (!hits.length) clearSelected();
+          if (!hits.length) { clearSelected(); return; }
+          // Handle cluster clicks here (not via a layer-specific listener, so it
+          // always fires): open the panel synchronously, then fill the member list.
+          const cluster = hits.find(h => h.layer.id === 'clusters');
+          if (cluster) {
+            const cid = cluster.properties.cluster_id;
+            const count = cluster.properties.point_count;
+            const center = cluster.geometry.coordinates;
+            setSelected({ type:'cluster', count, center, cid, items: [] });
+            const src = map.getSource('orgs');
+            src?.getClusterLeaves?.(cid, 1000, 0, (err, leaves) => {
+              if (err || !leaves) return;
+              const items = leaves.map(l => l.properties)
+                .sort((a, b) => (b.composite_score || 0) - (a.composite_score || 0));
+              setSelected(s => (s && s.type === 'cluster' && s.cid === cid) ? { ...s, items } : s);
+            });
+          }
         });
 
         mapRef.current = map;
@@ -765,6 +767,17 @@ export default function MapClient({ orgs=[], stateStats=[], foundingData=[], wit
 
             {selected.type === 'cluster' && (
               <div style={{ display:'flex', flexDirection:'column', gap:'2px' }}>
+                {selected.center && (
+                  <button onClick={() => mapRef.current?.easeTo({ center: selected.center, zoom: Math.min(14, (mapRef.current.getZoom() || 4) + 2) })}
+                    style={{ marginBottom:'0.5rem', padding:'0.4rem', background:'rgba(200,168,75,0.08)',
+                      border:'1px solid rgba(200,168,75,0.3)', color:'var(--gold)', cursor:'pointer',
+                      fontFamily:'var(--mono)', fontSize:'0.6rem', letterSpacing:'0.08em', textTransform:'uppercase' }}>
+                    Zoom to cluster →
+                  </button>
+                )}
+                {selected.items.length === 0 && (
+                  <span style={{ fontFamily:'var(--mono)', fontSize:'0.62rem', color:'var(--muted)', padding:'0.3rem 0' }}>Loading members…</span>
+                )}
                 {selected.items.map((it, i) => (
                   <button key={it.slug || i} onClick={() => selectOrg(it)}
                     style={{ display:'flex', alignItems:'center', gap:'0.5rem', textAlign:'left',
