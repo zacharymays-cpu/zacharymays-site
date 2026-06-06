@@ -200,6 +200,20 @@ a:hover { color: var(--paper); }
   rotate: 45deg;
 }
 
+/* Invisible hover bridge spanning the 12px gap between the trigger and the
+   menu. Without it, crossing the gap leaves the <li> and fires mouseleave,
+   closing the menu before the cursor reaches an option. Full-width so it works
+   off-center too. It's a descendant of the open menu, so the hover path from
+   trigger → menu stays continuous. */
+.nav__dropdown::after {
+  content: '';
+  position: absolute;
+  top: -12px;
+  left: 0;
+  right: 0;
+  height: 12px;
+}
+
 .nav__dropdown li { margin: 0; }
 
 .nav__dropdown a {
@@ -446,6 +460,7 @@ a:hover { color: var(--paper); }
     padding: 0 0 0.5rem 0;
   }
   .nav__dropdown::before { display: none; }
+  .nav__dropdown::after { display: none; }
   .nav__dropdown a { padding: 0.5rem 3rem; font-size: 0.72rem; }
 }
 
