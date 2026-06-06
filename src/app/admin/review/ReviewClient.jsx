@@ -204,7 +204,9 @@ function OrgCard({ item }) {
               ) : null}
             </span>
           ) : null}
-          {item.jurySpread != null ? (
+          {item.declineToScore ? (
+            <span style={{ fontSize: 11, fontWeight: 700, color: C.paper, background: C.err, padding: '3px 9px', borderRadius: 999, whiteSpace: 'nowrap' }}>⚠ models declined</span>
+          ) : item.jurySpread != null ? (
             <span style={{ fontSize: 12, fontWeight: 700, color: highSpread ? C.gold : C.muted, whiteSpace: 'nowrap' }}>spread {item.jurySpread}</span>
           ) : null}
           <span style={{ fontSize: 13, color: C.paper, padding: '3px 10px', borderRadius: 999, background: TIER_COLOR[item.tier] || '#555', whiteSpace: 'nowrap' }}>
