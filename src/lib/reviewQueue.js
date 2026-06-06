@@ -44,10 +44,19 @@ export async function getReviewQueue({ limit = 40 } = {}) {
     .filter((o) => latest.has(o.id))
     .map((o) => {
       const v = latest.get(o.id);
-      const p = priority(Number(o.composite_score), v.jury_spread == null ? null : Number(v.jury_spread));
+      // A model's stored composite is exactly 0 only when it abstained (scored
+      // every criterion N/A → breadth 0). If 2+ of the 3 models abstained, the
+      // jury has no usable consensus — surface it for a manual call even though
+      // its (single-model) spread is low and it would otherwise rank "Standard".
+      const declineToScore =
+        [v.score_claude, v.score_gpt4o, v.score_gemini]
+          .filter((x) => x != null && Number(x) === 0).length >= 2;
+      const p = declineToScore
+        ? { rank: 0, reason: 'Models decline to score — manual call needed' }
+        : priority(Number(o.composite_score), v.jury_spread == null ? null : Number(v.jury_spread));
       return { org: o, verdict: v, ...p };
     })
-    .filter((r) => r.rank <= 2) // worklist = disagreement + boundary cases
+    .filter((r) => r.rank <= 2) // worklist = decline-to-score + disagreement + boundary cases
     .sort((a, b) => a.rank - b.rank || (b.verdict.jury_spread || 0) - (a.verdict.jury_spread || 0))
     .slice(0, limit);
 
@@ -121,11 +130,21 @@ export async function getReviewQueue({ limit = 40 } = {}) {
       ? (activeComps.length >= 2 ? Math.round((Math.max(...activeComps) - Math.min(...activeComps)) * 100) / 100 : (activeComps.length ? 0 : null))
       : (verdict.jury_spread == null ? null : Number(verdict.jury_spread));
     const anyAbstained = havePerModel && models.some((m) => m.abstained);
-    // Recompute the display reason from the corrected spread so an abstention-only
-    // case stops reading as "High model disagreement" when the scoring models agree.
-    const displayReason = havePerModel
-      ? priority(Number(org.composite_score), jurySpread).reason + (anyAbstained ? ' · a model abstained' : '')
-      : reason;
+    // 2+ models abstained → the jury has no usable consensus (≤1 model scored).
+    // Flag for a manual call. Fall back to the verdict's 0-composites when
+    // per-model rows aren't loaded.
+    const declineToScore = havePerModel
+      ? models.filter((m) => m.abstained).length >= 2
+      : [verdict.score_claude, verdict.score_gpt4o, verdict.score_gemini]
+          .filter((x) => x != null && Number(x) === 0).length >= 2;
+    // Display reason: decline-to-score wins; otherwise recompute from the
+    // corrected spread so an abstention-only case stops reading as "High model
+    // disagreement" when the scoring models agree.
+    const displayReason = declineToScore
+      ? 'Models decline to score — manual call needed'
+      : havePerModel
+        ? priority(Number(org.composite_score), jurySpread).reason + (anyAbstained ? ' · a model abstained' : '')
+        : reason;
 
     return {
       orgId: org.id,
@@ -150,6 +169,8 @@ export async function getReviewQueue({ limit = 40 } = {}) {
       // all-N/A model can't inflate it and trip a false "high disagreement" flag.
       jurySpread,
       anyAbstained,
+      // 2+ models abstained — jury has no usable consensus; needs a human call.
+      declineToScore,
       modelCount: verdict.model_count ?? null,
       models,
       reviewedAt: org.reviewed_at || null,
