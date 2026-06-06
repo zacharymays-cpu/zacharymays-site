@@ -63,6 +63,11 @@ export default function RootLayout({ children }) {
                    style={{color: 'inherit', textDecoration: 'underline', textDecorationColor: 'rgba(212,206,196,0.3)'}}>
                   Terms of Use
                 </a>
+                {'  ·  '}
+                <a href="/admin/review"
+                   style={{color: 'inherit', textDecoration: 'underline', textDecorationColor: 'rgba(212,206,196,0.3)'}}>
+                  Analyst login
+                </a>
               </p>
             </div>
           </div>
