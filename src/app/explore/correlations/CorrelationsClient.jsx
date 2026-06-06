@@ -99,7 +99,7 @@ export default function CorrelationsClient({ orgs=[], scoreMap={} }) {
           ))}
         </div>
 
-        <div style={{display:'flex',gap:'2rem',alignItems:'flex-start',flexWrap:'wrap'}}>
+        <div style={{display:'flex',gap:'2rem',alignItems:'stretch',flexWrap:'wrap'}}>
           {/* Correlation matrix — left */}
           <div style={{overflowX:'auto',flexShrink:0}}>
             <div style={{position:'relative',display:'inline-block'}}>
@@ -157,7 +157,7 @@ export default function CorrelationsClient({ orgs=[], scoreMap={} }) {
           </div>
 
           {/* Selected-cell detail — right side, sticky so no scrolling is needed */}
-          <div style={{flex:'1 1 340px',minWidth:300,position:'sticky',top:'150px'}}>
+          <div style={{flex:'1 1 340px',minWidth:300,position:'sticky',top:'150px',display:'flex',flexDirection:'column'}}>
             {selected ? (()=>{
               const {a,b,r,pairs} = selected;
               const maxA = a==='COMPOSITE'?100:10, maxB = b==='COMPOSITE'?100:10;
@@ -165,11 +165,12 @@ export default function CorrelationsClient({ orgs=[], scoreMap={} }) {
               const sx = v => SP + (v/maxA)*(SW-SP*2);
               const sy = v => SH-SP - (v/maxB)*(SH-SP*2);
               return (
-                <div style={{display:'flex',flexDirection:'column',gap:'1rem'}}>
+                <div style={{display:'flex',flexDirection:'column',gap:'1rem',flex:1,minHeight:0}}>
                   <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',color:'var(--gold)',letterSpacing:'0.12em',textTransform:'uppercase'}}>
                     {a} vs {b} · r = {r!==null?(r>0?'+':'')+r.toFixed(3):'—'}
                   </div>
-                  <svg viewBox={`0 0 ${SW} ${SH}`} style={{width:'100%',display:'block',background:'rgba(244,240,232,0.02)',border:'1px solid rgba(212,206,196,0.1)'}}>
+                  <div style={{flex:1,minHeight:200,display:'flex'}}>
+                  <svg viewBox={`0 0 ${SW} ${SH}`} preserveAspectRatio="xMidYMid meet" style={{width:'100%',height:'100%',display:'block',background:'rgba(244,240,232,0.02)',border:'1px solid rgba(212,206,196,0.1)'}}>
                     {[0,0.25,0.5,0.75,1].map(f=>(
                       <g key={f}>
                         <line x1={SP} y1={sy(maxB*f)} x2={SW-SP} y2={sy(maxB*f)} stroke="rgba(212,206,196,0.06)" strokeWidth="1"/>
@@ -189,6 +190,7 @@ export default function CorrelationsClient({ orgs=[], scoreMap={} }) {
                     <text x={SW/2} y={SH-4} textAnchor="middle" fill="rgba(212,206,196,0.3)" fontSize={9}>{a==='COMPOSITE'?'Composite %':a+' score'}</text>
                     <text x={10} y={SH/2} textAnchor="middle" fill="rgba(212,206,196,0.3)" fontSize={9} transform={`rotate(-90,10,${SH/2})`}>{b==='COMPOSITE'?'Composite %':b+' score'}</text>
                   </svg>
+                  </div>
                   <div style={{padding:'1rem',background:'rgba(244,240,232,0.02)',border:'1px solid rgba(212,206,196,0.1)'}}>
                     <div style={{fontFamily:'var(--serif)',fontSize:'1rem',fontWeight:700,color:'var(--paper)',marginBottom:'0.75rem'}}>
                       {a==='COMPOSITE'?'Composite Score':C_NAMES[a]} × {b==='COMPOSITE'?'Composite Score':C_NAMES[b]}
@@ -215,7 +217,7 @@ export default function CorrelationsClient({ orgs=[], scoreMap={} }) {
                 </div>
               );
             })() : (
-              <div style={{padding:'2.5rem 1.25rem',textAlign:'center',border:'1px dashed rgba(212,206,196,0.15)',background:'rgba(244,240,232,0.015)',fontFamily:'var(--mono)',fontSize:'0.7rem',color:'rgba(212,206,196,0.4)',lineHeight:1.7}}>
+              <div style={{flex:1,minHeight:200,padding:'2.5rem 1.25rem',display:'flex',alignItems:'center',justifyContent:'center',textAlign:'center',border:'1px dashed rgba(212,206,196,0.15)',background:'rgba(244,240,232,0.015)',fontFamily:'var(--mono)',fontSize:'0.7rem',color:'rgba(212,206,196,0.4)',lineHeight:1.7}}>
                 Click any cell in the matrix to see its scatter plot and statistics here.
               </div>
             )}
