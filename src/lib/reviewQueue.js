@@ -116,6 +116,11 @@ export async function getReviewQueue({ limit = 40 } = {}) {
       // AI jury's overall composite (same 0–100 Young-proportional scale as the
       // published composite) — lets the header show how far a human has moved it.
       juryComposite: verdict.jury_mean == null ? null : Number(verdict.jury_mean),
+      // True when the latest verdict's run has NO ai_model_scores rows yet — i.e. a
+      // rescore wrote the verdict before the per-model scores landed. In that gap,
+      // coverage reads 0 for every model and must NOT be shown as "abstained".
+      // (A genuine abstention still has rows, with null scores, so this stays false.)
+      modelScoresMissing: !perCritModels.has(org.id),
       jurySpread: verdict.jury_spread == null ? null : Number(verdict.jury_spread),
       modelCount: verdict.model_count ?? null,
       models,

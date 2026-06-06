@@ -41,7 +41,7 @@ const btnStyle = {
   padding: '6px 12px', fontWeight: 700, cursor: 'pointer',
 };
 
-function Criterion({ orgId, c }) {
+function Criterion({ orgId, c, stale }) {
   const [score, setScore] = useState(c.score == null ? 'NA' : String(c.score));
   const [rationale, setRationale] = useState('');
   const [msg, setMsg] = useState(null);
@@ -108,18 +108,21 @@ function Criterion({ orgId, c }) {
         </div>
       </div>
 
-      {/* Per-model scores for this criterion — so the spread is explainable */}
-      <div style={{ display: 'flex', gap: 14, fontSize: 12, color: C.muted, margin: '8px 0 2px' }}>
-        {['claude', 'gpt4o', 'gemini'].map((k) => {
-          const label = k === 'gpt4o' ? 'GPT-4o' : k === 'claude' ? 'Claude' : 'Gemini';
-          const v = c.modelScores?.[k];
-          return (
-            <span key={k}>{label}:{' '}
-              <strong style={{ color: v == null ? C.faint : C.paper }}>{v == null ? 'N/A' : v}</strong>
-            </span>
-          );
-        })}
-      </div>
+      {/* Per-model scores for this criterion — so the spread is explainable. Hidden
+          during a rescore gap (no model rows yet) so it doesn't show false N/A. */}
+      {!stale ? (
+        <div style={{ display: 'flex', gap: 14, fontSize: 12, color: C.muted, margin: '8px 0 2px' }}>
+          {['claude', 'gpt4o', 'gemini'].map((k) => {
+            const label = k === 'gpt4o' ? 'GPT-4o' : k === 'claude' ? 'Claude' : 'Gemini';
+            const v = c.modelScores?.[k];
+            return (
+              <span key={k}>{label}:{' '}
+                <strong style={{ color: v == null ? C.faint : C.paper }}>{v == null ? 'N/A' : v}</strong>
+              </span>
+            );
+          })}
+        </div>
+      ) : null}
 
       {/* Evidence — what you judge against */}
       <p style={{
@@ -228,22 +231,27 @@ function OrgCard({ item }) {
             }}>
               <span style={{ color: C.muted, fontSize: 12 }}>Jury composites:</span>
               {item.models.map((m) => (
-                <span key={m.key} title={`${m.scored}/10 criteria scored`}>
+                <span key={m.key} title={item.modelScoresMissing ? 'coverage updating' : `${m.scored}/10 criteria scored`}>
                   {m.label}{' '}
                   <strong>{m.composite == null ? '—' : `${m.composite}%`}</strong>
-                  {m.abstained ? <span style={{ color: C.err }}> · abstained (0/10)</span>
+                  {/* Suppress coverage annotations during a rescore gap — coverage reads
+                      0 for everything then, which would falsely look like abstention. */}
+                  {item.modelScoresMissing ? null
+                    : m.abstained ? <span style={{ color: C.err }}> · abstained (0/10)</span>
                     : m.lowCoverage ? <span style={{ color: C.gold }}> · only {m.scored}/10</span>
                     : <span style={{ color: C.faint }}> · {m.scored}/10</span>}
                 </span>
               ))}
               <span style={{ color: C.muted, fontSize: 12, width: '100%', marginTop: 2 }}>
-                Spread {item.jurySpread} = range of these. A model marked “abstained” scored everything N/A —
-                it’s counted as 0% and inflates the spread, so weight it accordingly.
+                {item.modelScoresMissing
+                  ? 'Per-model coverage is updating (rescore in progress) — the spread may be temporarily inflated; recheck shortly.'
+                  : <>Spread {item.jurySpread} = range of these. A model marked “abstained” scored everything N/A —
+                      it’s counted as 0% and inflates the spread, so weight it accordingly.</>}
               </span>
             </div>
           ) : null}
 
-          {item.criteria.map((c) => <Criterion key={c.criterion} orgId={item.orgId} c={c} />)}
+          {item.criteria.map((c) => <Criterion key={c.criterion} orgId={item.orgId} c={c} stale={item.modelScoresMissing} />)}
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 6,
             paddingTop: 12, borderTop: `1px solid ${C.border}` }}>
