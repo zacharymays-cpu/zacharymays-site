@@ -62,6 +62,15 @@ export default function HeatmapClient({ orgs=[], scoreMap={} }) {
               {filtered.length} organizations · hover cells for detail
             </div>
           </div>
+          <p style={{fontSize:'0.82rem',color:'rgba(212,206,196,0.72)',lineHeight:1.5,maxWidth:'54rem',marginTop:'0.6rem'}}>
+            Each row is an organization and each column is one of the ten “cultiness” criteria (C1–C10:
+            Leadership, Sacred Assumptions, Mission, Individuality, Isolation, Vernacular, Us/Them, Labor,
+            Exit Costs, Ends/Means). A cell is that org's score on that criterion, 0–10 —
+            <span style={{color:'#5cb878'}}> green = low</span>,
+            <span style={{color:'#d99b3e'}}> amber = moderate</span>,
+            <span style={{color:'#e8574d'}}> red = high</span>; the right column is the overall composite.
+            Hover a cell for its criterion name; click a column header to sort by it.
+          </p>
           {/* Controls */}
           <div style={{display:'flex',gap:'1rem',marginTop:'1rem',flexWrap:'wrap',alignItems:'center'}}>
             <div style={{display:'flex',gap:'0.4rem',flexWrap:'wrap'}}>
