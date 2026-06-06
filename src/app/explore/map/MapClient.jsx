@@ -416,13 +416,16 @@ export default function MapClient({ orgs=[], stateStats=[], foundingData=[], wit
             const count = cluster.properties.point_count;
             const center = cluster.geometry.coordinates;
             setSelected({ type:'cluster', count, center, cid, items: [] });
+            // maplibre-gl v5 returns a Promise from getClusterLeaves (the old
+            // callback form was removed).
             const src = map.getSource('orgs');
-            src?.getClusterLeaves?.(cid, 1000, 0, (err, leaves) => {
-              if (err || !leaves) return;
-              const items = leaves.map(l => l.properties)
-                .sort((a, b) => (b.composite_score || 0) - (a.composite_score || 0));
-              setSelected(s => (s && s.type === 'cluster' && s.cid === cid) ? { ...s, items } : s);
-            });
+            Promise.resolve(src?.getClusterLeaves?.(cid, 1000, 0))
+              .then(leaves => {
+                const items = (leaves || []).map(l => l.properties)
+                  .sort((a, b) => (b.composite_score || 0) - (a.composite_score || 0));
+                setSelected(s => (s && s.type === 'cluster' && s.cid === cid) ? { ...s, items } : s);
+              })
+              .catch(() => {});
           }
         });
 
