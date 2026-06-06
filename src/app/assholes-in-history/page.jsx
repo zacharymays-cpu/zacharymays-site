@@ -44,7 +44,7 @@ export default function AssholesPage() {
             Temper Temper Publications
           </span>
           <h1 className="hero__title animate-up-2">
-            <span style={{display:'block', color:'var(--accent)'}}>Assholes</span>
+            <span style={{display:'block', color:'var(--accent-text)'}}>Assholes</span>
             <span style={{display:'block'}}>in History</span>
           </h1>
           <p className="hero__subtitle animate-up-3">
@@ -161,7 +161,7 @@ export default function AssholesPage() {
                   fontSize: '0.72rem',
                   letterSpacing: '0.12em',
                   textTransform: 'uppercase',
-                  color: 'var(--accent)',
+                  color: 'var(--accent-text)',
                   paddingTop: '0.2rem'
                 }}>{item.label}</div>
                 <p style={{color: 'var(--muted)', fontSize: '0.95rem', margin: 0}}>
