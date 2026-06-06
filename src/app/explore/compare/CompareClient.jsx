@@ -1,6 +1,5 @@
 'use client';
 import { useState, useMemo } from 'react';
-import Link from 'next/link';
 
 const CRITERIA = ['C1','C2','C3','C4','C5','C6','C7','C8','C9','C10'];
 const C_SHORT = { C1:'Leadership',C2:'Sacred Assump.',C3:'Mission',C4:'Individuality',C5:'Isolation',C6:'Vernacular',C7:'Us/Them',C8:'Labor',C9:'Exit Costs',C10:'Ends/Means' };
@@ -166,14 +165,6 @@ export default function CompareClient({ orgs=[], scoreMap={} }) {
       <div style={{borderBottom:'1px solid rgba(212,206,196,0.1)',padding:'2rem 0 1.5rem',background:'var(--ink)',position:'sticky',top:'60px',zIndex:50}}>
         <div className="container--wide">
           <div style={{display:'flex',alignItems:'baseline',justifyContent:'space-between',flexWrap:'wrap',gap:'1rem',marginBottom:'1.25rem'}}>
-            <div>
-              <span style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.15em',textTransform:'uppercase',color:'var(--gold)'}}>
-                <Link href="/explore" style={{color:'var(--gold)'}}>Explorer</Link> —
-              </span>
-              <h1 style={{fontFamily:'var(--serif)',fontSize:'clamp(1.3rem,3vw,2rem)',color:'var(--paper)',display:'inline',marginLeft:'0.4rem'}}>
-                Head-to-Head Comparison
-              </h1>
-            </div>
             <span style={{fontFamily:'var(--mono)',fontSize:'0.65rem',color:'rgba(212,206,196,0.35)'}}>
               {orgs.length} organizations available
             </span>

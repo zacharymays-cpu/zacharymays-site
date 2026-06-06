@@ -42,5 +42,5 @@ export default async function CompassPage() {
   const [orgs, referencePoints, stats] = await Promise.all([getOrgs(), getReferencePoints(), getFindingsStats()]);
   const regimes = referencePoints.filter(r => r.marker_type === 'regime');
   const presidentialEras = referencePoints.filter(r => r.marker_type === 'presidential_era');
-  return (<><ExploreNav /><CompassClient orgs={orgs} regimes={regimes} presidentialEras={presidentialEras} r={stats?.r ?? 0.67} /></>);
+  return (<><ExploreNav title="Political Compass" /><CompassClient orgs={orgs} regimes={regimes} presidentialEras={presidentialEras} r={stats?.r ?? 0.67} /></>);
 }

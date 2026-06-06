@@ -1,6 +1,5 @@
 'use client';
 import { useState, useMemo } from 'react';
-import Link from 'next/link';
 
 const TIER_COLORS = { 'Super Culty':'#e8574d','Kinda Culty':'#d99b3e','Not Culty':'#5cb878' };
 
@@ -61,15 +60,7 @@ export default function DistributionsClient({ orgs=[] }) {
     <div style={{minHeight:'100vh'}}>
       <div style={{borderBottom:'1px solid rgba(212,206,196,0.1)',padding:'2rem 0 1.5rem',background:'var(--ink)',position:'sticky',top:'60px',zIndex:50}}>
         <div className="container--wide">
-          <div style={{display:'flex',alignItems:'baseline',justifyContent:'space-between',flexWrap:'wrap',gap:'1rem'}}>
-            <div>
-              <span style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.15em',textTransform:'uppercase',color:'var(--gold)'}}>
-                <Link href="/explore" style={{color:'var(--gold)'}}>Explorer</Link> —
-              </span>
-              <h1 style={{fontFamily:'var(--serif)',fontSize:'clamp(1.3rem,3vw,2rem)',color:'var(--paper)',display:'inline',marginLeft:'0.4rem'}}>Category Distributions</h1>
-            </div>
-          </div>
-          <div style={{display:'flex',gap:'1rem',marginTop:'1rem',alignItems:'center',flexWrap:'wrap'}}>
+          <div style={{display:'flex',gap:'1rem',alignItems:'center',flexWrap:'wrap'}}>
             <span style={{fontFamily:'var(--mono)',fontSize:'0.6rem',color:'var(--muted)'}}>Sort by:</span>
             {[['median','Median'],['iqr','Spread (IQR)'],['count','Count'],['name','Name']].map(([v,l])=>(
               <button key={v} onClick={()=>setSortMode(v)}

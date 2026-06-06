@@ -42,5 +42,5 @@ export default async function SunburstPage() {
     }));
   }
 
-  return (<><ExploreNav /><SunburstClient data={data} /></>);
+  return (<><ExploreNav title="Tier Distribution" /><SunburstClient data={data} /></>);
 }

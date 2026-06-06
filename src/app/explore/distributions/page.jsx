@@ -12,5 +12,5 @@ export default async function DistributionsPage() {
     { headers: { apikey: ANON_KEY, Authorization: `Bearer ${ANON_KEY}` }, next: { revalidate: 3600 } }
   );
   const orgs = await res.json();
-  return (<><ExploreNav /><DistributionsClient orgs={orgs} /></>);
+  return (<><ExploreNav title="Category Distributions" /><DistributionsClient orgs={orgs} /></>);
 }

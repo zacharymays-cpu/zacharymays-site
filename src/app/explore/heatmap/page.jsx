@@ -30,5 +30,5 @@ async function getData() {
 
 export default async function HeatmapPage() {
   const { orgs, scoreMap } = await getData();
-  return (<><ExploreNav /><HeatmapClient orgs={orgs} scoreMap={scoreMap} /></>);
+  return (<><ExploreNav title="Criterion Heatmap" /><HeatmapClient orgs={orgs} scoreMap={scoreMap} /></>);
 }

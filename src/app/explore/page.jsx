@@ -24,5 +24,5 @@ async function getOrgs() {
 
 export default async function ExplorePage() {
   const orgs = await getOrgs();
-  return (<><ExploreNav /><ExploreClient initialOrgs={orgs} /></>);
+  return (<><ExploreNav title="Dataset Explorer" /><ExploreClient initialOrgs={orgs} /></>);
 }

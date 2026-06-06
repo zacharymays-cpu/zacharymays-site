@@ -1,6 +1,5 @@
 'use client';
 import { useEffect, useRef, useState, useCallback } from 'react';
-import Link from 'next/link';
 
 const SUPABASE_URL = 'https://shgdrkrqjnwtlyxcdayp.supabase.co';
 const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNoZ2Rya3Jxam53dGx5eGNkYXlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzMzgwNjYsImV4cCI6MjA5NTkxNDA2Nn0.L5NPabtJGLFWb81SruP3XfjgFuycu4DhvaMJhInqWfo';
@@ -82,16 +81,6 @@ export default function BubbleClient() {
       <div style={{ borderBottom:'1px solid rgba(212,206,196,0.1)', padding:'1.25rem 0 0.9rem',
         background:'var(--ink)', position:'sticky', top:'60px', zIndex:50 }}>
         <div className="container--wide">
-          <div style={{ display:'flex', alignItems:'baseline', gap:'0.5rem', marginBottom:'0.75rem' }}>
-            <span style={{ fontFamily:'var(--mono)', fontSize:'0.6rem', letterSpacing:'0.15em',
-              textTransform:'uppercase', color:'var(--gold)' }}>
-              <Link href="/explore" style={{color:'var(--gold)'}}>Explorer</Link> —
-            </span>
-            <h1 style={{ fontFamily:'var(--serif)', fontSize:'clamp(1.2rem,2.5vw,1.8rem)',
-              color:'var(--paper)', display:'inline', marginLeft:'0.4rem' }}>
-              Bubble Compass
-            </h1>
-          </div>
           {/* Tier filter buttons */}
           <div style={{ display:'flex', gap:'0.4rem', flexWrap:'wrap', alignItems:'center', marginBottom:'0.5rem' }}>
             {TIERS.map(t => (

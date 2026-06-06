@@ -27,5 +27,5 @@ export default async function SankeyPage() {
     map[key].count++;
   });
 
-  return (<><ExploreNav /><SankeyClient data={Object.values(map)} /></>);
+  return (<><ExploreNav title="Category → Tier Flow" /><SankeyClient data={Object.values(map)} /></>);
 }
