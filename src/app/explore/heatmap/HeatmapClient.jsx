@@ -47,7 +47,6 @@ export default function HeatmapClient({ orgs=[], scoreMap={} }) {
   const toggle = (v, state, setter) => setter(state.includes(v) ? state.filter(x=>x!==v) : [...state, v]);
 
   const ROW_H = 18;
-  const COL_W = 52;
   const LABEL_W = 180;
   const HEADER_H = 80;
   const totalH = HEADER_H + filtered.length * ROW_H;
@@ -122,11 +121,11 @@ export default function HeatmapClient({ orgs=[], scoreMap={} }) {
           <div style={{display:'flex',position:'sticky',top:0,zIndex:10,background:'var(--ink)',borderBottom:'1px solid rgba(212,206,196,0.12)',paddingBottom:'0.4rem'}}>
             <div style={{width:LABEL_W,flexShrink:0,fontFamily:'var(--mono)',fontSize:'0.58rem',color:'var(--muted)',letterSpacing:'0.1em',textTransform:'uppercase',paddingTop:'0.5rem'}}>Organization</div>
             {CRITERIA.map(c=>(
-              <div key={c} style={{width:COL_W,flexShrink:0,textAlign:'center'}}>
+              <div key={c} style={{flex:1,minWidth:38,textAlign:'center'}}>
                 <button onClick={()=>setSortMode(c)}
-                  style={{background:'transparent',border:'none',cursor:'pointer',padding:'2px 0'}}>
+                  style={{background:'transparent',border:'none',cursor:'pointer',padding:'2px 0',width:'100%'}}>
                   <div style={{fontFamily:'var(--mono)',fontSize:'0.65rem',color:sortMode===c?'var(--gold)':'var(--muted)',fontWeight:sortMode===c?700:400}}>{c}</div>
-                  <div style={{fontFamily:'var(--mono)',fontSize:'0.52rem',color:'rgba(212,206,196,0.3)',marginTop:'2px',maxWidth:COL_W-4,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',margin:'2px auto 0'}}>{C_NAMES[c]}</div>
+                  <div style={{fontFamily:'var(--mono)',fontSize:'0.52rem',color:'rgba(212,206,196,0.3)',marginTop:'2px',maxWidth:'100%',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{C_NAMES[c]}</div>
                 </button>
               </div>
             ))}
@@ -149,7 +148,7 @@ export default function HeatmapClient({ orgs=[], scoreMap={} }) {
                 {CRITERIA.map(c => {
                   const v = scores[c] ?? null;
                   return (
-                    <div key={c} style={{width:COL_W,flexShrink:0,height:ROW_H,display:'flex',alignItems:'center',justifyContent:'center',padding:'1px'}}
+                    <div key={c} style={{flex:1,minWidth:38,height:ROW_H,display:'flex',alignItems:'center',justifyContent:'center',padding:'1px'}}
                       onMouseEnter={e=>setHovered({org,criterion:c,score:v,x:e.clientX,y:e.clientY})}
                       onMouseLeave={()=>setHovered(null)}>
                       <div style={{width:'100%',height:'100%',background:scoreColor(v),display:'flex',alignItems:'center',justifyContent:'center',cursor:'default'}}>
