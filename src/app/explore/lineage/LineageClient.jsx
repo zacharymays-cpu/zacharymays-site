@@ -140,7 +140,8 @@ export default function LineageClient({ nodes = [], edges = [] }) {
                           markerEnd={`url(#arrow-${chainName.replace(/[^a-z0-9]/gi, '')})`} opacity={0.7} />
                         {REL_LABELS[e.relationship_type] && (
                           <text x={midx} y={midy - 4} textAnchor="middle"
-                            fontFamily="var(--mono)" fontSize={8.5} fill="rgba(212,206,196,0.55)">
+                            fontFamily="var(--mono)" fontSize={10} fill="rgba(235,231,223,0.95)"
+                            style={{ paintOrder: 'stroke', stroke: 'rgba(18,14,10,0.95)', strokeWidth: 4, strokeLinejoin: 'round' }}>
                             {REL_LABELS[e.relationship_type]}
                           </text>
                         )}
@@ -165,10 +166,10 @@ export default function LineageClient({ nodes = [], edges = [] }) {
                             fill="rgba(28,24,20,0.9)" stroke={tierColor}
                             strokeWidth={hover === slug ? 2 : 1.2} />
                           <rect x={p.x} y={p.y} width={4} height={NODE_H} rx={2} fill={tierColor} />
-                          <text x={p.x + 14} y={p.y + 19} fontFamily="var(--serif)" fontSize={12.5}
+                          <text x={p.x + 14} y={p.y + 20} fontFamily="var(--serif)" fontSize={13.5}
                             fill="var(--paper)" fontWeight={700}>{label}</text>
-                          <text x={p.x + 14} y={p.y + 36} fontFamily="var(--mono)" fontSize={9}
-                            fill={tierColor}>
+                          <text x={p.x + 14} y={p.y + 37} fontFamily="var(--mono)" fontSize={10}
+                            fill={tierColor} fontWeight={600}>
                             {n?.composite_tier || '—'}{score != null ? ` · ${score.toFixed(0)}%` : ''}
                           </text>
                         </g>
