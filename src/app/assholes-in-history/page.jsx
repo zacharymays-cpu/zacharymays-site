@@ -8,22 +8,28 @@ const SUBJECTS = [
   { name: 'Zhengde Emperor', section: 'The Incompetent', note: 'Built a zoo to avoid governing' },
   { name: 'King John', section: 'The Incompetent', note: 'Lost the Crown Jewels in a tidal estuary' },
   { name: 'Kaiser Wilhelm II', section: 'The Incompetent', note: 'One interview, four alienated powers' },
+  { name: 'Edward II', section: 'The Incompetent', note: 'Lost Scotland. His wife handled the rest.' },
+  { name: 'Henry VI', section: 'The Incompetent', note: 'Crowned at nine months. Lost France by thirty-one.' },
   { name: 'Richard II', section: 'The Incompetent', note: 'Briefly surprised by what happened next' },
   // The Cruel
   { name: 'Vlad the Impaler', section: 'The Cruel', note: '20,000 bodies. The Ottomans went home.' },
+  { name: 'Charles the Bad', section: 'The Cruel', note: 'The physicians handled it.' },
   { name: 'Ranavalona I', section: 'The Cruel', note: 'Buffalo hunt. No buffalo.' },
-  { name: 'Torquemada', section: 'The Cruel', note: 'Found the sessions satisfactory' },
   { name: 'Ivan the Terrible', section: 'The Cruel', note: 'Rang the bells for his own dead' },
+  { name: 'Torquemada', section: 'The Cruel', note: 'Found the sessions satisfactory' },
+  { name: 'Pope Alexander VI', section: 'The Cruel', note: 'Machiavelli took notes.' },
   // The Vain
   { name: 'Nero', section: 'The Vain', note: 'The boat failed. The assassins improved on it.' },
   { name: 'Commodus', section: 'The Vain', note: 'Renamed Rome, the months, and himself' },
+  { name: 'Xerxes', section: 'The Vain', note: 'Flogged the ocean. The ocean did not apologize.' },
   { name: 'Henry VIII', section: 'The Vain', note: 'Invented a religion. Kept the title.' },
+  { name: 'Empress Dowager Cixi', section: 'The Vain', note: 'The boat is marble. It has not moved.' },
   { name: 'Caligula', section: 'The Vain', note: 'The reason this book exists' },
   // The Just Plain Weird
   { name: 'Ludwig II', section: 'The Just Plain Weird', note: 'Bankrupted Bavaria. It worked out.' },
   { name: 'Muhammad Shah Rangeela', section: 'The Just Plain Weird', note: 'Continued entertainments the same week' },
+  { name: 'Ibrahim the Mad', section: 'The Just Plain Weird', note: 'The cage leaves marks.' },
   { name: 'King James I & VI', section: 'The Just Plain Weird', note: 'Weather control and scripture. Both serious.' },
-  { name: 'Ibrahim the Mad', section: 'The Just Plain Weird', note: 'Narrated by Mary Shelley' },
   { name: 'Qin Shi Huang', section: 'The Just Plain Weird', note: 'Unified China. Drank mercury. The door has not opened.' },
 ];
 
@@ -126,14 +132,7 @@ export default function AssholesPage() {
           </div>
 
           <p>
-            Nobody said them to Caligula. About anything. Ever. The machinery that
-            might have produced them — advisors with genuine authority, institutions
-            with genuine teeth, consequences that meant something — was absent,
-            dismantled, or too terrified to function.
-          </p>
-
-          <p>
-            This is the book's argument. The impulse is universal. The outcome is not.
+            Nobody said them to Caligula. About anything. Ever.
           </p>
 
           <hr className="rule" />
@@ -210,7 +209,8 @@ export default function AssholesPage() {
           <div className="section__label">The Voice</div>
 
           <p>
-            Suetonius meets Oscar Wilde. The narrator is never shocked. Never
+            A practical guide to evaluating what leaders actually mean — not what
+            they say. Suetonius meets Oscar Wilde. The narrator is never shocked. Never
             horrified. Merely observant. Flat affect, precise detail, humor that
             lives in the architecture of the sentence rather than in anything the
             narrator is trying to do. The cruelty and the absurdity arrive in the
@@ -232,6 +232,12 @@ export default function AssholesPage() {
             that the machinery that produced these people was entirely human. And
             that in several cases, variations of that machinery are running
             somewhere right now.
+          </p>
+
+          <p>
+            Written by a U.S. Marine Corps veteran whose career in logistics and
+            information systems gave him a direct view of what happens when
+            institutions fail to tell people what they need to hear.
           </p>
 
           <div style={{
