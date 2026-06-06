@@ -13,11 +13,21 @@ async function getData() {
   );
   const orgs = await res.json();
 
-  const csRes = await fetch(
-    `${SUPABASE_URL}/rest/v1/criterion_scores?select=org_id,criterion,score&order=org_id`,
-    { headers: { apikey: ANON_KEY, Authorization: `Bearer ${ANON_KEY}` }, next: { revalidate: 3600 } }
-  );
-  const scores = await csRes.json();
+  // criterion_scores has ~10 rows per org and exceeds Supabase's 1000-row REST
+  // cap, so page through all rows (otherwise most orgs render with empty cells).
+  const scores = [];
+  const PAGE = 1000;
+  for (let from = 0; ; from += PAGE) {
+    const csRes = await fetch(
+      `${SUPABASE_URL}/rest/v1/criterion_scores?select=org_id,criterion,score&order=org_id`,
+      { headers: { apikey: ANON_KEY, Authorization: `Bearer ${ANON_KEY}`, Range: `${from}-${from + PAGE - 1}` },
+        next: { revalidate: 3600 } }
+    );
+    const batch = await csRes.json();
+    if (!Array.isArray(batch) || batch.length === 0) break;
+    scores.push(...batch);
+    if (batch.length < PAGE) break;
+  }
 
   // Build map: orgId -> {C1:score, ...}
   const scoreMap = {};
