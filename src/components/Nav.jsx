@@ -18,7 +18,6 @@ const NAV_ITEMS = [
       { href: '/explore',                 label: 'Dataset Explorer' },
       { href: '/explore/map',             label: 'Geographic Map' },
       { href: '/compass',                 label: 'Political Compass' },
-      { href: '/explore/compass-bubble',  label: 'Bubble Compass' },
       { href: '/explore/compass3d',       label: '3D Compass' },
       { href: '/explore/heatmap',         label: 'Criterion Heatmap' },
       { href: '/explore/distributions',   label: 'Distributions' },
