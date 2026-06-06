@@ -58,7 +58,7 @@ export default function AboutPage() {
               </p>
 
               <p>
-                The first book started as a practical guide. Twenty-four of
+                The first book started as a practical guide. Twenty-three of
                 history's worst rulers made for excellent and frequently
                 hilarious case studies in evaluating what leaders actually
                 mean rather than what they say. The second came from a
@@ -111,7 +111,7 @@ export default function AboutPage() {
                   and the Recurring Human Failure to Say Temper, Temper
                 </p>
                 <p style={{fontSize: '0.9rem', color: 'var(--muted)', margin: 0}}>
-                  Twenty-four of history's worst rulers as a practical guide
+                  Twenty-three of history's worst rulers as a practical guide
                   to evaluating what leaders and powerful people actually mean —
                   not what they say. The pattern is easier to see at historical
                   distance. The examples are genuinely funny.
@@ -121,9 +121,10 @@ export default function AboutPage() {
               <hr className="rule" />
 
               <div className="section__label">Contact</div>
+              {/* TODO(verify before deploy): confirm zachary@zacharymays.com is provisioned and receiving mail. */}
               <p style={{color: 'var(--muted)'}}>
                 For press, speaking, and research inquiries:{' '}
-                <a href="mailto:zachary.mays@icloud.com">zachary.mays@icloud.com</a>
+                <a href="mailto:zachary@zacharymays.com">zachary@zacharymays.com</a>
               </p>
             </div>
           </div>
