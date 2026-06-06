@@ -25,12 +25,19 @@ tier-boundary orgs), and applies accepted changes through the audited
 
 ## One-time setup
 
-### 1. OAuth provider(s) — pick at least one
-Configure the provider's app and copy its Client ID/secret:
-- **Google** (easiest, free): Google Cloud Console → OAuth consent + credentials.
+### 1. Choose a sign-in method
+
+**Easiest — Email magic link (no external app to register).** This is integrated
+in Supabase: it emails a one-click sign-in link. Nothing to configure beyond
+Supabase's default email settings; the login page already offers it. Access is
+still gated by `ADMIN_EMAILS` + TOTP 2FA. *(Recommended for a solo admin.)*
+
+**Or an OAuth provider** (requires registering your own app + pasting Client
+ID/Secret into Supabase → Auth → Providers):
 - **GitHub** (easy, free): GitHub → Settings → Developer settings → OAuth Apps.
-- **Microsoft** (Azure/Entra): register an app, add a client secret.
-- **Apple** (needs paid Apple Developer account): create a Services ID + key.
+  Callback URL = `https://shgdrkrqjnwtlyxcdayp.supabase.co/auth/v1/callback`.
+- **Google** (free): Google Cloud Console → OAuth consent + credentials (same callback).
+- **Microsoft** (Azure/Entra) / **Apple** (paid Apple Developer account) also supported.
 
 For all, the authorization callback / redirect URL is:
 `https://<your-domain>/auth/callback` (and `http://localhost:3000/auth/callback` for dev).
