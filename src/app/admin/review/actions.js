@@ -82,6 +82,26 @@ export async function applyDecision(formData) {
   return { ok: true, scoreHistoryId: data };
 }
 
+// Mark an organization human-reviewed ("approve"). Records the analyst + time on
+// organizations (reviewed_by / reviewed_at, migration 0008). Per-criterion edits
+// are separate and already audited in score_history; this just records that a
+// human signed off on the org's scores as they stand.
+export async function approveOrg(formData) {
+  const user = await requireAdmin();
+  const orgId = String(formData.get('orgId') || '');
+  if (!orgId) return { ok: false, error: 'Missing orgId.' };
+
+  const admin = createSupabaseAdminClient();
+  const { error } = await admin
+    .from('organizations')
+    .update({ reviewed_by: user.id, reviewed_at: new Date().toISOString() })
+    .eq('id', orgId);
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath('/admin/review');
+  return { ok: true };
+}
+
 // Mirror of post_accept_hook.recalculate_composite (Young-proportional 30/60).
 async function recomputeComposite(admin, orgId) {
   const { data: rows } = await admin
