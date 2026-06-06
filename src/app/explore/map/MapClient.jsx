@@ -226,10 +226,25 @@ export default function MapClient({ orgs=[], stateStats=[], foundingData=[], wit
       });
 
       map.on('load', () => {
-        // Keep the warm brand background tone under the vector basemap.
-        if (map.getLayer('background')) {
-          map.setPaintProperty('background', 'background-color', '#1a1410');
-        }
+        // Re-tint the whole basemap to the site's warm palette with real
+        // land/water contrast and legible borders — instead of flat near-black.
+        try {
+          (map.getStyle().layers || []).forEach(l => {
+            const id = l.id;
+            if (l.type === 'background') {
+              map.setPaintProperty(id, 'background-color', '#211b16');
+            } else if (l.type === 'fill') {
+              map.setPaintProperty(id, 'fill-color', /water/i.test(id) ? '#12100c' : '#2c251e');
+            } else if (l.type === 'line') {
+              if (/boundary|admin/i.test(id)) map.setPaintProperty(id, 'line-color', 'rgba(212,206,196,0.26)');
+              else if (/water/i.test(id)) map.setPaintProperty(id, 'line-color', 'rgba(120,140,160,0.18)');
+              else if (/road|transport|bridge|tunnel/i.test(id)) map.setPaintProperty(id, 'line-color', 'rgba(212,206,196,0.06)');
+            } else if (l.type === 'symbol') {
+              try { map.setPaintProperty(id, 'text-color', 'rgba(220,214,204,0.65)'); } catch (_) {}
+              try { map.setPaintProperty(id, 'text-halo-color', 'rgba(20,16,12,0.85)'); } catch (_) {}
+            }
+          });
+        } catch (_) {}
         // ── State choropleth ──
         map.addSource('states', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
         map.addLayer({ id: 'state-fill', type: 'fill', source: 'states',
