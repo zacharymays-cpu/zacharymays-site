@@ -146,25 +146,15 @@ export default function LineageClient({ nodes = [], edges = [] }) {
       </div>`)
       .onNodeClick(node => setSelected(node === selected ? null : node))
       .onNodeHover(node => setHighlight(node ? node.id : null))
-      .d3Force('charge', null)
       .d3AlphaDecay(0.02)
       .d3VelocityDecay(0.3);
 
-    // Custom charge force — stronger repulsion
-    Graph.d3Force('charge', { strength: () => -300, initialize() {}, force(alpha) {
-      const ns = Graph.graphData().nodes;
-      for (let i = 0; i < ns.length; i++) {
-        for (let j = i + 1; j < ns.length; j++) {
-          const dx = ns[j].x - ns[i].x, dy = ns[j].y - ns[i].y;
-          const dist = Math.sqrt(dx*dx + dy*dy) || 1;
-          const f = -300 * alpha / (dist * dist);
-          ns[i].vx += f * dx / dist;
-          ns[i].vy += f * dy / dist;
-          ns[j].vx -= f * dx / dist;
-          ns[j].vy -= f * dy / dist;
-        }
-      }
-    }});
+    // Stronger repulsion so nodes spread out — configure force-graph's
+    // built-in charge (d3 forceManyBody) rather than replacing it with a
+    // hand-rolled force (d3 calls each force as a function per tick, so an
+    // object force throws and halts rendering).
+    const charge = Graph.d3Force('charge');
+    if (charge && typeof charge.strength === 'function') charge.strength(-220);
 
     graphRef.current = Graph;
   }, [loaded, graphData, selected, highlight]);
