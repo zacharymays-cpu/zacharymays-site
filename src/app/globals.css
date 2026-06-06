@@ -5,8 +5,9 @@
   --warm-white: #faf8f3;
   --accent:     #8b2020;
   --accent-dim: #6b1818;
+  --accent-text: #d9685c; /* lighter accent for text on dark bg — AA 4.5:1 (keep --accent for button backgrounds) */
   --gold:       #c8a84b;
-  --muted:      #6b6560;
+  --muted:      #a39d95; /* warm gray; AA 5.8:1 on --ink (was #6b6560 = 2.7:1, failed) */
   --rule:       #d4cec4;
   --serif:      var(--font-serif), 'Playfair Display', Georgia, serif;
   --body:       var(--font-body), 'Libre Baskerville', Georgia, serif;
@@ -302,7 +303,7 @@ a:hover { color: var(--paper); }
 }
 
 .hero__title--red {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .hero__subtitle {

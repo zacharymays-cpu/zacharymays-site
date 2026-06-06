@@ -17,7 +17,7 @@ export default function HomePage() {
           </span>
           <h1 className="animate-up-2" style={{fontFamily:'var(--serif)',fontSize:'clamp(2.5rem, 5vw, 4.5rem)',lineHeight:1.1,letterSpacing:'-0.02em',color:'var(--paper)',marginBottom:'2.5rem'}}>
             Two books.<br />One recurring<br />
-            <span style={{color:'var(--accent)'}}>pattern.</span>
+            <span style={{color:'var(--accent-text)'}}>pattern.</span>
           </h1>
           <p className="animate-up-3" style={{fontSize:'1.05rem',color:'var(--muted)',maxWidth:'520px',lineHeight:1.75,marginBottom:'3rem'}}>
             The machinery that produces catastrophic leaders is entirely human.
