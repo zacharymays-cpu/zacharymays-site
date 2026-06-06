@@ -26,7 +26,18 @@ const QUADRANTS = ['Authoritarian Right','Authoritarian Left','Libertarian Right
 // basemap, so this is a drop-in swap.
 // Revert: replace this URL with the previous inline raster style object using
 // 'https://{a|b}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png'.
-const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json';
+const CARTO_STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json';
+// Optional MapTiler basemap (richer tiles). Set NEXT_PUBLIC_MAPTILER_KEY — and
+// optionally NEXT_PUBLIC_MAPTILER_STYLE (e.g. 'satellite', 'hybrid',
+// 'streets-v2', 'topo-v2', 'dataviz-dark', 'backdrop') — to enable it. Falls
+// back to the free CARTO dark-matter style when no key is set. Restrict the
+// MapTiler key to this domain in the MapTiler dashboard (it is client-visible).
+const MAPTILER_KEY = process.env.NEXT_PUBLIC_MAPTILER_KEY;
+const MAPTILER_STYLE = process.env.NEXT_PUBLIC_MAPTILER_STYLE || 'dataviz-dark';
+const USING_MAPTILER = Boolean(MAPTILER_KEY);
+const MAP_STYLE = USING_MAPTILER
+  ? `https://api.maptiler.com/maps/${MAPTILER_STYLE}/style.json?key=${MAPTILER_KEY}`
+  : CARTO_STYLE;
 
 function scoreToFill(score) {
   if (score === null) return 'rgba(212,206,196,0.04)';
@@ -226,9 +237,10 @@ export default function MapClient({ orgs=[], stateStats=[], foundingData=[], wit
       });
 
       map.on('load', () => {
-        // Re-tint the whole basemap to the site's warm palette with real
+        // Re-tint the whole CARTO basemap to the site's warm palette with real
         // land/water contrast and legible borders — instead of flat near-black.
-        try {
+        // Skipped for MapTiler, whose chosen style already stands on its own.
+        if (!USING_MAPTILER) try {
           (map.getStyle().layers || []).forEach(l => {
             const id = l.id;
             if (l.type === 'background') {
