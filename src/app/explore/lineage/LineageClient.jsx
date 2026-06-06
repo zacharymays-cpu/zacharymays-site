@@ -95,6 +95,23 @@ export default function LineageClient({ nodes = [], edges = [] }) {
           <p style={{ fontFamily: 'var(--mono)', fontSize: '0.8rem', color: 'var(--muted)' }}>No lineage data available.</p>
         )}
 
+        {/* How to read it + tier key (moved up from a cramped bottom-right caption) */}
+        {orderedNames.length > 0 && (
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '0.85rem 1.75rem', marginBottom: '2rem' }}>
+            <span style={{ fontSize: '0.82rem', color: 'rgba(212,206,196,0.72)', lineHeight: 1.5, maxWidth: '44rem' }}>
+              Each card is an organization; arrows trace documented formation or influence (left → right). Click any card for its full assessment.
+            </span>
+            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
+              {Object.entries(TIER_COLORS).map(([tier, c]) => (
+                <div key={tier} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <span style={{ width: 9, height: 9, borderRadius: 2, background: c }} />
+                  <span style={{ fontFamily: 'var(--mono)', fontSize: '0.6rem', color: 'rgba(212,206,196,0.6)' }}>{tier}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {orderedNames.map(chainName => {
           const chainEdges = groupsMap[chainName];
           const { pos, width, height } = layoutChain(chainEdges);
@@ -174,10 +191,14 @@ export default function LineageClient({ nodes = [], edges = [] }) {
                     if (!s || !t || !REL_LABELS[e.relationship_type]) return null;
                     const x1 = s.x + NODE_W, y1 = s.y + NODE_H / 2;
                     const x2 = t.x - 2,      y2 = t.y + NODE_H / 2;
-                    const midx = (x1 + x2) / 2, midy = (y1 + y2) / 2;
+                    // Place the label in the column gap just right of the source, so a
+                    // long edge that skips columns never drops its label onto a box.
+                    const lx = x1 + COL_GAP / 2;
+                    const t01 = x2 > x1 ? Math.min(1, (COL_GAP / 2) / (x2 - x1)) : 0.5;
+                    const ly = y1 + (y2 - y1) * t01;
                     const dim = hover && hover !== e.source_slug && hover !== e.target_slug;
                     return (
-                      <text key={`l${i}`} x={midx} y={midy - 5} textAnchor="middle"
+                      <text key={`l${i}`} x={lx} y={ly - 5} textAnchor="middle"
                         fontFamily="var(--mono)" fontSize={10} fill="rgba(235,231,223,0.95)"
                         opacity={dim ? 0.12 : 1}
                         style={{ paintOrder: 'stroke', stroke: 'rgba(18,14,10,0.95)', strokeWidth: 4, strokeLinejoin: 'round', pointerEvents: 'none' }}>
@@ -190,20 +211,6 @@ export default function LineageClient({ nodes = [], edges = [] }) {
             </section>
           );
         })}
-
-        {/* Legend */}
-        <div style={{ borderTop: '1px solid rgba(212,206,196,0.08)', paddingTop: '1rem', marginTop: '0.5rem',
-          display: 'flex', gap: '1.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
-          {Object.entries(TIER_COLORS).map(([tier, c]) => (
-            <div key={tier} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-              <span style={{ width: 9, height: 9, borderRadius: 2, background: c }} />
-              <span style={{ fontFamily: 'var(--mono)', fontSize: '0.58rem', color: 'rgba(212,206,196,0.6)' }}>{tier}</span>
-            </div>
-          ))}
-          <span style={{ fontFamily: 'var(--mono)', fontSize: '0.58rem', color: 'rgba(212,206,196,0.35)', marginLeft: 'auto' }}>
-            Each card = an organization · arrows = documented formation/influence (left → right) · click a card for the full assessment
-          </span>
-        </div>
       </div>
     </div>
   );
