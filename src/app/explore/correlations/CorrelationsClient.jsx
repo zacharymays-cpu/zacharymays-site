@@ -169,8 +169,8 @@ export default function CorrelationsClient({ orgs=[], scoreMap={} }) {
                   <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',color:'var(--gold)',letterSpacing:'0.12em',textTransform:'uppercase'}}>
                     {a} vs {b} · r = {r!==null?(r>0?'+':'')+r.toFixed(3):'—'}
                   </div>
-                  <div style={{flex:1,minHeight:200,display:'flex'}}>
-                  <svg viewBox={`0 0 ${SW} ${SH}`} preserveAspectRatio="xMidYMid meet" style={{width:'100%',height:'100%',display:'block',background:'rgba(244,240,232,0.02)',border:'1px solid rgba(212,206,196,0.1)'}}>
+                  <div style={{flex:1,minHeight:200,position:'relative'}}>
+                  <svg viewBox={`0 0 ${SW} ${SH}`} preserveAspectRatio="xMidYMid meet" style={{position:'absolute',top:0,left:0,width:'100%',height:'100%',display:'block',background:'rgba(244,240,232,0.02)',border:'1px solid rgba(212,206,196,0.1)'}}>
                     {[0,0.25,0.5,0.75,1].map(f=>(
                       <g key={f}>
                         <line x1={SP} y1={sy(maxB*f)} x2={SW-SP} y2={sy(maxB*f)} stroke="rgba(212,206,196,0.06)" strokeWidth="1"/>
