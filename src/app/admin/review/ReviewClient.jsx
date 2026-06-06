@@ -245,8 +245,10 @@ function OrgCard({ item }) {
               <span style={{ color: C.muted, fontSize: 12, width: '100%', marginTop: 2 }}>
                 {item.modelScoresMissing
                   ? 'Per-model coverage is updating (rescore in progress) — the spread may be temporarily inflated; recheck shortly.'
-                  : <>Spread {item.jurySpread} = range of these. A model marked “abstained” scored everything N/A —
-                      it’s counted as 0% and inflates the spread, so weight it accordingly.</>}
+                  : <>Spread {item.jurySpread ?? '—'} = range across the models that scored.
+                      {item.anyAbstained
+                        ? ' A model marked “abstained” scored every criterion N/A (it declined to rate this org); it is excluded from the AI composite and the spread above.'
+                        : ''}</>}
               </span>
             </div>
           ) : null}

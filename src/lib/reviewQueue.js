@@ -103,6 +103,30 @@ export async function getReviewQueue({ limit = 40 } = {}) {
       { key: 'gemini', label: 'Gemini', composite: verdict.score_gemini == null ? null : Number(verdict.score_gemini), scored: cov.gemini },
     ].map((m) => ({ ...m, abstained: m.scored === 0, lowCoverage: m.scored > 0 && m.scored < 5 }))
      .filter((m) => m.composite != null || m.scored > 0);
+
+    // A model that scored every criterion N/A (breadth 0) has ABSTAINED — its
+    // stored "0%" is not a real composite (the model declined to score the org),
+    // so it must not floor the composite or inflate the spread. When per-model
+    // data is present, blank an abstained model's composite and recompute the
+    // jury composite + spread over only the models that actually scored. During a
+    // rescore gap (no per-model rows yet) we can't tell abstention from missing
+    // data, so fall back to the stored verdict values untouched.
+    const havePerModel = perCritModels.has(org.id);
+    if (havePerModel) for (const m of models) if (m.abstained) m.composite = null;
+    const activeComps = models.filter((m) => m.composite != null).map((m) => m.composite);
+    const juryComposite = havePerModel
+      ? (activeComps.length ? Math.round((activeComps.reduce((a, b) => a + b, 0) / activeComps.length) * 100) / 100 : null)
+      : (verdict.jury_mean == null ? null : Number(verdict.jury_mean));
+    const jurySpread = havePerModel
+      ? (activeComps.length >= 2 ? Math.round((Math.max(...activeComps) - Math.min(...activeComps)) * 100) / 100 : (activeComps.length ? 0 : null))
+      : (verdict.jury_spread == null ? null : Number(verdict.jury_spread));
+    const anyAbstained = havePerModel && models.some((m) => m.abstained);
+    // Recompute the display reason from the corrected spread so an abstention-only
+    // case stops reading as "High model disagreement" when the scoring models agree.
+    const displayReason = havePerModel
+      ? priority(Number(org.composite_score), jurySpread).reason + (anyAbstained ? ' · a model abstained' : '')
+      : reason;
+
     return {
       orgId: org.id,
       recordId: org.record_id,
@@ -114,18 +138,22 @@ export async function getReviewQueue({ limit = 40 } = {}) {
       youngs: org.youngs_score,
       methodologyVersion: org.methodology_version,
       // AI jury's overall composite (same 0–100 Young-proportional scale as the
-      // published composite) — lets the header show how far a human has moved it.
-      juryComposite: verdict.jury_mean == null ? null : Number(verdict.jury_mean),
+      // published composite) — recomputed over models that actually scored, so an
+      // abstaining model does not drag it toward 0.
+      juryComposite,
       // True when the latest verdict's run has NO ai_model_scores rows yet — i.e. a
       // rescore wrote the verdict before the per-model scores landed. In that gap,
       // coverage reads 0 for every model and must NOT be shown as "abstained".
       // (A genuine abstention still has rows, with null scores, so this stays false.)
       modelScoresMissing: !perCritModels.has(org.id),
-      jurySpread: verdict.jury_spread == null ? null : Number(verdict.jury_spread),
+      // Spread across only the models that scored (abstentions excluded), so an
+      // all-N/A model can't inflate it and trip a false "high disagreement" flag.
+      jurySpread,
+      anyAbstained,
       modelCount: verdict.model_count ?? null,
       models,
       reviewedAt: org.reviewed_at || null,
-      reason,
+      reason: displayReason,
       criteria: CRITERIA.map((c) => ({
         criterion: c,
         name: CRITERIA_NAMES[c],
