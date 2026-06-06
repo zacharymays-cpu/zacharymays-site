@@ -2,16 +2,16 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 
 const TIER_COLORS = {
-  'Super Culty':   '#c02020',
-  'Kinda Culty':   '#b58900',
-  'Not Culty':     '#859900',
+  'Super Culty':   '#e8574d',
+  'Kinda Culty':   '#d99b3e',
+  'Not Culty':     '#5cb878',
 };
 
 const CHAIN_COLORS = {
-  'White supremacist formations':        '#c02020',
-  'Religious-political-media formations':'#b58900',
-  'High-control religious formations':   '#cb4b16',
-  'Surveillance infrastructure formation':'#6c71c4',
+  'White supremacist formations':        '#e8574d',
+  'Religious-political-media formations':'#d99b3e',
+  'High-control religious formations':   '#e8703a',
+  'Surveillance infrastructure formation':'#8f93e0',
 };
 
 const REL_LABELS = {

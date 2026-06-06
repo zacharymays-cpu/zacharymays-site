@@ -6,9 +6,9 @@ const SUPABASE_URL = 'https://shgdrkrqjnwtlyxcdayp.supabase.co';
 const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNoZ2Rya3Jxam53dGx5eGNkYXlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzMzgwNjYsImV4cCI6MjA5NTkxNDA2Nn0.L5NPabtJGLFWb81SruP3XfjgFuycu4DhvaMJhInqWfo';
 
 const TC = {
-  'Super Culty':   {fill:'#ff4466', stroke:'#cc1133', hi:'#ff99aa'},
-  'Kinda Culty':   {fill:'#e6a800', stroke:'#b38200', hi:'#ffdd66'},
-  'Not Culty':     {fill:'#1a8fbf', stroke:'#116688', hi:'#66ddff'},
+  'Super Culty':   {fill:'#e8574d', stroke:'#cc1133', hi:'#ff99aa'},
+  'Kinda Culty':   {fill:'#d99b3e', stroke:'#b38200', hi:'#ffdd66'},
+  'Not Culty':     {fill:'#5cb878', stroke:'#116688', hi:'#66ddff'},
 };
 const TIERS = ['Super Culty','Kinda Culty','Not Culty'];
 

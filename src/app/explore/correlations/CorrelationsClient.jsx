@@ -18,14 +18,14 @@ function pearson(xs, ys) {
 
 function corrColor(r) {
   if (r === null) return 'rgba(212,206,196,0.05)';
-  if (r >= 0.7) return 'rgba(192,32,32,0.88)';
+  if (r >= 0.7) return 'rgba(232,87,77,0.88)';
   if (r >= 0.5) return 'rgba(176,96,32,0.78)';
   if (r >= 0.3) return 'rgba(160,144,48,0.65)';
   if (r >= 0.1) return 'rgba(80,130,80,0.45)';
   if (r >= -0.1) return 'rgba(80,100,140,0.25)';
   if (r >= -0.3) return 'rgba(60,80,160,0.45)';
   if (r >= -0.5) return 'rgba(40,60,180,0.65)';
-  return 'rgba(20,40,200,0.8)';
+  return 'rgba(90,120,240,0.8)';
 }
 
 export default function CorrelationsClient({ orgs=[], scoreMap={} }) {
@@ -79,7 +79,7 @@ export default function CorrelationsClient({ orgs=[], scoreMap={} }) {
     setSelected(sel => sel?.a===a&&sel?.b===b ? null : {a, b, r, pairs});
   };
 
-  const TIER_COLORS = { 'Super Culty':'#c02020','Kinda Culty':'#b07030','Not Culty':'#30a060' };
+  const TIER_COLORS = { 'Super Culty':'#e8574d','Kinda Culty':'#d99b3e','Not Culty':'#5cb878' };
 
   return (
     <div style={{minHeight:'100vh'}}>

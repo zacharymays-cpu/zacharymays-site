@@ -2,9 +2,9 @@
 import { useEffect, useRef, useState } from 'react';
 
 const TIER_COLORS = {
-  'Super Culty':  '#c02020',
-  'Kinda Culty':  '#b58900',
-  'Not Culty':    '#859900',
+  'Super Culty':  '#e8574d',
+  'Kinda Culty':  '#d99b3e',
+  'Not Culty':    '#5cb878',
 };
 
 const TIER_ORDER = ['Super Culty','Kinda Culty','Not Culty'];

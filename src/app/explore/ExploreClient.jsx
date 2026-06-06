@@ -8,7 +8,8 @@ const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsI
 
 const TIER_COLORS = {
   // Brightened for contrast against the warm-dark #272320 background — the
-  // previous values (esp. the #b07030 amber) sat almost on the background tone.
+  // previous muddy amber/red sat almost on the background tone. Shared across
+  // every visualization page so the tier colors stay consistent.
   'Super Culty':'#e8574d','Kinda Culty':'#d99b3e','Not Culty':'#5cb878',
 };
 const TIER_CLASS = {
@@ -36,7 +37,7 @@ function CriterionRow({ code, score, bodyText }) {
   const detail = CRITERIA_DETAIL[code];
   const isNA = score === null || score === undefined;
   const pct = !isNA ? (score/10)*100 : 0;
-  const color = !isNA ? (score>=8?'#c02020':score>=6?'#b07030':score>=4?'#a09040':'#30a060') : 'transparent';
+  const color = !isNA ? (score>=8?'#e8574d':score>=6?'#d99b3e':score>=4?'#d99b3e':'#5cb878') : 'transparent';
 
   return (
     <div style={{borderBottom:'1px solid rgba(212,206,196,0.08)'}}>
@@ -176,8 +177,8 @@ function RadarChart({ scores }) {
   // Color by average score
   const validScores = CRITERIA.map(c=>scores[c]?.score).filter(v=>v!=null);
   const avg = validScores.length ? validScores.reduce((a,b)=>a+b,0)/validScores.length : 0;
-  const fill = avg>=8?'rgba(192,32,32,0.25)':avg>=6?'rgba(176,96,32,0.22)':avg>=4?'rgba(160,144,48,0.2)':'rgba(48,160,96,0.18)';
-  const stroke = avg>=8?'rgba(192,32,32,0.8)':avg>=6?'rgba(176,96,32,0.75)':avg>=4?'rgba(160,144,48,0.7)':'rgba(48,160,96,0.6)';
+  const fill = avg>=8?'rgba(232,87,77,0.25)':avg>=6?'rgba(176,96,32,0.22)':avg>=4?'rgba(160,144,48,0.2)':'rgba(92,184,120,0.18)';
+  const stroke = avg>=8?'rgba(232,87,77,0.8)':avg>=6?'rgba(176,96,32,0.75)':avg>=4?'rgba(160,144,48,0.7)':'rgba(92,184,120,0.6)';
 
   return (
     <svg viewBox={`0 0 ${SIZE} ${SIZE}`} style={{width:'100%',maxWidth:SIZE,display:'block',margin:'0 auto'}}>
@@ -499,42 +500,22 @@ export default function ExploreClient({ initialOrgs=[] }) {
                 Dataset Explorer
               </h1>
             </div>
-            <div style={{display:'flex',gap:'1.5rem',alignItems:'center',flexWrap:'wrap',flex:'1 1 100%',justifyContent:'space-between'}}>
-              {/* Stats — left */}
-              <div style={{display:'flex',gap:'1.5rem',alignItems:'center'}}>
-                <div style={{textAlign:'center'}}>
-                  <div style={{fontFamily:'var(--serif)',fontSize:'1.4rem',fontWeight:700,color:'var(--gold)',lineHeight:1}}>{filtered.length}</div>
-                  <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'var(--muted)'}}>Showing</div>
-                </div>
-                <div style={{textAlign:'center'}}>
-                  <div style={{fontFamily:'var(--serif)',fontSize:'1.4rem',fontWeight:700,color:'var(--paper)',lineHeight:1}}>{orgs.length}</div>
-                  <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'var(--muted)'}}>Total</div>
-                </div>
-                {pendingCount>0&&(
-                  <div style={{textAlign:'center'}} title="Organizations imported but not yet scored">
-                    <div style={{fontFamily:'var(--serif)',fontSize:'1.4rem',fontWeight:700,color:'var(--muted)',lineHeight:1}}>{pendingCount}</div>
-                    <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'var(--muted)'}}>Pending</div>
-                  </div>
-                )}
+            {/* Dataset stats — chart switcher lives in the shared <ExploreNav/> above */}
+            <div style={{display:'flex',gap:'1.5rem',alignItems:'center'}}>
+              <div style={{textAlign:'center'}}>
+                <div style={{fontFamily:'var(--serif)',fontSize:'1.4rem',fontWeight:700,color:'var(--gold)',lineHeight:1}}>{filtered.length}</div>
+                <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'var(--muted)'}}>Showing</div>
               </div>
-              {/* Chart switcher — right */}
-              <div style={{display:'flex',gap:'0.5rem',flexWrap:'wrap',alignItems:'center',justifyContent:'flex-end'}}>
-                <Link href="/compass" className="explore-compass-link" style={{fontFamily:'var(--mono)',fontSize:'0.68rem',letterSpacing:'0.1em',textTransform:'uppercase',padding:'0.45rem 0.9rem',border:'1px solid rgba(200,168,75,0.4)',color:'var(--gold)',textDecoration:'none'}}>
-                  Compass →
-                </Link>
-                {[
-                  ['Heatmap','/explore/heatmap','Every organization scored criterion-by-criterion'],
-                  ['Distributions','/explore/distributions','Score spread within each category'],
-                  ['Correlations','/explore/correlations','How the ten criteria move together'],
-                  ['Lineage','/explore/lineage','Formation and influence chains between groups'],
-                  ['Sunburst','/explore/sunburst','Tiers broken down by category'],
-                  ['Flow','/explore/sankey','How each category flows into cultiness tiers'],
-                  ['Compare','/explore/compare','Put two organizations head-to-head'],
-                  ['Map','/explore/map','Geographic distribution of organizations'],
-                ].map(([l,href,desc])=>(
-                  <Link key={l} href={href} title={desc} aria-label={`${l} — ${desc}`} style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.08em',textTransform:'uppercase',padding:'0.35rem 0.65rem',border:'1px solid rgba(212,206,196,0.2)',color:'var(--muted)',textDecoration:'none'}}>{l}</Link>
-                ))}
+              <div style={{textAlign:'center'}}>
+                <div style={{fontFamily:'var(--serif)',fontSize:'1.4rem',fontWeight:700,color:'var(--paper)',lineHeight:1}}>{orgs.length}</div>
+                <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'var(--muted)'}}>Total</div>
               </div>
+              {pendingCount>0&&(
+                <div style={{textAlign:'center'}} title="Organizations imported but not yet scored">
+                  <div style={{fontFamily:'var(--serif)',fontSize:'1.4rem',fontWeight:700,color:'var(--muted)',lineHeight:1}}>{pendingCount}</div>
+                  <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'var(--muted)'}}>Pending</div>
+                </div>
+              )}
             </div>
           </div>
           <div style={{marginTop:'1.25rem'}}>

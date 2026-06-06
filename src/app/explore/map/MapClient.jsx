@@ -4,18 +4,18 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 const TIER_COLORS = {
-  'Super Culty':   '#c02020',
-  'Kinda Culty':   '#b58900',
-  'Not Culty':     '#859900',
+  'Super Culty':   '#e8574d',
+  'Kinda Culty':   '#d99b3e',
+  'Not Culty':     '#5cb878',
 };
 const TIERS = ['Super Culty','Kinda Culty','Not Culty'];
 const SIZE_RADIUS = { micro:5, small:7, medium:10, large:14, mass:20 };
 
 const CHAIN_COLORS = {
-  'White supremacist formations':         '#c02020',
-  'Religious-political-media formations': '#b58900',
-  'High-control religious formations':    '#cb4b16',
-  'Surveillance infrastructure formation':'#6c71c4',
+  'White supremacist formations':         '#e8574d',
+  'Religious-political-media formations': '#d99b3e',
+  'High-control religious formations':    '#e8703a',
+  'Surveillance infrastructure formation':'#8f93e0',
 };
 
 const QUADRANTS = ['Authoritarian Right','Authoritarian Left','Libertarian Right','Libertarian Left'];
@@ -31,11 +31,11 @@ const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.j
 
 function scoreToFill(score) {
   if (score === null) return 'rgba(212,206,196,0.04)';
-  if (score >= 70) return 'rgba(192,32,32,0.55)';
-  if (score >= 55) return 'rgba(181,137,0,0.50)';
-  if (score >= 41) return 'rgba(108,113,196,0.45)';
-  if (score >= 21) return 'rgba(42,161,152,0.35)';
-  return 'rgba(133,153,0,0.30)';
+  if (score >= 70) return 'rgba(232,87,77,0.55)';
+  if (score >= 55) return 'rgba(217,155,62,0.50)';
+  if (score >= 41) return 'rgba(140,150,235,0.45)';
+  if (score >= 21) return 'rgba(80,200,190,0.35)';
+  return 'rgba(92,184,120,0.30)';
 }
 
 export default function MapClient({ orgs=[], stateStats=[], foundingData=[], withGeo=0, lineageEdges=[] }) {
@@ -679,7 +679,7 @@ export default function MapClient({ orgs=[], stateStats=[], foundingData=[], wit
               <div style={{ fontFamily:'var(--mono)', fontSize:'0.54rem', color:'var(--muted)',
                 textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:4 }}>Trajectory</div>
               <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom:2 }}>
-                <div style={{ width:10, height:10, borderRadius:'50%', border:'1.5px solid #c02020',
+                <div style={{ width:10, height:10, borderRadius:'50%', border:'1.5px solid #e8574d',
                   background:'transparent' }} />
                 <span style={{ fontFamily:'var(--mono)', fontSize:'0.56rem', color:'rgba(212,206,196,0.5)' }}>Escalating (pulsing ring)</span>
               </div>
@@ -779,9 +779,9 @@ export default function MapClient({ orgs=[], stateStats=[], foundingData=[], wit
               </div>
               <div style={{ display:'grid', gap:'2px' }}>
                 {[
-                  ['Super Culty', selectedStateStats.cult, '#c02020'],
-                  ['Kinda Culty', selectedStateStats.high_control, '#b58900'],
-                  ['Not Culty', selectedStateStats.healthy_group, '#859900'],
+                  ['Super Culty', selectedStateStats.cult, '#e8574d'],
+                  ['Kinda Culty', selectedStateStats.high_control, '#d99b3e'],
+                  ['Not Culty', selectedStateStats.healthy_group, '#5cb878'],
                 ].filter(([,v]) => v > 0).map(([label, count, color]) => (
                   <div key={label} style={{ display:'flex', alignItems:'center', gap:'0.5rem', padding:'0.3rem 0.5rem', background:'rgba(244,240,232,0.02)' }}>
                     <div style={{ width:7, height:7, borderRadius:'50%', background:color, flexShrink:0 }} />
@@ -825,7 +825,7 @@ export default function MapClient({ orgs=[], stateStats=[], foundingData=[], wit
               </div>
             ))}
             {layer === 'choropleth' && <>
-              {[['≥70%','#c02020'],['55–70%','#b58900'],['41–55%','#6c71c4'],['21–40%','#2aa198'],['0–20%','#859900'],['No data','rgba(212,206,196,0.2)']].map(([label, color]) => (
+              {[['≥70%','#e8574d'],['55–70%','#d99b3e'],['41–55%','#8f93e0'],['21–40%','#2aa198'],['0–20%','#5cb878'],['No data','rgba(212,206,196,0.2)']].map(([label, color]) => (
                 <div key={label} style={{ display:'flex', alignItems:'center', gap:'0.3rem' }}>
                   <div style={{ width:12, height:12, background:color }} />
                   <span style={{ fontFamily:'var(--mono)', fontSize:'0.58rem', color:'rgba(212,206,196,0.45)' }}>{label}</span>

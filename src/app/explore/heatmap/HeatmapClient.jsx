@@ -5,19 +5,19 @@ import Link from 'next/link';
 const CRITERIA = ['C1','C2','C3','C4','C5','C6','C7','C8','C9','C10'];
 const C_NAMES = { C1:'Leadership',C2:'Sacred Assumptions',C3:'Mission',C4:'Individuality',C5:'Isolation',C6:'Vernacular',C7:'Us/Them',C8:'Labor',C9:'Exit Costs',C10:'Ends/Means' };
 const TIERS = ['Super Culty','Kinda Culty','Not Culty'];
-const TIER_COLORS = { 'Super Culty':'#c02020','Kinda Culty':'#b07030','Not Culty':'#30a060' };
+const TIER_COLORS = { 'Super Culty':'#e8574d','Kinda Culty':'#d99b3e','Not Culty':'#5cb878' };
 
 function scoreColor(v) {
   if (v === null || v === undefined) return 'rgba(212,206,196,0.05)';
-  if (v >= 9) return 'rgba(192,32,32,0.95)';
-  if (v >= 8) return 'rgba(192,32,32,0.78)';
-  if (v >= 7) return 'rgba(176,112,48,0.82)';
-  if (v >= 6) return 'rgba(160,144,64,0.78)';
-  if (v >= 5) return 'rgba(130,160,60,0.7)';
+  if (v >= 9) return 'rgba(232,87,77,0.95)';
+  if (v >= 8) return 'rgba(232,87,77,0.78)';
+  if (v >= 7) return 'rgba(217,155,62,0.82)';
+  if (v >= 6) return 'rgba(217,155,62,0.78)';
+  if (v >= 5) return 'rgba(92,184,120,0.7)';
   if (v >= 4) return 'rgba(80,140,80,0.65)';
-  if (v >= 3) return 'rgba(48,160,96,0.55)';
-  if (v >= 2) return 'rgba(48,160,96,0.38)';
-  return 'rgba(48,160,96,0.22)';
+  if (v >= 3) return 'rgba(92,184,120,0.55)';
+  if (v >= 2) return 'rgba(92,184,120,0.38)';
+  return 'rgba(92,184,120,0.22)';
 }
 
 export default function HeatmapClient({ orgs=[], scoreMap={} }) {
