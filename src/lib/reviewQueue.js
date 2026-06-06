@@ -113,6 +113,9 @@ export async function getReviewQueue({ limit = 40 } = {}) {
       tier: org.composite_tier,
       youngs: org.youngs_score,
       methodologyVersion: org.methodology_version,
+      // AI jury's overall composite (same 0–100 Young-proportional scale as the
+      // published composite) — lets the header show how far a human has moved it.
+      juryComposite: verdict.jury_mean == null ? null : Number(verdict.jury_mean),
       jurySpread: verdict.jury_spread == null ? null : Number(verdict.jury_spread),
       modelCount: verdict.model_count ?? null,
       models,

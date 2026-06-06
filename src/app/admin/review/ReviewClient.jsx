@@ -26,6 +26,11 @@ const TIER_COLOR = { 'Super Culty': '#8b2020', 'Kinda Culty': '#9a6a2a', 'Not Cu
 const DRIFT_HI = 1;
 const DRIFT_BIG = 3;
 const SPREAD_HI = 3;
+// Org-composite scale (0–100). ORG_SPREAD_HI keeps the existing >20 org threshold —
+// org spreads reach ~48, so unlike the per-criterion scale it fires correctly.
+const ORG_DRIFT_HI = 3;
+const ORG_DRIFT_BIG = 8;
+const ORG_SPREAD_HI = 20;
 
 const inputStyle = {
   background: C.inputBg, color: C.paper, border: `1px solid ${C.borderStrong}`,
@@ -148,6 +153,15 @@ function OrgCard({ item }) {
   const [msg, setMsg] = useState(null);
   const [pending, start] = useTransition();
 
+  // Org-level review signal: how far the published composite has moved from the
+  // AI jury's, and whether the models disagreed badly (high spread).
+  const aiComp = item.juryComposite;
+  const pubComp = item.composite;
+  const orgDelta = aiComp != null && pubComp != null ? Math.round((pubComp - aiComp) * 10) / 10 : null;
+  const orgMag = orgDelta == null ? 0 : Math.abs(orgDelta);
+  const orgDeltaColor = orgMag >= ORG_DRIFT_BIG ? C.err : orgMag >= ORG_DRIFT_HI ? C.gold : C.faint;
+  const highSpread = item.jurySpread != null && item.jurySpread >= ORG_SPREAD_HI;
+
   function approve() {
     setMsg(null);
     const fd = new FormData();
@@ -174,10 +188,23 @@ function OrgCard({ item }) {
           </span>
         </span>
         <span style={{ display: 'flex', gap: 12, alignItems: 'center', flexShrink: 0 }}>
-          {item.jurySpread != null ? (
-            <span style={{ fontSize: 12, color: item.jurySpread > 20 ? C.gold : C.muted }}>spread {item.jurySpread}</span>
+          {/* AI jury's composite + how far the published one moved (badge shows where it landed). */}
+          {aiComp != null ? (
+            <span style={{ fontSize: 12, color: C.muted, whiteSpace: 'nowrap' }}>
+              AI <strong style={{ color: C.paper, fontWeight: 600 }}>{aiComp}</strong>
+              {orgDelta != null && orgMag >= 0.05 ? (
+                <strong style={{ marginLeft: 6, fontWeight: 700, color: orgDeltaColor }}>
+                  Δ {orgDelta > 0 ? '+' : ''}{orgDelta}
+                </strong>
+              ) : orgDelta != null ? (
+                <span style={{ marginLeft: 6, color: C.faint }}>· match</span>
+              ) : null}
+            </span>
           ) : null}
-          <span style={{ fontSize: 13, color: C.paper, padding: '3px 10px', borderRadius: 999, background: TIER_COLOR[item.tier] || '#555' }}>
+          {item.jurySpread != null ? (
+            <span style={{ fontSize: 12, fontWeight: 700, color: highSpread ? C.gold : C.muted, whiteSpace: 'nowrap' }}>spread {item.jurySpread}</span>
+          ) : null}
+          <span style={{ fontSize: 13, color: C.paper, padding: '3px 10px', borderRadius: 999, background: TIER_COLOR[item.tier] || '#555', whiteSpace: 'nowrap' }}>
             {item.composite}% · {item.tier}
           </span>
           <span style={{ color: C.muted }}>{open ? '▲' : '▼'}</span>
