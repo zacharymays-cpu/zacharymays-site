@@ -11,7 +11,7 @@ const STATIC_PATHS = [
   '/cultiness/findings', '/cultiness/dataset', '/findings',
   '/explore', '/explore/heatmap', '/explore/distributions', '/explore/correlations',
   '/explore/lineage', '/explore/sankey', '/explore/sunburst', '/explore/compare',
-  '/explore/map', '/compass', '/explore/compass-bubble', '/explore/compass3d',
+  '/explore/map', '/compass', '/explore/compass3d',
 ];
 
 export default async function sitemap() {
