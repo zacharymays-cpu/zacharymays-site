@@ -25,7 +25,7 @@ export async function getReviewQueue({ limit = 40 } = {}) {
 
   const { data: orgs, error: orgErr } = await sb
     .from('organizations')
-    .select('id, record_id, name, composite_score, composite_tier, youngs_score, methodology_version')
+    .select('id, record_id, name, category, summary_text, composite_score, composite_tier, youngs_score, methodology_version, reviewed_at')
     .eq('is_calibration', false)
     .not('composite_score', 'is', null);
   if (orgErr) throw orgErr;
@@ -69,21 +69,27 @@ export async function getReviewQueue({ limit = 40 } = {}) {
   return ranked.map(({ org, verdict, reason }) => {
     const cs = scoresByOrg.get(org.id) || {};
     const means = verdict.criterion_means || {};
+    const spreads = verdict.criterion_spreads || {};
     return {
       orgId: org.id,
       recordId: org.record_id,
       name: org.name,
+      category: org.category,
+      summary: org.summary_text || '',
       composite: org.composite_score == null ? null : Number(org.composite_score),
       tier: org.composite_tier,
       youngs: org.youngs_score,
       methodologyVersion: org.methodology_version,
       jurySpread: verdict.jury_spread == null ? null : Number(verdict.jury_spread),
+      reviewedAt: org.reviewed_at || null,
       reason,
       criteria: CRITERIA.map((c) => ({
         criterion: c,
         name: CRITERIA_NAMES[c],
         score: cs[c]?.score ?? null,
+        body: cs[c]?.body_text || '',
         juryMean: means[c] == null ? null : Number(means[c]),
+        jurySpread: spreads[c] == null ? null : Number(spreads[c]),
       })),
     };
   });
