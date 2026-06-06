@@ -24,7 +24,7 @@ const REL_LABELS = {
 };
 
 // Layout constants (SVG units)
-const NODE_W = 168, NODE_H = 50, COL_GAP = 76, ROW_GAP = 20, PAD = 10;
+const NODE_W = 168, NODE_H = 50, COL_GAP = 150, ROW_GAP = 22, PAD = 10;
 
 // Longest-path layering of a chain's edges into left→right columns.
 function layoutChain(chainEdges) {
@@ -133,19 +133,10 @@ export default function LineageClient({ nodes = [], edges = [] }) {
                     const x1 = s.x + NODE_W, y1 = s.y + NODE_H / 2;
                     const x2 = t.x - 2,      y2 = t.y + NODE_H / 2;
                     const dim = hover && hover !== e.source_slug && hover !== e.target_slug;
-                    const midx = (x1 + x2) / 2, midy = (y1 + y2) / 2;
                     return (
-                      <g key={i} opacity={dim ? 0.15 : 1}>
-                        <path d={arrow(x1, y1, x2, y2)} fill="none" stroke={accent} strokeWidth={1.6}
-                          markerEnd={`url(#arrow-${chainName.replace(/[^a-z0-9]/gi, '')})`} opacity={0.7} />
-                        {REL_LABELS[e.relationship_type] && (
-                          <text x={midx} y={midy - 4} textAnchor="middle"
-                            fontFamily="var(--mono)" fontSize={10} fill="rgba(235,231,223,0.95)"
-                            style={{ paintOrder: 'stroke', stroke: 'rgba(18,14,10,0.95)', strokeWidth: 4, strokeLinejoin: 'round' }}>
-                            {REL_LABELS[e.relationship_type]}
-                          </text>
-                        )}
-                      </g>
+                      <path key={i} d={arrow(x1, y1, x2, y2)} fill="none" stroke={accent} strokeWidth={1.6}
+                        markerEnd={`url(#arrow-${chainName.replace(/[^a-z0-9]/gi, '')})`}
+                        opacity={dim ? 0.12 : 0.7} />
                     );
                   })}
 
@@ -174,6 +165,24 @@ export default function LineageClient({ nodes = [], edges = [] }) {
                           </text>
                         </g>
                       </a>
+                    );
+                  })}
+
+                  {/* Relationship labels — drawn last so the boxes never cover them */}
+                  {chainEdges.map((e, i) => {
+                    const s = pos[e.source_slug], t = pos[e.target_slug];
+                    if (!s || !t || !REL_LABELS[e.relationship_type]) return null;
+                    const x1 = s.x + NODE_W, y1 = s.y + NODE_H / 2;
+                    const x2 = t.x - 2,      y2 = t.y + NODE_H / 2;
+                    const midx = (x1 + x2) / 2, midy = (y1 + y2) / 2;
+                    const dim = hover && hover !== e.source_slug && hover !== e.target_slug;
+                    return (
+                      <text key={`l${i}`} x={midx} y={midy - 5} textAnchor="middle"
+                        fontFamily="var(--mono)" fontSize={10} fill="rgba(235,231,223,0.95)"
+                        opacity={dim ? 0.12 : 1}
+                        style={{ paintOrder: 'stroke', stroke: 'rgba(18,14,10,0.95)', strokeWidth: 4, strokeLinejoin: 'round', pointerEvents: 'none' }}>
+                        {REL_LABELS[e.relationship_type]}
+                      </text>
                     );
                   })}
                 </svg>
