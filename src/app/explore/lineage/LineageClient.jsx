@@ -117,13 +117,14 @@ export default function LineageClient({ nodes = [], edges = [] }) {
           ctx.lineWidth = 2 / scale;
           ctx.stroke();
         }
-        if (scale > 2.5) {
-          ctx.fillStyle = `rgba(244,240,232,${alpha * 0.8})`;
-          ctx.font = `${Math.min(12, 3 / scale)}px sans-serif`;
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillText(node.name.split(' ')[0], node.x, node.y + r + 4/scale);
-        }
+        // Always-on label so every node is identifiable without deep zoom
+        const fontSize = 11 / scale;
+        ctx.fillStyle = `rgba(244,240,232,${highlight ? (isHighlighted ? 0.92 : 0.12) : 0.82})`;
+        ctx.font = `${fontSize}px sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        const label = node.name.length > 24 ? node.name.slice(0, 23) + '…' : node.name;
+        ctx.fillText(label, node.x, node.y + r + 3 / scale);
       })
       .linkColor(l => {
         const baseColor = l.color || '#888';
@@ -156,6 +157,10 @@ export default function LineageClient({ nodes = [], edges = [] }) {
     const charge = Graph.d3Force('charge');
     if (charge && typeof charge.strength === 'function') charge.strength(-220);
 
+    // Fit the whole network into view once the layout settles (centers it)
+    let didFit = false;
+    Graph.onEngineStop(() => { if (!didFit) { didFit = true; Graph.zoomToFit(400, 50); } });
+
     graphRef.current = Graph;
   }, [loaded, graphData, selected, highlight]);
 
@@ -169,40 +174,33 @@ export default function LineageClient({ nodes = [], edges = [] }) {
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
 
-      {/* Header */}
-      <div style={{ padding: '1.25rem 0 0.75rem' }}>
-        <div className="container--wide">
-          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.75rem' }}>
-            <span style={{ fontFamily: 'var(--mono)', fontSize: '0.65rem', color: 'var(--muted)' }}>
+      {/* Graph + sidebar */}
+      <div style={{ display: 'grid', gridTemplateColumns: selected ? '1fr 280px' : '1fr', flex: 1, minHeight: 540, marginTop: '0.75rem' }}>
+        <div style={{ position: 'relative', background: 'rgba(244,240,232,0.015)' }}>
+          {/* Chain filters + count overlaid on the graph — no separate header strip */}
+          <div style={{ position: 'absolute', top: '0.75rem', left: '0.75rem', right: '0.75rem', zIndex: 5, display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center', pointerEvents: 'none' }}>
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center', pointerEvents: 'auto' }}>
+              <button onClick={() => setChainFilter(null)}
+                style={{ fontFamily: 'var(--mono)', fontSize: '0.62rem', padding: '0.3rem 0.65rem',
+                  background: !chainFilter ? 'rgba(200,168,75,0.18)' : 'rgba(18,14,10,0.65)',
+                  border: `1px solid ${!chainFilter ? 'rgba(200,168,75,0.5)' : 'rgba(212,206,196,0.2)'}`,
+                  color: !chainFilter ? 'var(--gold)' : 'var(--paper)', cursor: 'pointer' }}>
+                All chains
+              </button>
+              {chains.map(c => (
+                <button key={c} onClick={() => setChainFilter(chainFilter === c ? null : c)}
+                  style={{ fontFamily: 'var(--mono)', fontSize: '0.58rem', padding: '0.25rem 0.55rem',
+                    background: chainFilter === c ? `${CHAIN_COLORS[c]}28` : 'rgba(18,14,10,0.65)',
+                    border: `1px solid ${chainFilter === c ? CHAIN_COLORS[c] : 'rgba(212,206,196,0.2)'}`,
+                    color: chainFilter === c ? CHAIN_COLORS[c] : 'var(--paper)', cursor: 'pointer' }}>
+                  {c}
+                </button>
+              ))}
+            </div>
+            <span style={{ fontFamily: 'var(--mono)', fontSize: '0.6rem', color: 'var(--muted)', marginLeft: 'auto', background: 'rgba(18,14,10,0.65)', padding: '0.25rem 0.5rem' }}>
               {filteredNodes.length} orgs · {filteredEdges.length} edges
             </span>
           </div>
-
-          {/* Chain filters */}
-          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
-            <button onClick={() => setChainFilter(null)}
-              style={{ fontFamily: 'var(--mono)', fontSize: '0.62rem', padding: '0.3rem 0.65rem',
-                background: !chainFilter ? 'rgba(200,168,75,0.12)' : 'transparent',
-                border: `1px solid ${!chainFilter ? 'rgba(200,168,75,0.5)' : 'rgba(212,206,196,0.2)'}`,
-                color: !chainFilter ? 'var(--gold)' : 'var(--muted)', cursor: 'pointer' }}>
-              All chains
-            </button>
-            {chains.map(c => (
-              <button key={c} onClick={() => setChainFilter(chainFilter === c ? null : c)}
-                style={{ fontFamily: 'var(--mono)', fontSize: '0.58rem', padding: '0.25rem 0.55rem',
-                  background: chainFilter === c ? `${CHAIN_COLORS[c]}18` : 'transparent',
-                  border: `1px solid ${chainFilter === c ? CHAIN_COLORS[c] : 'rgba(212,206,196,0.15)'}`,
-                  color: chainFilter === c ? CHAIN_COLORS[c] : 'var(--muted)', cursor: 'pointer' }}>
-                {c}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Graph + sidebar */}
-      <div style={{ display: 'grid', gridTemplateColumns: selected ? '1fr 280px' : '1fr', flex: 1, minHeight: 540 }}>
-        <div style={{ position: 'relative', background: 'rgba(244,240,232,0.015)' }}>
           {error ? (
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
               <p style={{ fontFamily: 'var(--mono)', fontSize: '0.8rem', color: 'var(--muted)' }}>Failed to load graph library</p>
@@ -287,7 +285,7 @@ export default function LineageClient({ nodes = [], edges = [] }) {
               </div>
             ))}
             <span style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', color: 'rgba(212,206,196,0.25)', marginLeft: 'auto' }}>
-              Node size = composite score · Hover to trace connections · Click to select
+              Each dot = an organization · lines = documented formation/influence · size = composite score · hover to trace · click for detail
             </span>
           </div>
         </div>
