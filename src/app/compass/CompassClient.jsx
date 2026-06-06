@@ -177,7 +177,7 @@ export default function CompassClient({ orgs=[], regimes=[], presidentialEras=[]
 
   return (
     <>
-      <section style={{padding:'2.5rem 0 1.5rem',borderBottom:'1px solid rgba(212,206,196,0.1)'}}>
+      <section style={{padding:'1.25rem 0 0.75rem'}}>
         <div className="container--wide">
           <div style={{display:'flex',alignItems:'baseline',justifyContent:'space-between',flexWrap:'wrap',gap:'0.5rem',marginBottom:'0.6rem'}}>
             <span style={{fontFamily:'var(--mono)',fontSize:'0.62rem',color:'var(--muted)'}}>
