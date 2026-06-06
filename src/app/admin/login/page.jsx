@@ -3,14 +3,11 @@
 import { useState } from 'react';
 import { createSupabaseBrowserClient } from '../../../lib/supabase/client';
 
-// Enable the matching providers in Supabase → Auth → Providers. GitHub/Google are
-// the lightest to set up; Microsoft (azure) needs an Entra app; Apple needs a paid
-// Apple Developer account. Remove any you don't enable.
+// Active provider(s). Each must be enabled in Supabase → Auth → Providers.
+// To add more later, re-add entries (Supabase also supports 'google', 'azure'
+// for Microsoft, and 'apple').
 const PROVIDERS = [
-  { id: 'google', label: 'Continue with Google' },
   { id: 'github', label: 'Continue with GitHub' },
-  { id: 'azure', label: 'Continue with Microsoft' },
-  { id: 'apple', label: 'Continue with Apple' },
 ];
 
 export default function AdminLoginPage() {
