@@ -7,10 +7,15 @@ tier-boundary orgs), and applies accepted changes through the audited
 `score_history` trail with the analyst as the actor.
 
 ## Architecture
-- **Auth:** Supabase Auth with the **GitHub** OAuth provider (cookie sessions via
-  `@supabase/ssr`). `src/middleware.js` gates `/admin/*` on a session;
-  `src/app/admin/review/page.jsx` additionally checks the email against
-  `ADMIN_EMAILS`.
+- **Auth:** Supabase Auth (cookie sessions via `@supabase/ssr`) with a choice of
+  OAuth providers — **Google, GitHub, Microsoft (Azure), Apple** (buttons in
+  `src/app/admin/login/page.jsx`; enable whichever you configure, delete the rest).
+- **2FA (required):** TOTP. `src/app/admin/mfa/page.jsx` enrolls an authenticator
+  app (Google Authenticator / Authy / 1Password) and steps the session up to
+  **AAL2**. `/admin/review` and the write action both require AAL2.
+- **Gates:** `src/middleware.js` requires a session on `/admin/*`; the review page
+  requires the email in `ADMIN_EMAILS` **and** an AAL2 (2FA) session; the write
+  action re-checks both.
 - **Reads:** `src/lib/reviewQueue.js` (service role — the AI-jury tables are not
   anon-readable).
 - **Writes:** `src/app/admin/review/actions.js` Server Action → service-role →
@@ -20,16 +25,21 @@ tier-boundary orgs), and applies accepted changes through the audited
 
 ## One-time setup
 
-### 1. GitHub OAuth app
-GitHub → Settings → Developer settings → OAuth Apps → New:
-- Homepage URL: `https://<your-domain>`
-- Authorization callback URL: `https://<your-domain>/auth/callback`
-- Copy the Client ID + secret.
+### 1. OAuth provider(s) — pick at least one
+Configure the provider's app and copy its Client ID/secret:
+- **Google** (easiest, free): Google Cloud Console → OAuth consent + credentials.
+- **GitHub** (easy, free): GitHub → Settings → Developer settings → OAuth Apps.
+- **Microsoft** (Azure/Entra): register an app, add a client secret.
+- **Apple** (needs paid Apple Developer account): create a Services ID + key.
+
+For all, the authorization callback / redirect URL is:
+`https://<your-domain>/auth/callback` (and `http://localhost:3000/auth/callback` for dev).
 
 ### 2. Supabase
-- Auth → Providers → **GitHub**: paste the Client ID/secret, enable.
-- Auth → URL Configuration → add `https://<your-domain>/auth/callback` (and
-  `http://localhost:3000/auth/callback` for local dev) to redirect URLs.
+- Auth → Providers → enable each provider you set up and paste its Client ID/secret.
+- Auth → URL Configuration → add the callback URLs above to the redirect allowlist.
+- 2FA/TOTP is enabled by default; no extra config needed. (Optionally enforce MFA
+  org-wide in Auth settings — the app already enforces it for `/admin`.)
 
 ### 3. Environment variables (Vercel → Settings → Env Vars, and `.env.local`)
 See `.env.example`:

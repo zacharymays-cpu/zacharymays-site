@@ -26,6 +26,12 @@ async function requireAdmin() {
   if (!allow.includes(email)) {
     throw new Error(`${email} is not an approved analyst.`);
   }
+  // Require a stepped-up (2FA) session for any write — defense-in-depth beyond
+  // the page-level gate.
+  const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  if (aal?.currentLevel !== 'aal2') {
+    throw new Error('Two-factor step-up required before writing.');
+  }
   return user;
 }
 

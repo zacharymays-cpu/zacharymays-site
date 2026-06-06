@@ -2,6 +2,7 @@
 // Access: middleware requires a session; this page additionally requires the
 // signed-in email to be in ADMIN_EMAILS. Writes go through the applyDecision
 // Server Action (service-role + audited).
+import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '../../../lib/supabase/server';
 import { getReviewQueue } from '../../../lib/reviewQueue';
 import ReviewClient from './ReviewClient';
@@ -36,6 +37,15 @@ export default async function AdminReviewPage() {
         </p>
       </main>
     );
+  }
+
+  // Enforce TOTP 2FA for admins: must have a verified factor AND a stepped-up
+  // (AAL2) session. Otherwise route to enrollment / step-up.
+  const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  const { data: factors } = await supabase.auth.mfa.listFactors();
+  const hasVerifiedTotp = (factors?.totp || []).some((f) => f.status === 'verified');
+  if (!hasVerifiedTotp || aal?.currentLevel !== 'aal2') {
+    redirect('/admin/mfa');
   }
 
   let queue = [];
