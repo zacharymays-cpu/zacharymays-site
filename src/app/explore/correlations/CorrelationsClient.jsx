@@ -82,21 +82,14 @@ export default function CorrelationsClient({ orgs=[], scoreMap={} }) {
 
   return (
     <div style={{minHeight:'100vh'}}>
-      <div style={{borderBottom:'1px solid rgba(212,206,196,0.1)',padding:'2rem 0 1.5rem',background:'var(--ink)',position:'sticky',top:'60px',zIndex:50}}>
-        <div className="container--wide">
-          <div style={{display:'flex',gap:'1rem',alignItems:'center'}}>
-            <label style={{display:'flex',alignItems:'center',gap:'0.5rem',cursor:'pointer'}}>
-              <input type="checkbox" checked={includeComposite} onChange={e=>setIncludeComposite(e.target.checked)} style={{accentColor:'var(--gold)'}}/>
-              <span style={{fontFamily:'var(--mono)',fontSize:'0.68rem',color:'var(--muted)'}}>Include composite score column</span>
-            </label>
-            <span style={{fontFamily:'var(--mono)',fontSize:'0.62rem',color:'rgba(212,206,196,0.3)',marginLeft:'auto'}}>Click any cell to see scatter</span>
-          </div>
-        </div>
-      </div>
-
       <div className="container--wide" style={{paddingTop:'1.5rem',paddingBottom:'4rem'}}>
-        {/* Color scale */}
-        <div style={{display:'flex',gap:'0.5rem',alignItems:'center',marginBottom:'1.25rem',flexWrap:'wrap'}}>
+        {/* Controls + color scale on one line (no separate header strip) */}
+        <div style={{display:'flex',gap:'0.75rem',alignItems:'center',marginBottom:'1.25rem',flexWrap:'wrap'}}>
+          <label style={{display:'flex',alignItems:'center',gap:'0.5rem',cursor:'pointer'}}>
+            <input type="checkbox" checked={includeComposite} onChange={e=>setIncludeComposite(e.target.checked)} style={{accentColor:'var(--gold)'}}/>
+            <span style={{fontFamily:'var(--mono)',fontSize:'0.66rem',color:'var(--muted)'}}>Include composite</span>
+          </label>
+          <span style={{width:1,height:14,background:'rgba(212,206,196,0.15)',margin:'0 0.25rem'}}/>
           <span style={{fontFamily:'var(--mono)',fontSize:'0.6rem',color:'var(--muted)'}}>r =</span>
           {[-1,-0.7,-0.5,-0.3,-0.1,0,0.1,0.3,0.5,0.7,1].map(r=>(
             <div key={r} style={{display:'flex',alignItems:'center',gap:'3px'}}>
