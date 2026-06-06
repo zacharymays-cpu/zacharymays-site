@@ -35,9 +35,17 @@ const CARTO_STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style
 const MAPTILER_KEY = process.env.NEXT_PUBLIC_MAPTILER_KEY;
 const MAPTILER_STYLE = process.env.NEXT_PUBLIC_MAPTILER_STYLE || 'dataviz-dark';
 const USING_MAPTILER = Boolean(MAPTILER_KEY);
-const MAP_STYLE = USING_MAPTILER
-  ? `https://api.maptiler.com/maps/${MAPTILER_STYLE}/style.json?key=${MAPTILER_KEY}`
-  : CARTO_STYLE;
+const styleUrl = (id) => (USING_MAPTILER
+  ? `https://api.maptiler.com/maps/${id}/style.json?key=${MAPTILER_KEY}`
+  : CARTO_STYLE);
+// Basemap choices for the in-map switcher (only shown when MapTiler is active).
+const STYLE_OPTIONS = [
+  { id: 'dataviz-dark', label: 'Dark' },
+  { id: 'satellite',    label: 'Satellite' },
+  { id: 'hybrid',       label: 'Hybrid' },
+  { id: 'streets-v2',   label: 'Streets' },
+  { id: 'topo-v2',      label: 'Terrain' },
+];
 
 function scoreToFill(score) {
   if (score === null) return 'rgba(212,206,196,0.04)';
@@ -53,10 +61,12 @@ export default function MapClient({ orgs=[], stateStats=[], foundingData=[], wit
   const searchParams = useSearchParams();
   const mapContainer = useRef(null);
   const mapRef       = useRef(null);
+  const viewRef      = useRef(null); // preserves center/zoom across basemap switches
 
   // ── State ──────────────────────────────────────────────────────────────────
   const [mapLoaded,      setMapLoaded]      = useState(false);
   const [mapError,       setMapError]       = useState(null);
+  const [mapStyle,       setMapStyle]       = useState(MAPTILER_STYLE);
   const [tierFilter,     setTierFilter]     = useState([]);
   const [quadrantFilter, setQuadrantFilter] = useState([]);
   const [sizeMode,       setSizeMode]       = useState(true);
@@ -205,9 +215,11 @@ export default function MapClient({ orgs=[], stateStats=[], foundingData=[], wit
 
   // ── Init map ───────────────────────────────────────────────────────────────
   useEffect(() => {
-    if (!mapContainer.current || mapRef.current) return;
+    if (!mapContainer.current) return;
     let map;
+    let cancelled = false;
     import('maplibre-gl').then(({ default: maplibregl }) => {
+      if (cancelled || !mapContainer.current) return;
       if (!document.getElementById('maplibre-css')) {
         const link = document.createElement('link');
         link.id = 'maplibre-css'; link.rel = 'stylesheet';
@@ -217,8 +229,9 @@ export default function MapClient({ orgs=[], stateStats=[], foundingData=[], wit
       try {
         map = new maplibregl.Map({
           container: mapContainer.current,
-          style: MAP_STYLE,
-          center: [-96, 38], zoom: 3.8, minZoom: 2, maxZoom: 16,
+          style: styleUrl(mapStyle),
+          center: viewRef.current?.center || [-96, 38],
+          zoom: viewRef.current?.zoom ?? 3.8, minZoom: 2, maxZoom: 16,
           attributionControl: false,
         });
       } catch (err) {
@@ -406,10 +419,21 @@ export default function MapClient({ orgs=[], stateStats=[], foundingData=[], wit
         mapRef.current = map;
         setMapLoaded(true);
       });
-
-      return () => { if (map) { map.remove(); mapRef.current = null; } };
     }).catch(err => setMapError('Failed to load map library: ' + err.message));
-  }, []);
+
+    // Rebuild on basemap switch: tear down the old map (preserving the view),
+    // then the effect re-runs to create it with the new style. The data-sync
+    // effect re-fills all sources once the new map fires setMapLoaded(true).
+    return () => {
+      cancelled = true;
+      if (map) {
+        try { viewRef.current = { center: map.getCenter(), zoom: map.getZoom() }; } catch (_) {}
+        map.remove();
+      }
+      mapRef.current = null;
+      setMapLoaded(false);
+    };
+  }, [mapStyle]);
 
   // ── Sync data & visibility ─────────────────────────────────────────────────
   useEffect(() => {
@@ -644,6 +668,21 @@ export default function MapClient({ orgs=[], stateStats=[], foundingData=[], wit
           ) : (
             <>
               <div ref={mapContainer} style={{ width:'100%', height:'100%', minHeight:520 }} />
+              {USING_MAPTILER && (
+                <div style={{ position:'absolute', top:12, left:12, zIndex:5, display:'flex', gap:4,
+                  background:'rgba(18,14,10,0.8)', border:'1px solid rgba(212,206,196,0.15)', borderRadius:4, padding:4 }}>
+                  {STYLE_OPTIONS.map(s => (
+                    <button key={s.id} onClick={() => setMapStyle(s.id)} title={`Basemap: ${s.label}`}
+                      style={{ fontFamily:'var(--mono)', fontSize:'0.58rem', letterSpacing:'0.06em', textTransform:'uppercase',
+                        padding:'0.28rem 0.5rem', cursor:'pointer',
+                        background: mapStyle === s.id ? 'rgba(200,168,75,0.18)' : 'transparent',
+                        border:`1px solid ${mapStyle === s.id ? 'rgba(200,168,75,0.55)' : 'transparent'}`,
+                        color: mapStyle === s.id ? 'var(--gold)' : 'rgba(212,206,196,0.7)' }}>
+                      {s.label}
+                    </button>
+                  ))}
+                </div>
+              )}
               {!mapLoaded && (
                 <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center',
                   justifyContent:'center', background:'rgba(18,14,10,0.85)', zIndex:10 }}>
