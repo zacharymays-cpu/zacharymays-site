@@ -192,27 +192,6 @@ export default function CompassClient({ orgs=[], regimes=[], presidentialEras=[]
               {orgs.length} organizations · {regimes.length} regimes ◆ · {presidentialEras.length} eras ★
             </span>
           </div>
-          {/* Visualization nav */}
-          <div style={{display:'flex',gap:'0.5rem',flexWrap:'wrap'}}>
-            {[
-              {href:'/explore',          label:'Explorer'},
-              {href:'/explore/heatmap',  label:'Heatmap'},
-              {href:'/explore/distributions', label:'Distributions'},
-              {href:'/explore/correlations',  label:'Correlations'},
-              {href:'/explore/lineage',  label:'Lineage'},
-              {href:'/explore/compare',  label:'Compare'},
-              {href:'/explore/map',      label:'Map'},
-            ].map(({href,label})=>(
-              <Link key={href} href={href}
-                style={{fontFamily:'var(--mono)',fontSize:'0.58rem',letterSpacing:'0.08em',textTransform:'uppercase',
-                  padding:'0.22rem 0.55rem',background:'transparent',
-                  border:'1px solid rgba(212,206,196,0.18)',color:'var(--muted)',textDecoration:'none',
-                  transition:'color 0.15s,border-color 0.15s'}}
-                onMouseEnter={e=>{e.currentTarget.style.color='var(--paper)';e.currentTarget.style.borderColor='rgba(212,206,196,0.45)';}}
-                onMouseLeave={e=>{e.currentTarget.style.color='var(--muted)';e.currentTarget.style.borderColor='rgba(212,206,196,0.18)';}}
-              >{label}</Link>
-            ))}
-          </div>
         </div>
       </section>
 
