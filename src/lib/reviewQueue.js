@@ -33,7 +33,7 @@ export async function getReviewQueue({ limit = 40 } = {}) {
   // Latest jury verdict per org (dedupe newest-first in JS — PostgREST has no DISTINCT ON).
   const { data: verdicts, error: vErr } = await sb
     .from('ai_jury_verdicts')
-    .select('org_id, jury_mean, jury_spread, consensus_strong, criterion_means, criterion_spreads, computed_at')
+    .select('org_id, run_id, jury_mean, jury_spread, consensus_strong, model_count, score_claude, score_gpt4o, score_gemini, criterion_means, criterion_spreads, computed_at')
     .order('computed_at', { ascending: false });
   if (vErr) throw vErr;
   const latest = new Map();
@@ -66,10 +66,43 @@ export async function getReviewQueue({ limit = 40 } = {}) {
     }
   }
 
+  // Per-model, per-criterion scores from the latest jury run (so the spread is
+  // explainable — you can see which model scored what, and which abstained).
+  const modelKey = (m) =>
+    m?.startsWith('claude') ? 'claude' : m?.startsWith('gpt') ? 'gpt4o' : m?.startsWith('gemini') ? 'gemini' : m;
+  const perCritModels = new Map(); // org_id -> { criterion -> {claude,gpt4o,gemini} }
+  const coverage = new Map(); // org_id -> { claude:n, gpt4o:n, gemini:n }
+  if (ids.length) {
+    const runByOrg = new Map(ranked.map((r) => [r.org.id, r.verdict.run_id]));
+    const { data: ms, error: msErr } = await sb
+      .from('ai_model_scores')
+      .select('org_id, run_id, model, criterion, score')
+      .in('org_id', ids);
+    if (msErr) throw msErr;
+    for (const row of ms) {
+      if (row.run_id !== runByOrg.get(row.org_id)) continue; // latest run only
+      const k = modelKey(row.model);
+      if (!perCritModels.has(row.org_id)) perCritModels.set(row.org_id, {});
+      const byCrit = perCritModels.get(row.org_id);
+      if (!byCrit[row.criterion]) byCrit[row.criterion] = {};
+      byCrit[row.criterion][k] = row.score;
+      if (!coverage.has(row.org_id)) coverage.set(row.org_id, { claude: 0, gpt4o: 0, gemini: 0 });
+      if (row.score != null) coverage.get(row.org_id)[k] = (coverage.get(row.org_id)[k] || 0) + 1;
+    }
+  }
+
   return ranked.map(({ org, verdict, reason }) => {
     const cs = scoresByOrg.get(org.id) || {};
     const means = verdict.criterion_means || {};
     const spreads = verdict.criterion_spreads || {};
+    const cov = coverage.get(org.id) || { claude: 0, gpt4o: 0, gemini: 0 };
+    const byCrit = perCritModels.get(org.id) || {};
+    const models = [
+      { key: 'claude', label: 'Claude', composite: verdict.score_claude == null ? null : Number(verdict.score_claude), scored: cov.claude },
+      { key: 'gpt4o', label: 'GPT-4o', composite: verdict.score_gpt4o == null ? null : Number(verdict.score_gpt4o), scored: cov.gpt4o },
+      { key: 'gemini', label: 'Gemini', composite: verdict.score_gemini == null ? null : Number(verdict.score_gemini), scored: cov.gemini },
+    ].map((m) => ({ ...m, abstained: m.scored === 0, lowCoverage: m.scored > 0 && m.scored < 5 }))
+     .filter((m) => m.composite != null || m.scored > 0);
     return {
       orgId: org.id,
       recordId: org.record_id,
@@ -81,6 +114,8 @@ export async function getReviewQueue({ limit = 40 } = {}) {
       youngs: org.youngs_score,
       methodologyVersion: org.methodology_version,
       jurySpread: verdict.jury_spread == null ? null : Number(verdict.jury_spread),
+      modelCount: verdict.model_count ?? null,
+      models,
       reviewedAt: org.reviewed_at || null,
       reason,
       criteria: CRITERIA.map((c) => ({
@@ -90,6 +125,7 @@ export async function getReviewQueue({ limit = 40 } = {}) {
         body: cs[c]?.body_text || '',
         juryMean: means[c] == null ? null : Number(means[c]),
         jurySpread: spreads[c] == null ? null : Number(spreads[c]),
+        modelScores: byCrit[c] || {},
       })),
     };
   });

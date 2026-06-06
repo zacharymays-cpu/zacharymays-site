@@ -103,9 +103,22 @@ function Criterion({ orgId, c }) {
         </div>
       </div>
 
+      {/* Per-model scores for this criterion — so the spread is explainable */}
+      <div style={{ display: 'flex', gap: 14, fontSize: 12, color: C.muted, margin: '8px 0 2px' }}>
+        {['claude', 'gpt4o', 'gemini'].map((k) => {
+          const label = k === 'gpt4o' ? 'GPT-4o' : k === 'claude' ? 'Claude' : 'Gemini';
+          const v = c.modelScores?.[k];
+          return (
+            <span key={k}>{label}:{' '}
+              <strong style={{ color: v == null ? C.faint : C.paper }}>{v == null ? 'N/A' : v}</strong>
+            </span>
+          );
+        })}
+      </div>
+
       {/* Evidence — what you judge against */}
       <p style={{
-        margin: '10px 0', fontSize: 13.5, lineHeight: 1.6, color: C.paper,
+        margin: '8px 0 10px', fontSize: 13.5, lineHeight: 1.6, color: C.paper,
         whiteSpace: 'pre-wrap', maxHeight: 220, overflow: 'auto',
         borderLeft: `2px solid ${C.border}`, paddingLeft: 12,
       }}>
@@ -178,6 +191,31 @@ function OrgCard({ item }) {
               {item.summary}
             </p>
           ) : null}
+
+          {/* Model breakdown — explains the spread (range of these composites) */}
+          {item.models?.length ? (
+            <div style={{
+              display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center',
+              fontSize: 13, color: C.paper, background: C.panel2, border: `1px solid ${C.border}`,
+              borderRadius: 8, padding: '10px 14px', marginBottom: 14,
+            }}>
+              <span style={{ color: C.muted, fontSize: 12 }}>Jury composites:</span>
+              {item.models.map((m) => (
+                <span key={m.key} title={`${m.scored}/10 criteria scored`}>
+                  {m.label}{' '}
+                  <strong>{m.composite == null ? '—' : `${m.composite}%`}</strong>
+                  {m.abstained ? <span style={{ color: C.err }}> · abstained (0/10)</span>
+                    : m.lowCoverage ? <span style={{ color: C.gold }}> · only {m.scored}/10</span>
+                    : <span style={{ color: C.faint }}> · {m.scored}/10</span>}
+                </span>
+              ))}
+              <span style={{ color: C.muted, fontSize: 12, width: '100%', marginTop: 2 }}>
+                Spread {item.jurySpread} = range of these. A model marked “abstained” scored everything N/A —
+                it’s counted as 0% and inflates the spread, so weight it accordingly.
+              </span>
+            </div>
+          ) : null}
+
           {item.criteria.map((c) => <Criterion key={c.criterion} orgId={item.orgId} c={c} />)}
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 6,
