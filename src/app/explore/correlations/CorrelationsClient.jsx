@@ -156,8 +156,8 @@ export default function CorrelationsClient({ orgs=[], scoreMap={} }) {
             </div>
           </div>
 
-          {/* Selected-cell detail — right side, sticky so no scrolling is needed */}
-          <div style={{flex:'1 1 340px',minWidth:300,position:'sticky',top:'150px',display:'flex',flexDirection:'column'}}>
+          {/* Selected-cell detail — right side; stretches to the matrix height so the two columns' bottoms align */}
+          <div style={{flex:'1 1 340px',minWidth:300,display:'flex',flexDirection:'column'}}>
             {selected ? (()=>{
               const {a,b,r,pairs} = selected;
               const maxA = a==='COMPOSITE'?100:10, maxB = b==='COMPOSITE'?100:10;
