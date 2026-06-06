@@ -121,7 +121,6 @@ export default function AboutPage() {
               <hr className="rule" />
 
               <div className="section__label">Contact</div>
-              {/* TODO(verify before deploy): confirm zachary@zacharymays.com is provisioned and receiving mail. */}
               <p style={{color: 'var(--muted)'}}>
                 For press, speaking, and research inquiries:{' '}
                 <a href="mailto:zachary@zacharymays.com">zachary@zacharymays.com</a>

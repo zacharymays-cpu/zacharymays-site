@@ -265,18 +265,6 @@ export default function AssholesPage() {
               Publication details to be announced.
             </p>
           </div>
-
-          {/* TODO(substack): replace href with the real Substack URL when available. */}
-          <p style={{
-            fontFamily: 'var(--mono)',
-            fontSize: '0.78rem',
-            letterSpacing: '0.05em',
-            color: 'var(--muted)',
-            textAlign: 'center',
-            marginTop: '1.5rem'
-          }}>
-            <a href="#substack-todo">Follow on Substack for updates.</a>
-          </p>
         </div>
       </section>
     </>
