@@ -43,7 +43,9 @@ const MODES = [
   { id: 'other', label: 'Other lineages' },
 ];
 
-const NODE_W = 176, NODE_H = 52, COL_GAP = 150, ROW_GAP = 22, PAD = 12;
+// Vertical cascade: depth flows top→bottom, siblings spread left→right and are
+// centered within each level. H_GAP separates siblings; V_GAP separates levels.
+const NODE_W = 150, NODE_H = 48, H_GAP = 16, V_GAP = 54, PAD = 12;
 const safe = (s) => s.replace(/[^a-z0-9]/gi, '');
 
 export default function LineageClient({ nodes = [], edges = [] }) {
@@ -89,7 +91,8 @@ export default function LineageClient({ nodes = [], edges = [] }) {
     return { subEdges: sub, rootSlug: mode, nodeCount: reach.size };
   }, [mode, edges, reachOf]);
 
-  // Longest-path layering into left→right columns; cluster by branch within columns.
+  // Longest-path layering into top→bottom levels; cluster by branch within each
+  // level and centre the level horizontally so it reads as a cascade.
   const { pos, width, height, branchOf } = useMemo(() => {
     const slugs = new Set(); if (rootSlug) slugs.add(rootSlug);
     subEdges.forEach(e => { slugs.add(e.source_slug); slugs.add(e.target_slug); });
@@ -107,27 +110,30 @@ export default function LineageClient({ nodes = [], edges = [] }) {
     const branchOf = {};
     subEdges.forEach(e => { if (branchOf[e.target_slug] == null) branchOf[e.target_slug] = e.chain_name; });
 
-    const cols = {};
-    [...slugs].forEach(s => { (cols[layer[s]] = cols[layer[s]] || []).push(s); });
+    const rows = {};
+    [...slugs].forEach(s => { (rows[layer[s]] = rows[layer[s]] || []).push(s); });
+    Object.values(rows).forEach(arr => arr.sort((a, b) => {
+      const ba = branchOf[a] || '', bb = branchOf[b] || '';
+      if (ba !== bb) return ba.localeCompare(bb);
+      return (nodeBySlug[a]?.name || a).localeCompare(nodeBySlug[b]?.name || b);
+    }));
+
+    const layerNums = Object.keys(rows).map(Number);
+    const maxLayer = layerNums.length ? Math.max(...layerNums) : 0;
+    const maxRowSize = Math.max(1, ...Object.values(rows).map(a => a.length));
+    const totalW = maxRowSize * NODE_W + (maxRowSize - 1) * H_GAP;
 
     const pos = {};
-    let maxRows = 0;
-    const colNums = Object.keys(cols).map(Number);
-    const maxCol = colNums.length ? Math.max(...colNums) : 0;
-    Object.entries(cols).forEach(([col, arr]) => {
-      arr.sort((a, b) => {
-        const ba = branchOf[a] || '', bb = branchOf[b] || '';
-        if (ba !== bb) return ba.localeCompare(bb);
-        return (nodeBySlug[a]?.name || a).localeCompare(nodeBySlug[b]?.name || b);
+    Object.entries(rows).forEach(([L, arr]) => {
+      const layerW = arr.length * NODE_W + (arr.length - 1) * H_GAP;
+      const offX = PAD + (totalW - layerW) / 2;
+      arr.forEach((s, i) => {
+        pos[s] = { x: offX + i * (NODE_W + H_GAP), y: PAD + Number(L) * (NODE_H + V_GAP) };
       });
-      arr.forEach((s, row) => {
-        pos[s] = { x: PAD + Number(col) * (NODE_W + COL_GAP), y: PAD + row * (NODE_H + ROW_GAP) };
-      });
-      maxRows = Math.max(maxRows, arr.length);
     });
 
-    const width = PAD * 2 + (maxCol + 1) * NODE_W + maxCol * COL_GAP;
-    const height = PAD * 2 + maxRows * NODE_H + Math.max(0, maxRows - 1) * ROW_GAP;
+    const width = PAD * 2 + totalW;
+    const height = PAD * 2 + (maxLayer + 1) * NODE_H + maxLayer * V_GAP;
     return { pos, width, height, branchOf };
   }, [subEdges, rootSlug, nodeBySlug]);
 
@@ -137,7 +143,7 @@ export default function LineageClient({ nodes = [], edges = [] }) {
     return Object.entries(m).sort((a, b) => b[1] - a[1]);
   }, [subEdges]);
 
-  const arrow = (x1, y1, x2, y2) => { const mx = (x1 + x2) / 2; return `M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`; };
+  const arrow = (x1, y1, x2, y2) => { const my = (y1 + y2) / 2; return `M${x1},${y1} C${x1},${my} ${x2},${my} ${x2},${y2}`; };
 
   const dimEdge = (e) =>
     (branchHL && e.chain_name !== branchHL) ||
@@ -180,7 +186,7 @@ export default function LineageClient({ nodes = [], edges = [] }) {
           {mode === 'other'
             ? 'Lineages that descend from neither the Nazi Party nor the Ku Klux Klan — shown as a forest of their own roots.'
             : 'Every organization with a documented line of descent from the selected origin, combined into a single tree.'}{' '}
-          Traced left → right through formation and ideological inheritance. Each <strong>branch</strong> (a named lineage)
+          Traced top → bottom through formation and ideological inheritance. Each <strong>branch</strong> (a named lineage)
           has its own color; arrows show direction of influence. Hover a branch in the key to isolate it, or a card to
           trace its links. Click any card for its full assessment. Branches converge where later groups draw on more than one line.
         </p>
@@ -214,9 +220,10 @@ export default function LineageClient({ nodes = [], edges = [] }) {
           </div>
         </div>
 
-        {/* Diagram (scrolls horizontally if wide) */}
+        {/* Diagram — scales to page width; depth grows downward (vertical scroll) */}
         <div style={{ overflowX: 'auto', paddingBottom: '0.5rem' }}>
-          <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} style={{ display: 'block', maxWidth: 'none' }}>
+          <svg viewBox={`0 0 ${width} ${height}`} width="100%"
+            style={{ display: 'block', maxWidth: width, height: 'auto', margin: '0 auto' }}>
             <defs>
               {branches.map(([c]) => (
                 <marker key={c} id={`lin-arrow-${safe(c)}`} viewBox="0 0 10 10" refX="9" refY="5"
@@ -226,12 +233,12 @@ export default function LineageClient({ nodes = [], edges = [] }) {
               ))}
             </defs>
 
-            {/* Edges */}
+            {/* Edges (top of source → bottom of target) */}
             {subEdges.map((e, i) => {
               const s = pos[e.source_slug], t = pos[e.target_slug];
               if (!s || !t) return null;
-              const x1 = s.x + NODE_W, y1 = s.y + NODE_H / 2;
-              const x2 = t.x - 2,      y2 = t.y + NODE_H / 2;
+              const x1 = s.x + NODE_W / 2, y1 = s.y + NODE_H;
+              const x2 = t.x + NODE_W / 2, y2 = t.y - 1;
               return (
                 <path key={i} d={arrow(x1, y1, x2, y2)} fill="none" stroke={branchColor(e.chain_name)}
                   strokeWidth={1.6} markerEnd={`url(#lin-arrow-${safe(e.chain_name || 'Other formations')})`}
@@ -247,7 +254,7 @@ export default function LineageClient({ nodes = [], edges = [] }) {
               const tierColor = TIER_COLORS[n?.composite_tier] || '#888';
               const bColor = isRoot ? 'var(--gold)' : branchColor(branchOf[slug]);
               const score = n ? parseFloat(n.composite_score || 0) : null;
-              const label = name.length > 25 ? name.slice(0, 24) + '…' : name;
+              const label = name.length > 20 ? name.slice(0, 19) + '…' : name;
               return (
                 <a key={slug} href={`/org/${slug}`}
                   onMouseEnter={() => setHover(slug)} onMouseLeave={() => setHover(null)}
@@ -257,8 +264,8 @@ export default function LineageClient({ nodes = [], edges = [] }) {
                       fill="rgba(28,24,20,0.92)" stroke={isRoot ? 'var(--gold)' : tierColor}
                       strokeWidth={isRoot || hover === slug ? 2 : 1.2} />
                     <rect x={p.x} y={p.y} width={5} height={NODE_H} rx={2} fill={bColor} />
-                    <text x={p.x + 15} y={p.y + 21} fontFamily="var(--serif)" fontSize={13.5} fill="var(--paper)" fontWeight={700}>{label}</text>
-                    <text x={p.x + 15} y={p.y + 39} fontFamily="var(--mono)" fontSize={10} fill={isRoot ? 'var(--gold)' : tierColor} fontWeight={600}>
+                    <text x={p.x + 13} y={p.y + 19} fontFamily="var(--serif)" fontSize={12.5} fill="var(--paper)" fontWeight={700}>{label}</text>
+                    <text x={p.x + 13} y={p.y + 36} fontFamily="var(--mono)" fontSize={9.5} fill={isRoot ? 'var(--gold)' : tierColor} fontWeight={600}>
                       {isRoot ? 'ORIGIN' : (n?.composite_tier || '—')}{!isRoot && score != null ? ` · ${score.toFixed(0)}%` : ''}
                     </text>
                   </g>
@@ -271,13 +278,12 @@ export default function LineageClient({ nodes = [], edges = [] }) {
               if (e.source_slug !== hover && e.target_slug !== hover) return null;
               const s = pos[e.source_slug], t = pos[e.target_slug];
               if (!s || !t || !REL_LABELS[e.relationship_type]) return null;
-              const x1 = s.x + NODE_W, y1 = s.y + NODE_H / 2;
-              const x2 = t.x - 2,      y2 = t.y + NODE_H / 2;
-              const lx = x1 + COL_GAP / 2;
-              const t01 = x2 > x1 ? Math.min(1, (COL_GAP / 2) / (x2 - x1)) : 0.5;
-              const ly = y1 + (y2 - y1) * t01;
+              const x1 = s.x + NODE_W / 2, y1 = s.y + NODE_H;
+              const x2 = t.x + NODE_W / 2, y2 = t.y;
+              const lx = (x1 + x2) / 2;
+              const ly = (y1 + y2) / 2 + 3;
               return (
-                <text key={`l${i}`} x={lx} y={ly - 5} textAnchor="middle" fontFamily="var(--mono)" fontSize={10}
+                <text key={`l${i}`} x={lx} y={ly} textAnchor="middle" fontFamily="var(--mono)" fontSize={10}
                   fill="rgba(235,231,223,0.95)"
                   style={{ paintOrder: 'stroke', stroke: 'rgba(18,14,10,0.95)', strokeWidth: 4, strokeLinejoin: 'round', pointerEvents: 'none' }}>
                   {REL_LABELS[e.relationship_type]}
