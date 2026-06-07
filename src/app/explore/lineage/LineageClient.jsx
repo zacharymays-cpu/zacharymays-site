@@ -45,6 +45,9 @@ const BRANCH_ORDER = [
 const NODE_ORDER = {
   'national-socialist-liberation-front': 0,
   'national-alliance': 1,
+  'oath-keepers': 0,
+  'three-percenters': 1,
+  'proud-boys': 2,
 };
 const orderKey = (s) => (s in NODE_ORDER ? NODE_ORDER[s] : 1e6);
 
