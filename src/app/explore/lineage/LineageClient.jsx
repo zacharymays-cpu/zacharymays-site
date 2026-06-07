@@ -7,19 +7,20 @@ const TIER_COLORS = {
   'Not Culty':   '#5cb878',
 };
 
-// Branch (chain) palette.
+// Branch (chain) palette — a qualitative set chosen so co-occurring branches are
+// always distinct (National Socialist red vs White-supremacist green no longer clash).
 const CHAIN_COLORS = {
-  'National Socialist lineage':           '#b0413e',
-  'Neo-Nazi media lineage':               '#a8688f',
-  'Racist skinhead lineage':              '#6f8fb0',
-  'Alt-right identitarian lineage':       '#cf7a3a',
-  'Christian Identity lineage':           '#c9a13b',
-  'Creativity lineage':                   '#5c9e8f',
-  'Ku Klux Klan lineage':                 '#7a5cbf',
-  'White supremacist formations':         '#e8574d',
-  'Religious-political-media formations': '#d99b3e',
-  'High-control religious formations':    '#e8703a',
-  'Surveillance infrastructure formation':'#8f93e0',
+  'National Socialist lineage':           '#e15759', // red
+  'Neo-Nazi media lineage':               '#d774b0', // magenta
+  'Racist skinhead lineage':              '#6f8fb0', // slate blue
+  'Alt-right identitarian lineage':       '#f28e2b', // orange
+  'Christian Identity lineage':           '#edc948', // yellow
+  'Creativity lineage':                   '#4cc0b0', // teal
+  'Ku Klux Klan lineage':                 '#8d6fd1', // violet
+  'White supremacist formations':         '#8cc152', // green
+  'Religious-political-media formations': '#d76f8f', // rose
+  'High-control religious formations':    '#9c755f', // brown
+  'Surveillance infrastructure formation':'#4e79a7', // blue
 };
 const branchColor = (c) => CHAIN_COLORS[c] || 'rgba(212,206,196,0.5)';
 
@@ -110,17 +111,51 @@ export default function LineageClient({ nodes = [], edges = [] }) {
     const branchOf = {};
     subEdges.forEach(e => { if (branchOf[e.target_slug] == null) branchOf[e.target_slug] = e.chain_name; });
 
-    const rows = {};
-    [...slugs].forEach(s => { (rows[layer[s]] = rows[layer[s]] || []).push(s); });
-    Object.values(rows).forEach(arr => arr.sort((a, b) => {
+    // Predecessor / successor lists within the subgraph (for crossing reduction).
+    const preds = {}, succs = {};
+    subEdges.forEach(e => {
+      (succs[e.source_slug] = succs[e.source_slug] || []).push(e.target_slug);
+      (preds[e.target_slug] = preds[e.target_slug] || []).push(e.source_slug);
+    });
+
+    const nameKey = (s) => (nodeBySlug[s]?.name || s);
+    const tie = (a, b) => {
       const ba = branchOf[a] || '', bb = branchOf[b] || '';
       if (ba !== bb) return ba.localeCompare(bb);
-      return (nodeBySlug[a]?.name || a).localeCompare(nodeBySlug[b]?.name || b);
-    }));
+      return nameKey(a).localeCompare(nameKey(b));
+    };
 
-    const layerNums = Object.keys(rows).map(Number);
-    const maxLayer = layerNums.length ? Math.max(...layerNums) : 0;
-    const maxRowSize = Math.max(1, ...Object.values(rows).map(a => a.length));
+    const rows = {};
+    [...slugs].forEach(s => { (rows[layer[s]] = rows[layer[s]] || []).push(s); });
+    const layerNums = Object.keys(rows).map(Number).sort((a, b) => a - b);
+    Object.values(rows).forEach(arr => arr.sort(tie));
+
+    // Barycenter ordering: repeatedly reorder each level by the mean position of a
+    // node's neighbours in the adjacent (already-placed) level, so children sit
+    // under their parents and long diagonal crossings collapse.
+    const idxOf = {};
+    layerNums.forEach(L => rows[L].forEach((s, i) => { idxOf[s] = i; }));
+    const bary = (s, neigh) => {
+      const ns = neigh[s];
+      if (!ns || !ns.length) return idxOf[s];
+      let sum = 0; for (const n of ns) sum += idxOf[n];
+      return sum / ns.length;
+    };
+    for (let sweep = 0; sweep < 8; sweep++) {
+      const down = sweep % 2 === 0;
+      const seq = down ? layerNums.slice(1) : layerNums.slice(0, -1).reverse();
+      const neigh = down ? preds : succs;
+      for (const L of seq) {
+        rows[L] = rows[L].slice().sort((a, b) => {
+          const da = bary(a, neigh), db = bary(b, neigh);
+          return da !== db ? da - db : tie(a, b);
+        });
+        rows[L].forEach((s, i) => { idxOf[s] = i; });
+      }
+    }
+
+    const maxLayer = layerNums.length ? layerNums[layerNums.length - 1] : 0;
+    const maxRowSize = Math.max(1, ...layerNums.map(L => rows[L].length));
     const totalW = maxRowSize * NODE_W + (maxRowSize - 1) * H_GAP;
 
     const pos = {};
