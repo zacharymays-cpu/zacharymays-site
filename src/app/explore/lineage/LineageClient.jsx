@@ -40,6 +40,14 @@ const BRANCH_ORDER = [
   'Alt-right identitarian lineage',
 ];
 
+// Manual left→right order overrides for specific nodes within their lane/level
+// (lower = further left). Everything else falls back to alphabetical by name.
+const NODE_ORDER = {
+  'national-socialist-liberation-front': 0,
+  'national-alliance': 1,
+};
+const orderKey = (s) => (s in NODE_ORDER ? NODE_ORDER[s] : 1e6);
+
 const REL_LABELS = {
   ideological_heir:        'Ideological heir',
   tactical_evolution:      'Tactical evolution',
@@ -165,7 +173,10 @@ export default function LineageClient({ nodes = [], edges = [] }) {
         (byBranch[b] = byBranch[b] || []).push(s);
       });
       Object.entries(byBranch).forEach(([b, arr]) => {
-        arr.sort((a, c) => nameKey(a).localeCompare(nameKey(c)));
+        arr.sort((a, c) => {
+          const oa = orderKey(a), oc = orderKey(c);
+          return oa !== oc ? oa - oc : nameKey(a).localeCompare(nameKey(c));
+        });
         arr.forEach((s, i) => {
           const col = laneStart[b] + i;
           pos[s] = { x: PAD + col * (NODE_W + H_GAP), y: PAD + L * (NODE_H + V_GAP) };
