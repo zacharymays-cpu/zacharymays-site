@@ -32,16 +32,20 @@ export async function getActiveCultsTimeline() {
 
     const series = [];
     for (let y = START_YEAR; y <= endYear; y++) {
-      let sup = 0, kin = 0;
+      let sup = 0, kin = 0, def = 0;
       for (const r of rows) {
         const f = r.founding_year;
         const d = r.defunct_year;
-        if (f == null || f > y) continue;
-        if (d != null && d < y) continue;
+        if (f == null) continue;
+        // Cumulative dissolutions: an org joins the defunct tally the year after
+        // its recorded dissolution — mirroring the active exclusion below, so the
+        // active bands are unchanged.
+        if (d != null && d < y) { def++; continue; }
+        if (f > y) continue;
         if (r.composite_tier === 'Super Culty') sup++;
         else if (r.composite_tier === 'Kinda Culty') kin++;
       }
-      series.push({ year: y, super: sup, kinda: kin, total: sup + kin });
+      series.push({ year: y, super: sup, kinda: kin, total: sup + kin, defunct: def });
     }
 
     const last = series[series.length - 1];
@@ -55,6 +59,7 @@ export async function getActiveCultsTimeline() {
       currentTotal: last.total,
       currentSuper: last.super,
       currentKinda: last.kinda,
+      currentDefunct: last.defunct,
       growthSinceStart: last.total - first.total,
     };
   } catch {

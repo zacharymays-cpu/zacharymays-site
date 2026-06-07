@@ -6,15 +6,16 @@ import { getActiveCultsTimeline } from '../lib/getActiveCultsTimeline';
 // stacks above it, using the same tier colors as the Findings tier distribution.
 const SUPER_COLOR = '#6b1010';
 const KINDA_COLOR = '#7a4a1a';
+const DEFUNCT_COLOR = '#4a90a4';
 
 // Fallback mirrors the live shape if the fetch fails (rare; cached hourly).
 const FALLBACK = {
   series: [
-    { year: 1900, super: 29, kinda: 41, total: 70 },
-    { year: 2025, super: 206, kinda: 240, total: 446 },
+    { year: 1900, super: 29, kinda: 41, total: 70, defunct: 0 },
+    { year: 2025, super: 206, kinda: 240, total: 446, defunct: 24 },
   ],
   startYear: 1900, endYear: 2025, oldestFounding: 1540,
-  currentTotal: 446, currentSuper: 206, currentKinda: 240, growthSinceStart: 376,
+  currentTotal: 446, currentSuper: 206, currentKinda: 240, currentDefunct: 24, growthSinceStart: 376,
 };
 
 export default async function CultsOverTimeChart() {
@@ -23,12 +24,20 @@ export default async function CultsOverTimeChart() {
 
   // Geometry (viewBox units; scales responsively via width:100%).
   const W = 800, H = 380;
-  const ml = 48, mr = 16, mt = 16, mb = 40;
+  const ml = 48, mr = 44, mt = 16, mb = 40;
   const iw = W - ml - mr, ih = H - mt - mb;
 
   const yMax = Math.ceil(Math.max(...series.map((d) => d.total), 1) / 50) * 50;
   const xOf = (yr) => ml + ((yr - startYear) / (endYear - startYear)) * iw;
   const yOf = (v) => mt + ih - (v / yMax) * ih;
+
+  // Secondary axis (right) for the cumulative-defunct line — far smaller in
+  // magnitude than the active population, so it gets its own scale.
+  const defMax = Math.max(Math.ceil(Math.max(...series.map((d) => d.defunct || 0), 1) / 5) * 5, 5);
+  const yOfDef = (v) => mt + ih - (v / defMax) * ih;
+  const defunctLine = series.map((d) => `${xOf(d.year)},${yOfDef(d.defunct || 0)}`);
+  const defTicks = [];
+  for (let v = 0; v <= defMax; v += defMax / 5) defTicks.push(v);
 
   // Stacked bands: kinda 0..kinda, super kinda..total.
   const kindaTop = series.map((d) => `${xOf(d.year)},${yOf(d.kinda)}`);
@@ -60,6 +69,9 @@ export default async function CultsOverTimeChart() {
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem' }}>
           <span style={{ width: 12, height: 12, background: KINDA_COLOR, display: 'inline-block' }} /> Kinda Culty
         </span>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem', color: DEFUNCT_COLOR }}>
+          <span style={{ width: 14, height: 0, borderTop: `2px dashed ${DEFUNCT_COLOR}`, display: 'inline-block' }} /> Gone defunct (cumulative · right axis)
+        </span>
       </div>
 
       <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img"
@@ -76,17 +88,24 @@ export default async function CultsOverTimeChart() {
         {xTicks.map((yr, i) => (
           <text key={i} x={xOf(yr)} y={H - mb + 20} textAnchor="middle" fontFamily="var(--mono)" fontSize="11" fill="var(--muted)">{yr}</text>
         ))}
+        {/* right-axis labels (cumulative defunct scale) */}
+        {defTicks.map((v, i) => (
+          <text key={`r${i}`} x={W - mr + 8} y={yOfDef(v) + 4} textAnchor="start" fontFamily="var(--mono)" fontSize="11" fill={DEFUNCT_COLOR}>{v}</text>
+        ))}
         {/* stacked areas */}
         <polygon points={kindaArea} fill={KINDA_COLOR} fillOpacity="0.85" />
         <polygon points={superArea} fill={SUPER_COLOR} fillOpacity="0.85" />
         {/* total outline */}
         <polyline points={totalTop.join(' ')} fill="none" stroke="var(--gold)" strokeWidth="1.5" />
+        {/* cumulative defunct (right-axis scale) */}
+        <polyline points={defunctLine.join(' ')} fill="none" stroke={DEFUNCT_COLOR} strokeWidth="1.75" strokeDasharray="5 4" />
       </svg>
 
       <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginTop: '1.5rem' }}>
         <Stat n={data.currentTotal} l={`Active in ${endYear}`} />
         <Stat n={data.currentSuper} l="Super Culty" />
         <Stat n={data.currentKinda} l="Kinda Culty" />
+        <Stat n={data.currentDefunct} l={`Gone defunct by ${endYear}`} />
         <Stat n={`+${data.growthSinceStart}`} l={`Since ${startYear}`} />
       </div>
 
@@ -96,7 +115,10 @@ export default async function CultsOverTimeChart() {
         a tail of organizations was founded as far back as {oldestFounding}. Because few
         organizations in the dataset have a recorded dissolution year, the upward trend
         mainly reflects the accumulating population of still-active culty organizations
-        rather than the rate of new formation. Figures update as new assessments are completed.
+        rather than the rate of new formation. The dashed line tracks the cumulative
+        count of organizations that have gone defunct, read against the right-hand axis
+        (a much smaller scale than the active population). Figures update as new
+        assessments are completed.
       </p>
     </div>
   );
