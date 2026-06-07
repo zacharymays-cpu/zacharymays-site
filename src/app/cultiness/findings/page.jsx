@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { getFindingsStats, TIER_ORDER } from '../../../lib/getFindingsStats';
+import CultsOverTimeChart from '../../../components/CultsOverTimeChart';
 
 export const metadata = {
   title: 'Findings — The Cultiness Spectrum',
@@ -130,6 +131,17 @@ export default async function FindingsPage() {
             {' '}{largest.pct.toFixed(0)}% of scored organizations. These figures
             update as new assessments are completed.
           </p>
+
+          <hr className="rule" />
+
+          <div className="section__label">Active Organizations Over Time</div>
+
+          <p style={{color: 'var(--muted)', marginBottom: '2rem', fontSize: '0.9rem'}}>
+            The number of culty organizations (Kinda Culty or Super Culty) counted
+            as active in the United States in each year:
+          </p>
+
+          <CultsOverTimeChart />
 
           <hr className="rule" />
 
