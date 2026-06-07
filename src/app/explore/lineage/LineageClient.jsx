@@ -24,6 +24,22 @@ const CHAIN_COLORS = {
 };
 const branchColor = (c) => CHAIN_COLORS[c] || 'rgba(212,206,196,0.5)';
 
+// Left→right lane order for the hierarchical layout: National Socialist on the far
+// left, the Alt-right / Patriot Front line on the far right.
+const BRANCH_ORDER = [
+  'National Socialist lineage',
+  'Racist skinhead lineage',
+  'Neo-Nazi media lineage',
+  'Creativity lineage',
+  'Christian Identity lineage',
+  'Ku Klux Klan lineage',
+  'White supremacist formations',
+  'High-control religious formations',
+  'Religious-political-media formations',
+  'Surveillance infrastructure formation',
+  'Alt-right identitarian lineage',
+];
+
 const REL_LABELS = {
   ideological_heir:        'Ideological heir',
   tactical_evolution:      'Tactical evolution',
@@ -110,62 +126,57 @@ export default function LineageClient({ nodes = [], edges = [] }) {
 
     const branchOf = {};
     subEdges.forEach(e => { if (branchOf[e.target_slug] == null) branchOf[e.target_slug] = e.chain_name; });
-
-    // Predecessor / successor lists within the subgraph (for crossing reduction).
-    const preds = {}, succs = {};
-    subEdges.forEach(e => {
-      (succs[e.source_slug] = succs[e.source_slug] || []).push(e.target_slug);
-      (preds[e.target_slug] = preds[e.target_slug] || []).push(e.source_slug);
-    });
+    // Source-only nodes (chain roots in "Other" mode) take the branch they feed into.
+    subEdges.forEach(e => { if (branchOf[e.source_slug] == null) branchOf[e.source_slug] = e.chain_name; });
 
     const nameKey = (s) => (nodeBySlug[s]?.name || s);
-    const tie = (a, b) => {
-      const ba = branchOf[a] || '', bb = branchOf[b] || '';
-      if (ba !== bb) return ba.localeCompare(bb);
-      return nameKey(a).localeCompare(nameKey(b));
-    };
 
     const rows = {};
     [...slugs].forEach(s => { (rows[layer[s]] = rows[layer[s]] || []).push(s); });
     const layerNums = Object.keys(rows).map(Number).sort((a, b) => a - b);
-    Object.values(rows).forEach(arr => arr.sort(tie));
-
-    // Barycenter ordering: repeatedly reorder each level by the mean position of a
-    // node's neighbours in the adjacent (already-placed) level, so children sit
-    // under their parents and long diagonal crossings collapse.
-    const idxOf = {};
-    layerNums.forEach(L => rows[L].forEach((s, i) => { idxOf[s] = i; }));
-    const bary = (s, neigh) => {
-      const ns = neigh[s];
-      if (!ns || !ns.length) return idxOf[s];
-      let sum = 0; for (const n of ns) sum += idxOf[n];
-      return sum / ns.length;
-    };
-    for (let sweep = 0; sweep < 8; sweep++) {
-      const down = sweep % 2 === 0;
-      const seq = down ? layerNums.slice(1) : layerNums.slice(0, -1).reverse();
-      const neigh = down ? preds : succs;
-      for (const L of seq) {
-        rows[L] = rows[L].slice().sort((a, b) => {
-          const da = bary(a, neigh), db = bary(b, neigh);
-          return da !== db ? da - db : tie(a, b);
-        });
-        rows[L].forEach((s, i) => { idxOf[s] = i; });
-      }
-    }
-
     const maxLayer = layerNums.length ? layerNums[layerNums.length - 1] : 0;
-    const maxRowSize = Math.max(1, ...layerNums.map(L => rows[L].length));
-    const totalW = maxRowSize * NODE_W + (maxRowSize - 1) * H_GAP;
+
+    // Swimlanes: each branch gets a fixed horizontal lane (BRANCH_ORDER, left→right),
+    // sized to the most nodes it holds in any one level. Each lineage flows straight
+    // down its lane — a traditional hierarchy, not a centered tree.
+    const branchesPresent = [...new Set(Object.values(branchOf))].filter(Boolean);
+    const laneBranches = [
+      ...BRANCH_ORDER.filter(b => branchesPresent.includes(b)),
+      ...branchesPresent.filter(b => !BRANCH_ORDER.includes(b)),
+    ];
+    const laneWidth = {};
+    laneBranches.forEach(b => { laneWidth[b] = 1; });
+    layerNums.forEach(L => {
+      const cnt = {};
+      rows[L].forEach(s => { if (s === rootSlug) return; const b = branchOf[s]; if (b) cnt[b] = (cnt[b] || 0) + 1; });
+      Object.entries(cnt).forEach(([b, c]) => { if (c > laneWidth[b]) laneWidth[b] = c; });
+    });
+    const laneStart = {}; let acc = 0;
+    laneBranches.forEach(b => { laneStart[b] = acc; acc += laneWidth[b]; });
+    const totalCols = Math.max(acc, 1);
+    const totalW = totalCols * NODE_W + (totalCols - 1) * H_GAP;
 
     const pos = {};
-    Object.entries(rows).forEach(([L, arr]) => {
-      const layerW = arr.length * NODE_W + (arr.length - 1) * H_GAP;
-      const offX = PAD + (totalW - layerW) / 2;
-      arr.forEach((s, i) => {
-        pos[s] = { x: offX + i * (NODE_W + H_GAP), y: PAD + Number(L) * (NODE_H + V_GAP) };
+    layerNums.forEach(L => {
+      const byBranch = {};
+      rows[L].forEach(s => {
+        if (s === rootSlug) return;
+        const b = branchOf[s];
+        (byBranch[b] = byBranch[b] || []).push(s);
+      });
+      Object.entries(byBranch).forEach(([b, arr]) => {
+        arr.sort((a, c) => nameKey(a).localeCompare(nameKey(c)));
+        arr.forEach((s, i) => {
+          const col = laneStart[b] + i;
+          pos[s] = { x: PAD + col * (NODE_W + H_GAP), y: PAD + L * (NODE_H + V_GAP) };
+        });
       });
     });
+
+    // Root centred across all lanes at its level.
+    if (rootSlug && layer[rootSlug] != null) {
+      pos[rootSlug] = { x: PAD + (totalW - NODE_W) / 2, y: PAD + layer[rootSlug] * (NODE_H + V_GAP) };
+    }
 
     const width = PAD * 2 + totalW;
     const height = PAD * 2 + (maxLayer + 1) * NODE_H + maxLayer * V_GAP;
