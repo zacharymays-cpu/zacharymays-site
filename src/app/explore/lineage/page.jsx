@@ -16,7 +16,10 @@ const opts = { headers, next: { revalidate: 3600 } };
 export default async function LineagePage() {
   const [edgesRes, orgsRes] = await Promise.all([
     fetch(`${SUPABASE_URL}/rest/v1/org_lineage?select=*&order=chain_name,chain_order`, opts),
-    fetch(`${SUPABASE_URL}/rest/v1/organizations?select=slug,name,composite_tier,composite_score,category&active=eq.true&scoring_status=eq.ACCEPTED`, opts),
+    // No active/scoring_status filter: lineage chains include historical/defunct and
+    // not-yet-scored (PENDING) orgs. The activeSlugs filter below keeps only orgs that
+    // actually appear in a lineage edge, so unrelated orgs are never pulled onto the page.
+    fetch(`${SUPABASE_URL}/rest/v1/organizations?select=slug,name,composite_tier,composite_score,category&limit=2000`, opts),
   ]);
 
   const edges = await edgesRes.json().catch(() => []);

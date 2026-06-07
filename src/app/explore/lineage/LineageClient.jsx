@@ -12,6 +12,13 @@ const CHAIN_COLORS = {
   'Religious-political-media formations': '#d99b3e',
   'High-control religious formations':    '#e8703a',
   'Surveillance infrastructure formation':'#8f93e0',
+  'National Socialist lineage':           '#b0413e',
+  'Alt-right identitarian lineage':       '#cf7a3a',
+  'Ku Klux Klan lineage':                 '#7a5cbf',
+  'Christian Identity lineage':           '#c9a13b',
+  'Racist skinhead lineage':              '#6f8fb0',
+  'Creativity lineage':                   '#5c9e8f',
+  'Neo-Nazi media lineage':               '#a8688f',
 };
 
 const REL_LABELS = {
