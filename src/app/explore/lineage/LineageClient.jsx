@@ -253,7 +253,9 @@ export default function LineageClient({ nodes = [], edges = [] }) {
               const isRoot = slug === rootSlug;
               const tierColor = TIER_COLORS[n?.composite_tier] || '#888';
               const bColor = isRoot ? 'var(--gold)' : branchColor(branchOf[slug]);
-              const score = n ? parseFloat(n.composite_score || 0) : null;
+              const hasScore = n && n.composite_score != null && !Number.isNaN(parseFloat(n.composite_score));
+              const score = hasScore ? parseFloat(n.composite_score) : null;
+              const tierText = n?.composite_tier || (n ? 'Unscored' : '—');
               const label = name.length > 20 ? name.slice(0, 19) + '…' : name;
               return (
                 <a key={slug} href={`/org/${slug}`}
@@ -266,7 +268,7 @@ export default function LineageClient({ nodes = [], edges = [] }) {
                     <rect x={p.x} y={p.y} width={5} height={NODE_H} rx={2} fill={bColor} />
                     <text x={p.x + 13} y={p.y + 19} fontFamily="var(--serif)" fontSize={12.5} fill="var(--paper)" fontWeight={700}>{label}</text>
                     <text x={p.x + 13} y={p.y + 36} fontFamily="var(--mono)" fontSize={9.5} fill={isRoot ? 'var(--gold)' : tierColor} fontWeight={600}>
-                      {isRoot ? 'ORIGIN' : (n?.composite_tier || '—')}{!isRoot && score != null ? ` · ${score.toFixed(0)}%` : ''}
+                      {isRoot ? 'ORIGIN' : tierText}{!isRoot && hasScore ? ` · ${score.toFixed(0)}%` : ''}
                     </text>
                   </g>
                 </a>
