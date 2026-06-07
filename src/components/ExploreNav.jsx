@@ -11,6 +11,7 @@ const VIEWS = [
   ['Timeline',      '/explore/timeline'],
   ['Correlations',  '/explore/correlations'],
   ['Lineage',       '/explore/lineage'],
+  ['Origins',       '/explore/origins'],
   ['Sunburst',      '/explore/sunburst'],
   ['Flow',          '/explore/sankey'],
   ['Compare',       '/explore/compare'],
