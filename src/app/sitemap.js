@@ -10,7 +10,7 @@ const STATIC_PATHS = [
   '/cultiness', '/cultiness/methodology', '/cultiness/ai-methodology',
   '/cultiness/findings', '/cultiness/dataset', '/findings',
   '/explore', '/explore/heatmap', '/explore/distributions', '/explore/timeline',
-  '/explore/correlations', '/explore/lineage', '/explore/origins', '/explore/sankey', '/explore/sunburst',
+  '/explore/correlations', '/explore/lineage', '/explore/sankey', '/explore/sunburst',
   '/explore/compare', '/explore/map', '/compass',
 ];
 

@@ -6,7 +6,7 @@ const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsI
 
 export const metadata = {
   title: 'Formation Lineage — The Cultiness Spectrum',
-  description: 'Force-directed graph of documented formation lineage and ideological inheritance between high-control organizations.',
+  description: 'Documented formation lineage traced from a single origin — the Nazi Party, the Ku Klux Klan, or other roots — with each descendant branch identified.',
 };
 export const revalidate = 3600;
 
