@@ -20,6 +20,7 @@ const NAV_ITEMS = [
       { href: '/compass',                 label: 'Political Compass' },
       { href: '/explore/heatmap',         label: 'Criterion Heatmap' },
       { href: '/explore/distributions',   label: 'Distributions' },
+      { href: '/explore/timeline',        label: 'Active Over Time' },
       { href: '/explore/correlations',    label: 'Correlations' },
       { href: '/explore/lineage',         label: 'Formation Lineage' },
       { href: '/explore/sankey',          label: 'Category Flow' },

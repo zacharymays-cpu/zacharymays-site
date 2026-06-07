@@ -9,9 +9,9 @@ const STATIC_PATHS = [
   '/how-we-got-here', '/assholes-in-history',
   '/cultiness', '/cultiness/methodology', '/cultiness/ai-methodology',
   '/cultiness/findings', '/cultiness/dataset', '/findings',
-  '/explore', '/explore/heatmap', '/explore/distributions', '/explore/correlations',
-  '/explore/lineage', '/explore/sankey', '/explore/sunburst', '/explore/compare',
-  '/explore/map', '/compass',
+  '/explore', '/explore/heatmap', '/explore/distributions', '/explore/timeline',
+  '/explore/correlations', '/explore/lineage', '/explore/sankey', '/explore/sunburst',
+  '/explore/compare', '/explore/map', '/compass',
 ];
 
 export default async function sitemap() {

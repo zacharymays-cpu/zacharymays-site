@@ -8,6 +8,7 @@ const VIEWS = [
   ['Explorer',      '/explore'],
   ['Heatmap',       '/explore/heatmap'],
   ['Distributions', '/explore/distributions'],
+  ['Timeline',      '/explore/timeline'],
   ['Correlations',  '/explore/correlations'],
   ['Lineage',       '/explore/lineage'],
   ['Sunburst',      '/explore/sunburst'],
