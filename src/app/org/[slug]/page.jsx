@@ -21,6 +21,8 @@ async function getOrg(slug) {
       composite_score, composite_tier,
       youngs_score, youngs_band,
       trajectory, summary_text,
+      founding_year, defunct_year,
+      founding_year_source_url, location_source_url, defunct_year_source_url,
       methodology_version, updated_at, active,
       political_scores ( economic_axis, authority_axis, political_quadrant, scoring_notes ),
       criterion_scores ( criterion, score, confidence, na_rationale, body_text,
@@ -73,6 +75,18 @@ const CRITERIA = {
 }
 
 const TRAJ = { Escalating:'↑ Escalating', Stable:'→ Stable', Declining:'↓ Declining', Defunct:'— Defunct' }
+
+// Small superscript source link for a sourced provenance fact (founding year,
+// location, defunct year). Renders nothing when no URL is recorded.
+function SourceCite({ url, label = 'source' }) {
+  if (!url) return null
+  return (
+    <a href={url} target="_blank" rel="noopener noreferrer" title={`Source: ${url}`}
+      style={{ color: 'var(--gold)', textDecoration: 'none', fontSize: '0.72em', verticalAlign: 'super', marginLeft: '0.15em' }}>
+      ↗<span style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0 0 0 0)' }}>{label}</span>
+    </a>
+  )
+}
 
 // ── SVG Spider/Radar chart ────────────────────────────────────────────────
 function RadarChart({ criteria, tierColor }) {
@@ -222,6 +236,22 @@ export default async function OrgPage({ params }) {
             <span style={{ fontFamily: 'var(--mono)', fontSize: '0.6rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)' }}>
               {org.category}
             </span>
+            {org.founding_year && (
+              <>
+                <span style={{ color: 'rgba(212,206,196,0.3)', fontFamily: 'var(--mono)', fontSize: '0.6rem' }}>—</span>
+                <span style={{ fontFamily: 'var(--mono)', fontSize: '0.6rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)' }}>
+                  Founded {org.founding_year}<SourceCite url={org.founding_year_source_url} label="founding year source" />
+                </span>
+              </>
+            )}
+            {org.defunct_year && (
+              <>
+                <span style={{ color: 'rgba(212,206,196,0.3)', fontFamily: 'var(--mono)', fontSize: '0.6rem' }}>—</span>
+                <span style={{ fontFamily: 'var(--mono)', fontSize: '0.6rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)' }}>
+                  Defunct {org.defunct_year}<SourceCite url={org.defunct_year_source_url} label="defunct year source" />
+                </span>
+              </>
+            )}
           </div>
           <h1 style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(1.8rem,4vw,3rem)', fontWeight: 700, color: 'var(--paper)', marginBottom: '1rem', lineHeight: 1.15 }}>
             {org.name}
