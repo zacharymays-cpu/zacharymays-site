@@ -1,0 +1,24 @@
+{
+  "metadata": {
+    "title": "Leadership Crossover Visualization Dashboard",
+    "date": "2026-06-07"
+  },
+  "people": [
+    {"name":"Jim Jones","cultiness":92.0,"cluster":"Extreme/Cultic","type":"Cult Leader","orgs":["Peoples Temple (US phase)","Peoples Temple (Guyana)"],"sonar":0},
+    {"name":"Marcial Maciel","cultiness":81.5,"cluster":"Extreme/Cultic","type":"Cult Leader","orgs":["Legion of Christ / Regnum Christi","Legionaries of Christ"],"sonar":0},
+    {"name":"Ernesto Miranda","cultiness":78.0,"cluster":"Extreme/Cultic","type":"Militant/Gang","orgs":["MS-13","MS-13 (US presence)"],"sonar":0},
+    {"name":"Werner Erhard","cultiness":72.5,"cluster":"Extreme/Cultic","type":"Cult Leader","orgs":["est (Erhard Seminars Training)","Landmark Forum"],"sonar":0},
+    {"name":"Elon Musk","cultiness":68.0,"cluster":"Corporate/Tech","type":"Tech CEO","orgs":["SpaceX (Employee Culture)","Tesla Employee Culture"],"sonar":0},
+    {"name":"Andy Jassy","cultiness":64.0,"cluster":"Corporate/Tech","type":"Tech CEO","orgs":["Amazon corporate culture","Amazon Flex","Amazon warehouse workforce"],"sonar":0},
+    {"name":"William Boeing","cultiness":62.0,"cluster":"Corporate/Tech","type":"Corporate","orgs":["Boeing (Commercial Airplanes)","Boeing (Defense Division)"],"sonar":0},
+    {"name":"Robert Rundo","cultiness":57.0,"cluster":"Militant/Supremacist","type":"White Supremacist","orgs":["Active Clubs","Rise Above Movement"],"sonar":1},
+    {"name":"Brian Becker","cultiness":55.5,"cluster":"Left-Wing Activist","type":"Left-Wing Activist","orgs":["ANSWER Coalition","Party for Socialism and Liberation"],"sonar":0},
+    {"name":"James Dobson","cultiness":54.5,"cluster":"Ideological Fringe","type":"Evangelical Religious Leader","orgs":["Family Research Council (FRC)","Focus on the Family"],"sonar":0},
+    {"name":"Sheldon Emry","cultiness":52.5,"cluster":"Ideological Fringe","type":"Christian Identity Theology","orgs":["America's Promise Ministries","Kingdom Identity Ministries"],"sonar":0},
+    {"name":"Willis Carto","cultiness":39.5,"cluster":"Ideological Fringe","type":"White Nationalist","orgs":["Barnes Review/Foundation for Economic Liberty, Inc.","Institute for Historical Review"],"sonar":0},
+    {"name":"Frank Gaffney","cultiness":34.0,"cluster":"Ideological Mainstream","type":"Neoconservative","orgs":["Center for Security Policy","Family Security Matters"],"sonar":0},
+    {"name":"John Tanton","cultiness":27.5,"cluster":"Ideological Mainstream","type":"Immigration Restrictionist","orgs":["Federation for American Immigration Reform","ProEnglish"],"sonar":0},
+    {"name":"Joel Osteen","cultiness":13.0,"cluster":"Ideological Mainstream","type":"Mainstream Megachurch","orgs":["Joel Osteen / Lakewood Church","Lakewood Church"],"sonar":0},
+    {"name":"Elias Camp Morris","cultiness":10.0,"cluster":"Ideological Mainstream","type":"Baptist Leader","orgs":["Black Baptist Conventions (NBC USA/NBC America)","National Baptist Convention, USA"],"sonar":0}
+  ]
+}
