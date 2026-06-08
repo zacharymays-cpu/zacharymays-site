@@ -1,0 +1,78 @@
+Leadership Crossover Analysis - June 7, 2026
+============================================
+
+SECTION 1: NETWORK CENTRALITY (SoNAR Influence)
+==============================================
+Name,Organizations,Org_Count,Network_Connections,Outgoing_Influence,Incoming_Influence,Influence_Tier
+Robert Rundo,Active Clubs | Rise Above Movement,2,1,1,0,🟢 CONNECTED
+John Tanton,Federation for American Immigration Reform | ProEnglish,2,0,0,0,⚪ ISOLATED
+Andy Jassy,Amazon corporate culture | Amazon Flex | Amazon warehouse workforce,3,0,0,0,⚪ ISOLATED
+Elon Musk,SpaceX (Employee Culture) | Tesla Employee Culture,2,0,0,0,⚪ ISOLATED
+Ernesto Miranda,MS-13 | MS-13 (US presence),2,0,0,0,⚪ ISOLATED
+Willis Carto,Barnes Review/Foundation for Economic Liberty, Inc. | Institute for Historical Review,2,0,0,0,⚪ ISOLATED
+Marcial Maciel,Legion of Christ / Regnum Christi | Legionaries of Christ,2,0,0,0,⚪ ISOLATED
+James Dobson,Family Research Council (FRC) | Focus on the Family,2,0,0,0,⚪ ISOLATED
+Joel Osteen,Joel Osteen / Lakewood Church | Lakewood Church,2,0,0,0,⚪ ISOLATED
+Sheldon Emry,America's Promise Ministries | Kingdom Identity Ministries,2,0,0,0,⚪ ISOLATED
+Jim Jones,Jonestown / Peoples Temple (Guyana Phase) | Peoples Temple / Jonestown,2,0,0,0,⚪ ISOLATED
+Charles Manson,Manson Family,2,0,0,0,⚪ ISOLATED
+Frank Gaffney,Center for Security Policy | Family Security Matters,2,0,0,0,⚪ ISOLATED
+Elias Camp Morris,Black Baptist Conventions (NBC USA / NBC America) | National Baptist Convention USA,2,0,0,0,⚪ ISOLATED
+William Boeing,Boeing (Commercial Airplanes) | Boeing (Defense Division),2,0,0,0,⚪ ISOLATED
+Brian Becker,ANSWER Coalition | Party for Socialism and Liberation,2,0,0,0,⚪ ISOLATED
+Werner Erhard,est (Erhard Seminars Training) | Landmark Forum,2,0,0,0,⚪ ISOLATED
+
+SECTION 2: IDEOLOGICAL CLUSTERING (by Average Cultiness Score)
+==============================================================
+Name,Org_Count,Avg_Cultiness,Tier_Mix,Cultiness_Profile,Ideological_Category
+Jim Jones,2,92.0,Super Culty,VERY HIGH CULTINESS,Cult Leader
+Marcial Maciel,2,81.5,Super Culty,VERY HIGH CULTINESS,Cult Leader
+Ernesto Miranda,2,78.0,Super Culty,VERY HIGH CULTINESS,Militant/Gang
+Werner Erhard,2,72.5,Super Culty / Kinda Culty,VERY HIGH CULTINESS,Cult Leader
+Elon Musk,2,68.0,Super Culty / Kinda Culty,HIGH CULTINESS,Tech/Corporate
+Charles Manson,2,67.5,Super Culty / Kinda Culty,HIGH CULTINESS,Cult Leader
+Andy Jassy,3,64.0,Super Culty / Kinda Culty,HIGH CULTINESS,Tech/Corporate
+William Boeing,2,62.0,Super Culty,HIGH CULTINESS,Corporate
+Robert Rundo,2,57.0,Super Culty / Kinda Culty,HIGH CULTINESS,White Supremacist
+Brian Becker,2,55.5,Kinda Culty,HIGH CULTINESS,Left-Wing Activist
+James Dobson,2,54.5,Super Culty / Kinda Culty,HIGH CULTINESS,Evangelical Religious
+Sheldon Emry,2,52.5,Kinda Culty,HIGH CULTINESS,Christian Identity
+Willis Carto,2,39.5,Kinda Culty,MODERATE,White Nationalist
+Frank Gaffney,2,34.0,Not Culty / Kinda Culty,MODERATE,Neoconservative
+John Tanton,2,27.5,Not Culty / Kinda Culty,MODERATE,Immigration Restrictionist
+Joel Osteen,2,13.0,Not Culty,LOW CULTINESS,Mainstream Megachurch
+Elias Camp Morris,2,10.0,Not Culty,LOW CULTINESS,Baptist Leader
+
+SECTION 3: IDEOLOGICAL CLUSTERS (Grouped)
+==========================================
+EXTREME/CULTIC CLUSTER (70%+ cultiness):
+- Jim Jones (92%): Peoples Temple founder
+- Marcial Maciel (81.5%): Legion of Christ founder
+- Ernesto Miranda (78%): MS-13 leadership
+- Werner Erhard (72.5%): est/Landmark Forum founder
+
+CORPORATE/TECH CLUSTER (60-68%):
+- Elon Musk (68%): Tesla + SpaceX
+- Andy Jassy (64%): Amazon divisions
+
+MILITANT/SUPREMACIST CLUSTER (50-60%):
+- Robert Rundo (57%): White supremacist networks (ONLY PIRUS-connected figure)
+
+IDEOLOGICAL FRINGE CLUSTER (40-55%):
+- James Dobson (54.5%): Evangelical political movement
+- Sheldon Emry (52.5%): Christian Identity theology
+- Willis Carto (39.5%): White nationalist networks
+
+IDEOLOGICAL MAINSTREAM (10-35%):
+- Frank Gaffney (34%): Neoconservative establishment
+- John Tanton (27.5%): Immigration policy establishment
+- Joel Osteen (13%): Mainstream evangelical
+- Elias Camp Morris (10%): Mainstream religious leadership
+
+KEY INSIGHTS:
+============
+1. PIRUS/SoNAR coverage limited to radicalized individuals → most crossover figures are outside network
+2. Only Robert Rundo (white supremacist) has documented SoNAR connections
+3. Clear cultiness gradient: Cult leaders (70%+) > Corporate (60%+) > Ideological extremists (40-55%) > Mainstream (10-35%)
+4. Multiple ideological clusters visible: Cultic, Corporate, Supremacist, Evangelical, Neoconservative, Mainstream
+5. No bridging between ideological clusters - groups are ideologically homogeneous

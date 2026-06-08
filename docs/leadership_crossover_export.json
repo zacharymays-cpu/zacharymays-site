@@ -1,0 +1,187 @@
+{
+  "metadata": {
+    "date": "2026-06-07",
+    "title": "Leadership Crossover Analysis: Cult-like Organizations",
+    "description": "17 people appearing in multiple scored organizations, analyzed for network centrality, ideological clustering, and cultiness patterns",
+    "datasets": ["cultiness_spectrum", "pirus", "sonar"]
+  },
+  "summary": {
+    "total_crossover_figures": 17,
+    "with_org_count_2": 16,
+    "with_org_count_3": 1,
+    "pirus_connected": 1,
+    "average_cultiness_range": "10.0 - 92.0",
+    "ideological_clusters": 6
+  },
+  "clusters": {
+    "extreme_cultic_70plus": {
+      "label": "Extreme/Cultic (70%+ cultiness)",
+      "count": 4,
+      "members": [
+        {
+          "name": "Jim Jones",
+          "cultiness": 92.0,
+          "type": "Cult Leader",
+          "orgs": ["Peoples Temple (US phase)", "Peoples Temple (Guyana)"],
+          "tier": "Super Culty"
+        },
+        {
+          "name": "Marcial Maciel",
+          "cultiness": 81.5,
+          "type": "Cult Leader",
+          "orgs": ["Legion of Christ / Regnum Christi", "Legionaries of Christ"],
+          "tier": "Super Culty"
+        },
+        {
+          "name": "Ernesto Miranda",
+          "cultiness": 78.0,
+          "type": "Militant/Gang",
+          "orgs": ["MS-13", "MS-13 (US presence)"],
+          "tier": "Super Culty"
+        },
+        {
+          "name": "Werner Erhard",
+          "cultiness": 72.5,
+          "type": "Cult Leader",
+          "orgs": ["est (Erhard Seminars Training)", "Landmark Forum"],
+          "tier": "Super Culty / Kinda Culty"
+        }
+      ]
+    },
+    "corporate_tech_60to68": {
+      "label": "Corporate/Tech (60-68%)",
+      "count": 3,
+      "members": [
+        {
+          "name": "Elon Musk",
+          "cultiness": 68.0,
+          "type": "Tech CEO",
+          "orgs": ["SpaceX (Employee Culture)", "Tesla Employee Culture"],
+          "tier": "Super Culty / Kinda Culty",
+          "note": "Leadership cult around founder"
+        },
+        {
+          "name": "Andy Jassy",
+          "cultiness": 64.0,
+          "type": "Tech CEO",
+          "orgs": ["Amazon corporate culture", "Amazon Flex", "Amazon warehouse workforce"],
+          "tier": "Super Culty / Kinda Culty",
+          "org_count": 3
+        },
+        {
+          "name": "William Boeing",
+          "cultiness": 62.0,
+          "type": "Corporate",
+          "orgs": ["Boeing (Commercial Airplanes)", "Boeing (Defense Division)"],
+          "tier": "Super Culty"
+        }
+      ]
+    },
+    "militant_supremacist_50to60": {
+      "label": "Militant/Supremacist (50-60%)",
+      "count": 1,
+      "pirus_network": true,
+      "members": [
+        {
+          "name": "Robert Rundo",
+          "cultiness": 57.0,
+          "type": "White Supremacist",
+          "orgs": ["Active Clubs", "Rise Above Movement"],
+          "tier": "Super Culty / Kinda Culty",
+          "sonar_connections": 1,
+          "note": "ONLY crossover figure with documented SoNAR network ties"
+        }
+      ]
+    },
+    "ideological_fringe_40to55": {
+      "label": "Ideological Fringe (40-55%)",
+      "count": 3,
+      "members": [
+        {
+          "name": "James Dobson",
+          "cultiness": 54.5,
+          "type": "Evangelical Religious Leader",
+          "orgs": ["Family Research Council (FRC)", "Focus on the Family"],
+          "tier": "Super Culty / Kinda Culty",
+          "network": "Evangelical political pipeline"
+        },
+        {
+          "name": "Sheldon Emry",
+          "cultiness": 52.5,
+          "type": "Christian Identity Theology",
+          "orgs": ["America's Promise Ministries", "Kingdom Identity Ministries"],
+          "tier": "Kinda Culty",
+          "ideology": "Racist theology"
+        },
+        {
+          "name": "Willis Carto",
+          "cultiness": 39.5,
+          "type": "White Nationalist",
+          "orgs": ["Barnes Review/Foundation for Economic Liberty, Inc.", "Institute for Historical Review"],
+          "tier": "Kinda Culty",
+          "ideology": "Holocaust denial, white nationalist"
+        }
+      ]
+    },
+    "ideological_mainstream_10to35": {
+      "label": "Ideological Mainstream (10-35%)",
+      "count": 6,
+      "members": [
+        {
+          "name": "Frank Gaffney",
+          "cultiness": 34.0,
+          "type": "Neoconservative",
+          "orgs": ["Center for Security Policy", "Family Security Matters"],
+          "tier": "Not Culty / Kinda Culty"
+        },
+        {
+          "name": "John Tanton",
+          "cultiness": 27.5,
+          "type": "Immigration Restrictionist",
+          "orgs": ["Federation for American Immigration Reform", "ProEnglish"],
+          "tier": "Not Culty / Kinda Culty",
+          "network": "Anti-immigration establishment"
+        },
+        {
+          "name": "Joel Osteen",
+          "cultiness": 13.0,
+          "type": "Mainstream Megachurch",
+          "orgs": ["Joel Osteen / Lakewood Church", "Lakewood Church"],
+          "tier": "Not Culty"
+        },
+        {
+          "name": "Elias Camp Morris",
+          "cultiness": 10.0,
+          "type": "Baptist Leader",
+          "orgs": ["Black Baptist Conventions (NBC USA/NBC America)", "National Baptist Convention, USA"],
+          "tier": "Not Culty"
+        }
+      ]
+    }
+  },
+  "key_insights": [
+    "17 people documented with roles in multiple scored organizations",
+    "Clear cultiness gradient: Cult leaders (70%+) >> Corporate (60%+) >> Ideological extremists (40-55%) >> Mainstream (10-35%)",
+    "Only Robert Rundo (white supremacist) has documented PIRUS/SoNAR network connections (1 edge)",
+    "Most crossover figures are outside PIRUS dataset (which covers radicalized individuals)",
+    "Multiple isolated ideological clusters: no bridging between cultic, corporate, white supremacist, evangelical, and mainstream groups",
+    "Corporate tech companies (Amazon, Tesla, SpaceX) score as 'Super Culty' due to founder-centric culture and control dynamics",
+    "Evangelical leaders (Dobson, Osteen) span cultiness spectrum from 13% to 54%, showing diversity within religious leadership"
+  ],
+  "network_analysis": {
+    "total_sonar_edges": 14290,
+    "sonar_edges_among_crossover": 1,
+    "centrality_hub_distribution": {
+      "isolated": 16,
+      "connected_1to5": 1,
+      "connected_5plus": 0
+    },
+    "interpretation": "PIRUS/SoNAR dataset focuses on radicalized individuals; most crossover figures (corporate, mainstream religious, ideological establishment) are outside this scope"
+  },
+  "recommendations": [
+    "Robert Rundo network worth deeper investigation - only crossover figure actively in PIRUS network",
+    "Corporate tech founder cults (Musk, Jassy) show cultiness mechanisms similar to religious cults - explore for comparative analysis",
+    "White nationalist/supremacist cluster (Carto, Emry, Rundo) demonstrates ideological homogeneity - no bridging to other clusters",
+    "Evangelical mainstream vs fringe split (Osteen 13% vs Dobson 54%) suggests political radicalization gradient within religious leadership"
+  ]
+}
