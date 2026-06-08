@@ -31,6 +31,14 @@ async function getOrg(slug) {
     .eq('slug', slug)
     .single()
   if (error || !org) return null
+
+  // Check if org appears in lineage (source or target)
+  const { data: inLineage } = await supabase
+    .from('org_lineage')
+    .select('id', { count: 'exact', head: true })
+    .or(`source_slug.eq.${slug},target_slug.eq.${slug}`)
+  org.in_lineage = (inLineage && inLineage.length > 0)
+
   return org
 }
 
@@ -252,10 +260,25 @@ export default async function OrgPage({ params }) {
                 </span>
               </>
             )}
+            {org.location_source_url && (
+              <>
+                <span style={{ color: 'rgba(212,206,196,0.3)', fontFamily: 'var(--mono)', fontSize: '0.6rem' }}>—</span>
+                <span style={{ fontFamily: 'var(--mono)', fontSize: '0.6rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)' }}>
+                  Location<SourceCite url={org.location_source_url} label="location source" />
+                </span>
+              </>
+            )}
           </div>
           <h1 style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(1.8rem,4vw,3rem)', fontWeight: 700, color: 'var(--paper)', marginBottom: '1rem', lineHeight: 1.15 }}>
             {org.name}
           </h1>
+          {!org.active && (
+            <div style={{ marginBottom: '1.5rem', padding: '0.75rem 1rem', background: 'rgba(200,168,75,0.08)', border: '1px solid rgba(200,168,75,0.2)', borderRadius: '4px' }}>
+              <span style={{ fontFamily: 'var(--mono)', fontSize: '0.7rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--gold)' }}>
+                ⚠ Historical organization — no longer active
+              </span>
+            </div>
+          )}
           {/* Scoreboard — composite as focal point */}
           <div style={{ display: 'flex', alignItems: 'stretch', gap: '1.5rem', flexWrap: 'wrap', marginTop: '1.5rem' }}>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.7rem' }}>
@@ -391,6 +414,18 @@ export default async function OrgPage({ params }) {
                   )
                 })}
               </div>
+
+              {/* Lineage cross-link */}
+              {org.in_lineage && (
+                <div style={{ marginBottom: '3rem', padding: '1.25rem', background: 'rgba(181,137,0,0.08)', border: '1px solid rgba(181,137,0,0.2)', borderRadius: '4px' }}>
+                  <div style={{ fontFamily: 'var(--mono)', fontSize: '0.62rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '0.5rem' }}>
+                    Organizational Lineage
+                  </div>
+                  <p style={{ fontSize: '0.9rem', color: '#d4cec4', margin: 0, lineHeight: 1.6 }}>
+                    This organization is part of a documented lineage chain. <Link href="/explore/lineage" style={{ color: 'var(--gold)', textDecoration: 'none', fontWeight: 500 }}>Explore the lineage →</Link>
+                  </p>
+                </div>
+              )}
 
               {/* Sources & Evidence */}
               {sources.length > 0 && (
