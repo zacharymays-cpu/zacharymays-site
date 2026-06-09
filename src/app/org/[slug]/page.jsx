@@ -22,6 +22,9 @@ async function getOrg(slug) {
       youngs_score, youngs_band,
       trajectory, summary_text,
       founding_year, defunct_year,
+      membership_count, membership_count_year,
+      revenue_usd, revenue_year,
+      size_tier, size_notes,
       founding_year_source_url, location_source_url, defunct_year_source_url,
       methodology_version, updated_at, active,
       political_scores ( economic_axis, authority_axis, political_quadrant, scoring_notes ),
@@ -43,7 +46,8 @@ async function getOrg(slug) {
 }
 
 export async function generateMetadata({ params }) {
-  const org = await getOrg(params.slug)
+  const { slug } = await params
+  const org = await getOrg(slug)
   if (!org) return { title: 'Organization Not Found' }
   const scored = !Number.isNaN(parseFloat(org.composite_score))
   return {
@@ -83,6 +87,42 @@ const CRITERIA = {
 }
 
 const TRAJ = { Escalating:'↑ Escalating', Stable:'→ Stable', Declining:'↓ Declining', Defunct:'— Defunct' }
+
+const SIZE_TIER_LABELS = {
+  micro: 'Micro',
+  small: 'Small',
+  medium: 'Medium',
+  large: 'Large',
+  mass: 'Mass',
+}
+
+function formatWholeNumber(value) {
+  if (value === null || value === undefined || value === '') return null
+  const n = Number(value)
+  if (!Number.isFinite(n)) return null
+  return n.toLocaleString('en-US', { maximumFractionDigits: 0 })
+}
+
+function formatUsd(value) {
+  if (value === null || value === undefined || value === '') return null
+  const n = Number(value)
+  if (!Number.isFinite(n)) return null
+  if (Math.abs(n) >= 1_000_000_000) return `$${(n / 1_000_000_000).toFixed(n >= 10_000_000_000 ? 0 : 1)}B`
+  if (Math.abs(n) >= 1_000_000) return `$${(n / 1_000_000).toFixed(n >= 10_000_000 ? 0 : 1)}M`
+  if (Math.abs(n) >= 1_000) return `$${(n / 1_000).toFixed(n >= 10_000 ? 0 : 1)}K`
+  return `$${n.toLocaleString('en-US', { maximumFractionDigits: 0 })}`
+}
+
+function ScaleMetric({ label, value, sub }) {
+  if (!value) return null
+  return (
+    <div style={{ background: 'rgba(244,240,232,0.025)', border: '1px solid rgba(212,206,196,0.08)', padding: '1.25rem' }}>
+      <div style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '0.35rem' }}>{label}</div>
+      <div style={{ fontFamily: 'var(--serif)', fontSize: '1.35rem', fontWeight: 700, color: 'var(--paper)', lineHeight: 1.1 }}>{value}</div>
+      {sub && <div style={{ fontFamily: 'var(--mono)', fontSize: '0.58rem', color: 'var(--muted)', marginTop: '0.35rem', lineHeight: 1.4 }}>{sub}</div>}
+    </div>
+  )
+}
 
 // Small superscript source link for a sourced provenance fact (founding year,
 // location, defunct year). Renders nothing when no URL is recorded.
@@ -202,7 +242,8 @@ function MiniCompass({ econ, auth, quadrant, tierColor }) {
 
 // ── Page ──────────────────────────────────────────────────────────────────
 export default async function OrgPage({ params }) {
-  const org = await getOrg(params.slug)
+  const { slug } = await params
+  const org = await getOrg(slug)
   if (!org) notFound()
 
   const criteria = [...(org.criterion_scores || [])]
@@ -230,6 +271,10 @@ export default async function OrgPage({ params }) {
   const tierColor   = TIER_BG[org.composite_tier]   ?? 'rgba(212,206,196,0.1)'
   const tierText    = TIER_TEXT[org.composite_tier]  ?? 'var(--muted)'
   const lastUpdated = new Date(org.updated_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+  const membershipCount = formatWholeNumber(org.membership_count)
+  const revenueUsd = formatUsd(org.revenue_usd)
+  const sizeTier = org.size_tier ? (SIZE_TIER_LABELS[org.size_tier] ?? org.size_tier) : null
+  const hasScaleData = Boolean(membershipCount || revenueUsd || sizeTier || org.size_notes)
 
   return (
     <>
@@ -343,6 +388,38 @@ export default async function OrgPage({ params }) {
                   {ps.scoring_notes && (
                     <p style={{ fontSize: '0.85rem', color: 'rgba(212,206,196,0.75)', lineHeight: 1.7, marginTop: '0.75rem', marginBottom: 0 }}>
                       {ps.scoring_notes}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* Organization scale */}
+              {hasScaleData && (
+                <div style={{ marginBottom: '3rem' }}>
+                  <div style={{ fontFamily: 'var(--mono)', fontSize: '0.62rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    Organization Scale
+                    <span style={{ flex: 1, height: 1, background: 'rgba(212,206,196,0.15)' }} />
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '2px' }}>
+                    <ScaleMetric
+                      label="Membership / reach"
+                      value={membershipCount}
+                      sub={org.membership_count_year ? `Most recent available, ${org.membership_count_year}` : 'Most recent available'}
+                    />
+                    <ScaleMetric
+                      label="Annual revenue"
+                      value={revenueUsd}
+                      sub={org.revenue_year ? `Reported year, ${org.revenue_year}` : 'Reported year unavailable'}
+                    />
+                    <ScaleMetric
+                      label="Size tier"
+                      value={sizeTier}
+                      sub="Bucketed from available size data"
+                    />
+                  </div>
+                  {org.size_notes && (
+                    <p style={{ fontSize: '0.82rem', color: 'rgba(212,206,196,0.68)', lineHeight: 1.7, marginTop: '0.75rem', marginBottom: 0 }}>
+                      {org.size_notes}
                     </p>
                   )}
                 </div>
