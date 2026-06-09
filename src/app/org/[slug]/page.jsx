@@ -113,14 +113,16 @@ function formatUsd(value) {
   return `$${n.toLocaleString('en-US', { maximumFractionDigits: 0 })}`
 }
 
-function ScaleMetric({ label, value, sub }) {
+function ScoreboardMetric({ label, value, sub }) {
   if (!value) return null
   return (
-    <div style={{ background: 'rgba(244,240,232,0.025)', border: '1px solid rgba(212,206,196,0.08)', padding: '1.25rem' }}>
-      <div style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '0.35rem' }}>{label}</div>
-      <div style={{ fontFamily: 'var(--serif)', fontSize: '1.35rem', fontWeight: 700, color: 'var(--paper)', lineHeight: 1.1 }}>{value}</div>
-      {sub && <div style={{ fontFamily: 'var(--mono)', fontSize: '0.58rem', color: 'var(--muted)', marginTop: '0.35rem', lineHeight: 1.4 }}>{sub}</div>}
-    </div>
+    <>
+      <div style={{ width: 1, background: 'rgba(212,206,196,0.15)' }} />
+      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '0.3rem', minWidth: '6.5rem' }}>
+        <span style={{ fontFamily: 'var(--serif)', fontSize: '1.15rem', fontWeight: 700, color: 'var(--paper)', lineHeight: 1 }}>{value}</span>
+        <span style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)' }}>{label}{sub ? ` · ${sub}` : ''}</span>
+      </div>
+    </>
   )
 }
 
@@ -353,7 +355,27 @@ export default async function OrgPage({ params }) {
               <span style={{ fontFamily: 'var(--serif)', fontSize: '1.15rem', fontWeight: 700, color: 'var(--paper)', lineHeight: 1 }}>{TRAJ[org.trajectory] ?? org.trajectory ?? '—'}</span>
               <span style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)' }}>Trajectory</span>
             </div>
+
+            <ScoreboardMetric
+              label="Membership / reach"
+              value={membershipCount}
+              sub={org.membership_count_year}
+            />
+            <ScoreboardMetric
+              label="Revenue"
+              value={revenueUsd}
+              sub={org.revenue_year}
+            />
+            <ScoreboardMetric
+              label="Size"
+              value={sizeTier}
+            />
           </div>
+          {org.size_notes && hasScaleData && (
+            <p style={{ fontFamily: 'var(--mono)', fontSize: '0.62rem', color: 'rgba(212,206,196,0.55)', lineHeight: 1.6, marginTop: '0.9rem', maxWidth: 860 }}>
+              {org.size_notes}
+            </p>
+          )}
         </div>
       </section>
 
@@ -388,38 +410,6 @@ export default async function OrgPage({ params }) {
                   {ps.scoring_notes && (
                     <p style={{ fontSize: '0.85rem', color: 'rgba(212,206,196,0.75)', lineHeight: 1.7, marginTop: '0.75rem', marginBottom: 0 }}>
                       {ps.scoring_notes}
-                    </p>
-                  )}
-                </div>
-              )}
-
-              {/* Organization scale */}
-              {hasScaleData && (
-                <div style={{ marginBottom: '3rem' }}>
-                  <div style={{ fontFamily: 'var(--mono)', fontSize: '0.62rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    Organization Scale
-                    <span style={{ flex: 1, height: 1, background: 'rgba(212,206,196,0.15)' }} />
-                  </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '2px' }}>
-                    <ScaleMetric
-                      label="Membership / reach"
-                      value={membershipCount}
-                      sub={org.membership_count_year ? `Most recent available, ${org.membership_count_year}` : 'Most recent available'}
-                    />
-                    <ScaleMetric
-                      label="Annual revenue"
-                      value={revenueUsd}
-                      sub={org.revenue_year ? `Reported year, ${org.revenue_year}` : 'Reported year unavailable'}
-                    />
-                    <ScaleMetric
-                      label="Size tier"
-                      value={sizeTier}
-                      sub="Bucketed from available size data"
-                    />
-                  </div>
-                  {org.size_notes && (
-                    <p style={{ fontSize: '0.82rem', color: 'rgba(212,206,196,0.68)', lineHeight: 1.7, marginTop: '0.75rem', marginBottom: 0 }}>
-                      {org.size_notes}
                     </p>
                   )}
                 </div>
