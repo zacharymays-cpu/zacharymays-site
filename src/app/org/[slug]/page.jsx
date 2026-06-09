@@ -2,14 +2,18 @@
 import { createClient } from '@supabase/supabase-js'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../../../lib/supabase/config'
 
 export const revalidate = 300
 
+// URL comes from the shared config so this page can never read a different
+// project than the rest of the site. The service key (RLS bypass) keeps
+// inactive/historical orgs linked from the lineage graph reachable; falls
+// back to the anon key if it isn't configured.
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || SUPABASE_ANON_KEY
+
 function getSupabase() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_ROLE_KEY
-  )
+  return createClient(SUPABASE_URL, SUPABASE_KEY)
 }
 
 async function getOrg(slug) {

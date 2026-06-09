@@ -1,8 +1,7 @@
+import { SUPABASE_URL } from '../../../../lib/supabase/config';
+
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-
-const SUPABASE_URL =
-  process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://shgdrkrqjnwtlyxcdayp.supabase.co';
 
 export async function GET(request) {
   const authHeader = request.headers.get('authorization');

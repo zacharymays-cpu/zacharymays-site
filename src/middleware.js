@@ -4,12 +4,7 @@
 // a session so unauthenticated users never see the review UI.
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
-
-const SUPABASE_URL =
-  process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://shgdrkrqjnwtlyxcdayp.supabase.co';
-const SUPABASE_ANON_KEY =
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNoZ2Rya3Jxam53dGx5eGNkYXlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzMzgwNjYsImV4cCI6MjA5NTkxNDA2Nn0.L5NPabtJGLFWb81SruP3XfjgFuycu4DhvaMJhInqWfo';
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from './lib/supabase/config';
 
 export async function middleware(request) {
   let response = NextResponse.next({ request });

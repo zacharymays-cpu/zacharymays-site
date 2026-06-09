@@ -2,8 +2,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
-const SUPABASE_URL = 'https://shgdrkrqjnwtlyxcdayp.supabase.co';
-const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNoZ2Rya3Jxam53dGx5eGNkYXlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzMzgwNjYsImV4cCI6MjA5NTkxNDA2Nn0.L5NPabtJGLFWb81SruP3XfjgFuycu4DhvaMJhInqWfo';
+import { SUPABASE_URL, ANON_KEY } from '../../lib/supabase/config';
 
 const TIER_COLORS = {
   // Brightened for contrast against the warm-dark #272320 background — the

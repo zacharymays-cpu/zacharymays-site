@@ -2,8 +2,7 @@
 // and the composite-tier distribution, derived from current Supabase data.
 // Server-side, cached for an hour. Next dedupes the identical fetch across
 // components within one request, so the query runs once per render.
-const SUPABASE_URL = 'https://shgdrkrqjnwtlyxcdayp.supabase.co';
-const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNoZ2Rya3Jxam53dGx5eGNkYXlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzMzgwNjYsImV4cCI6MjA5NTkxNDA2Nn0.L5NPabtJGLFWb81SruP3XfjgFuycu4DhvaMJhInqWfo';
+import { SUPABASE_URL, ANON_KEY } from './supabase/config';
 
 export const TIER_ORDER = ['Super Culty', 'Kinda Culty', 'Not Culty'];
 
