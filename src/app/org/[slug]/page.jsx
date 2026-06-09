@@ -89,11 +89,11 @@ const CRITERIA = {
 const TRAJ = { Escalating:'↑ Escalating', Stable:'→ Stable', Declining:'↓ Declining', Defunct:'— Defunct' }
 
 const SIZE_TIER_LABELS = {
-  micro: 'Micro',
-  small: 'Small',
-  medium: 'Medium',
-  large: 'Large',
-  mass: 'Mass',
+  micro: 'Micro scale (<1K)',
+  small: 'Small scale (1K-50K)',
+  medium: 'Medium scale (50K-1M)',
+  large: 'Large scale (1M-10M)',
+  mass: 'Mass scale (>10M)',
 }
 
 function formatWholeNumber(value) {
