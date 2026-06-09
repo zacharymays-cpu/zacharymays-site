@@ -5,8 +5,7 @@
 // Scope: accepted, non-calibration orgs tiered Super Culty or Kinda Culty.
 // Server-side, cached for an hour. The chart starts at START_YEAR for
 // readability; orgs founded earlier are folded into the START_YEAR baseline.
-const SUPABASE_URL = 'https://shgdrkrqjnwtlyxcdayp.supabase.co';
-const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNoZ2Rya3Jxam53dGx5eGNkYXlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzMzgwNjYsImV4cCI6MjA5NTkxNDA2Nn0.L5NPabtJGLFWb81SruP3XfjgFuycu4DhvaMJhInqWfo';
+import { SUPABASE_URL, ANON_KEY } from './supabase/config';
 
 export const START_YEAR = 1900;
 export const CULTY_TIERS = ['Super Culty', 'Kinda Culty'];

@@ -4,9 +4,8 @@
 // verified as an admin. Reads the key from SUPABASE_SERVICE_ROLE_KEY (a Vercel
 // env var / .env.local — never hardcoded, never NEXT_PUBLIC_).
 import { createClient } from '@supabase/supabase-js';
+import { SUPABASE_URL } from './config';
 
-const SUPABASE_URL =
-  process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://shgdrkrqjnwtlyxcdayp.supabase.co';
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 export function createSupabaseAdminClient() {

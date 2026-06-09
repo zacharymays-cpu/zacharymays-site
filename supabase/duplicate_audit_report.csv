@@ -1,0 +1,47 @@
+record_id_1,name_1,active_1,score_1,record_id_2,name_2,active_2,score_2,match_type,similarity_score,recommended_action
+HWGH-v1-A-0071,"Council for National Policy (CNP)",true,70.00,HWGH-v1-A-0510,"Council for National Policy (CNP)",true,76.00,exact,1.000,review_manually
+HWGH-v1-A-0302,"ACLU (American Civil Liberties Union)",true,24.00,HWGH-v1-A-0502,"American Civil Liberties Union (ACLU)",true,3.00,near_raw,1.000,review_manually
+HWGH-v1-A-0282,"HRC (Human Rights Campaign)",true,25.00,HWGH-v1-A-0505,"Human Rights Campaign",true,15.00,near_raw,0.880,review_manually
+HWGH-v1-A-0498,"United Church of Christ",true,20.00,HWGH-v1-A-0272,"United Church of Christ (UCC)",true,26.00,near_raw,0.880,review_manually
+HWGH-v1-A-0281,"Satanic Temple",true,30.00,HWGH-v1-A-0501,"The Satanic Temple",true,24.00,near_raw,0.833,review_manually
+HWGH-v1-A-0279,"Unitarian Universalist Assoc. (UUA)",true,26.00,HWGH-v1-A-0497,"Unitarian Universalist Association",true,9.00,near_raw,0.694,review_manually
+HWGH-v1-A-0153,"UnitedHealth",true,49.00,HWGH-v1-A-0476,"UnitedHealth Group",true,60.00,near_raw,0.684,review_manually
+HWGH-v1-A-0494,"Legionaries of Christ",true,93.00,HWGH-v1-A-0580,"Legion of Christ / Regnum Christi",true,93.00,near_raw,0.500,review_manually
+HWGH-v1-A-0386,WWASP,true,100.00,HWGH-v1-A-0545,"WWASPS Network (World Wide Association of Specialty Programs)",true,97.00,alias_pair,0.088,intentionally_distinct
+HWGH-v1-A-0336,"KIPP Charter School Network",true,66.00,HWGH-v1-A-0481,KIPP,true,65.00,alias_pair,0.179,intentionally_distinct
+HWGH-v1-A-0541,"Joel Osteen / Lakewood Church",true,65.00,HWGH-v1-A-0102,"Lakewood Church",true,68.00,alias_pair,0.571,intentionally_distinct
+HWGH-v1-A-0178,"HBCUs (Historically Black Colleges/Univs)",false,42.00,HWGH-v1-A-0559,"HBCU System (mid-tier public institutions)",false,33.00,alias_pair,0.053,both_inactive
+HWGH-v1-A-0527,"State Prison Systems (Southern states)",false,88.00,HWGH-v1-A-0528,"State Prison Systems (Northern/Western states)",false,74.00,near_raw,0.650,both_inactive
+HWGH-v1-A-0089,"DHS (broader)",false,65.00,HWGH-v1-A-0140,"HHS (broader)",false,52.00,near_raw,0.600,both_inactive
+HWGH-v1-SPLC-0041,"National Alliance",true,,HWGH-v1-SPLC-0043,"National Liberty Alliance",true,,near_raw,0.692,intentionally_distinct
+HWGH-v1-SPLC-0031,"Goyim Defense League",true,,HWGH-v1-SPLC-0035,"Jewish Defense League",true,,near_raw,0.536,intentionally_distinct
+HWGH-v1-SPLC-0054,"Rise Above Movement",true,,HWGH-v1-A-0305,"Sunrise Movement",true,52.00,near_raw,0.500,intentionally_distinct
+HWGH-v1-SPLC-0055,"Ruth Institute",true,,HWGH-v1-A-0441,"Cato Institute",true,2.00,near_raw,0.500,intentionally_distinct
+HWGH-v1-SPLC-0067,"White Revolution",true,,HWGH-v1-A-0309,"Our Revolution",true,31.00,near_raw,0.524,intentionally_distinct
+HWGH-v1-A-0217,"ABC News (employer)",true,41.00,HWGH-v1-A-0221,"NBC News (employer)",true,41.00,near_raw,0.750,intentionally_distinct
+HWGH-v1-A-0221,"NBC News (employer)",true,41.00,HWGH-v1-A-0218,"CBS News (employer)",true,41.00,near_raw,0.667,intentionally_distinct
+HWGH-v1-A-0217,"ABC News (employer)",true,41.00,HWGH-v1-A-0218,"CBS News (employer)",true,41.00,near_raw,0.636,intentionally_distinct
+HWGH-v1-A-0078,"Fox News (employer culture)",true,76.00,HWGH-v1-A-0195,"NPR (employer culture)",true,44.00,near_raw,0.621,intentionally_distinct
+HWGH-v1-A-0516,"Deloitte (US employee culture)",true,62.00,HWGH-v1-A-0517,"PwC (US employee culture)",true,58.00,near_raw,0.606,intentionally_distinct
+HWGH-v1-A-0517,"PwC (US employee culture)",true,58.00,HWGH-v1-A-0519,"KPMG (US employee culture)",true,55.00,near_raw,0.690,intentionally_distinct
+HWGH-v1-A-0516,"Deloitte (US employee culture)",true,62.00,HWGH-v1-A-0519,"KPMG (US employee culture)",true,55.00,near_raw,0.588,intentionally_distinct
+HWGH-v1-A-0517,"PwC (US employee culture)",true,58.00,HWGH-v1-A-0518,"EY (Ernst & Young, US employee culture)",true,57.00,near_raw,0.541,intentionally_distinct
+HWGH-v1-A-0058,"Tesla Employee Culture",true,80.00,HWGH-v1-A-0317,"SpaceX (Employee Culture)",true,77.00,near_raw,0.567,intentionally_distinct
+HWGH-v1-A-0058,"Tesla Employee Culture",true,80.00,HWGH-v1-A-0324,"Netflix (Employee Culture)",true,55.00,near_raw,0.548,intentionally_distinct
+HWGH-v1-A-0470,DoorDash,true,50.00,HWGH-v1-A-0126,"DoorDash Drivers",true,56.00,near_raw,0.563,intentionally_distinct
+HWGH-v1-A-0430,"Communist Party USA",true,62.00,HWGH-v1-A-0426,"Revolutionary Communist Party USA",true,86.00,near_raw,0.588,intentionally_distinct
+HWGH-v1-A-0427,"Workers World Party",true,75.00,HWGH-v1-A-0428,"Socialist Workers Party",true,45.00,near_raw,0.519,intentionally_distinct
+HWGH-v1-A-0010,"Air Force PJs",true,92.00,HWGH-v1-A-0032,"US Air Force",true,77.00,near_raw,0.588,intentionally_distinct
+HWGH-v1-A-0032,"US Air Force",true,77.00,HWGH-v1-A-0316,"US Air Force Academy (USAFA)",true,88.00,near_raw,0.542,intentionally_distinct
+HWGH-v1-A-0032,"US Air Force",true,77.00,HWGH-v1-A-0036,"US Space Force",true,76.00,near_raw,0.500,intentionally_distinct
+HWGH-v1-A-0261,"AME Church",true,29.00,HWGH-v1-A-0354,"AME Zion Church",true,24.00,near_raw,0.688,intentionally_distinct
+HWGH-v1-A-0260,"ELCA Lutheran",true,13.00,HWGH-v1-A-0192,"LCMS Lutheran",true,44.00,near_raw,0.500,intentionally_distinct
+HWGH-v1-A-0244,"United Methodist Church",true,16.00,HWGH-v1-A-0498,"United Church of Christ",true,20.00,near_raw,0.533,intentionally_distinct
+HWGH-v1-A-0176,"Department of Transportation",true,9.00,HWGH-v1-A-0235,"Department of Education",true,38.00,near_raw,0.514,intentionally_distinct
+HWGH-v1-A-0096,"Department of Energy",true,63.00,HWGH-v1-A-0219,"Department of Labor",true,41.00,near_raw,0.519,intentionally_distinct
+HWGH-v1-A-0182,"Department of Interior",true,46.00,HWGH-v1-A-0219,"Department of Labor",true,41.00,near_raw,0.536,intentionally_distinct
+HWGH-v1-A-0096,"Department of Energy",true,63.00,HWGH-v1-A-0235,"Department of Education",true,38.00,near_raw,0.500,intentionally_distinct
+HWGH-v1-A-0346,"Stanford University",true,52.00,HWGH-v1-A-0423,"Strayer University",true,42.00,near_raw,0.500,intentionally_distinct
+HWGH-v1-A-0136,"Disney (corporate culture)",true,52.00,HWGH-v1-A-0112,"Amazon corporate culture",true,74.00,near_raw,0.548,intentionally_distinct
+HWGH-v1-A-0325,"Starbucks (Corporate Culture)",true,57.00,HWGH-v1-A-0112,"Amazon corporate culture",true,74.00,near_raw,0.500,intentionally_distinct
+HWGH-v1-A-0325,"Starbucks (Corporate Culture)",true,57.00,HWGH-v1-A-0136,"Disney (corporate culture)",true,52.00,near_raw,0.500,intentionally_distinct
