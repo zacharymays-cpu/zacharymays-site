@@ -8,6 +8,9 @@ const TIER_COLORS = {
 };
 
 const TIER_ORDER = ['Super Culty','Kinda Culty','Not Culty'];
+// Softer reader-facing labels for the DB tier enum (keys are unchanged).
+const TIER_LABELS = { 'Super Culty':'High-Control','Kinda Culty':'Moderate-Control','Not Culty':'Low-Control' };
+const lbl = (t) => TIER_LABELS[t] || t;
 
 export default function SankeyClient({ data = [] }) {
   const svgRef = useRef(null);
@@ -107,7 +110,7 @@ export default function SankeyClient({ data = [] }) {
       <div style={{ padding: '1.25rem 0 0.75rem' }}>
         <div className="container--wide">
           <p style={{ fontFamily: 'var(--mono)', fontSize: '0.62rem', color: 'var(--muted)', marginTop: 0 }}>
-            How each organizational category distributes across cultiness tiers. Hover to trace a category or tier.
+            How each organizational category distributes across control tiers. Hover to trace a category or tier.
           </p>
         </div>
       </div>
@@ -174,7 +177,7 @@ export default function SankeyClient({ data = [] }) {
                   fontSize={Math.max(9, Math.min(12, n.h * 0.5))}
                   fontFamily="monospace"
                   fontWeight="700">
-                  {n.name}
+                  {lbl(n.name)}
                 </text>
                 <text x={COL_GAP + NODE_W + 6} y={n.y + n.h/2 + 7}
                   dominantBaseline="middle"
@@ -191,7 +194,7 @@ export default function SankeyClient({ data = [] }) {
           <div style={{ marginTop: '1rem', padding: '0.75rem 1rem', background: 'rgba(18,14,10,0.95)', border: `1px solid ${hovered.tgt?.color || 'rgba(212,206,196,0.2)'}40`, display: 'inline-block', fontFamily: 'var(--mono)', fontSize: '0.65rem' }}>
             <span style={{ color: 'var(--paper)' }}>{hovered.category}</span>
             <span style={{ color: 'var(--muted)', margin: '0 0.5rem' }}>→</span>
-            <span style={{ color: hovered.tgt?.color || 'var(--gold)' }}>{hovered.tier}</span>
+            <span style={{ color: hovered.tgt?.color || 'var(--gold)' }}>{lbl(hovered.tier)}</span>
             <span style={{ color: 'var(--gold)', marginLeft: '0.75rem', fontWeight: 700 }}>{hovered.value} orgs</span>
           </div>
         )}

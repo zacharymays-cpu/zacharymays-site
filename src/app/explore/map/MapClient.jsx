@@ -8,6 +8,9 @@ const TIER_COLORS = {
   'Not Culty':     '#5cb878',
 };
 const TIERS = ['Super Culty','Kinda Culty','Not Culty'];
+// Softer reader-facing labels for the DB tier enum (keys are unchanged).
+const TIER_LABELS = { 'Super Culty':'High-Control','Kinda Culty':'Moderate-Control','Not Culty':'Low-Control' };
+const lbl = (t) => TIER_LABELS[t] || t;
 const SIZE_RADIUS = { micro:5, small:7, medium:10, large:14, mass:20 };
 
 const CHAIN_COLORS = {
@@ -808,7 +811,7 @@ export default function MapClient({ orgs=[], stateStats=[], foundingData=[], wit
                 background:`${TIER_COLORS[selected.composite_tier]||'#888'}18`,
                 border:`1px solid ${TIER_COLORS[selected.composite_tier]||'#888'}40` }}>
                 <div style={{ width:7, height:7, borderRadius:'50%', background:TIER_COLORS[selected.composite_tier]||'#888' }} />
-                <span style={{ fontFamily:'var(--mono)', fontSize:'0.62rem', color:TIER_COLORS[selected.composite_tier]||'#888', textTransform:'uppercase' }}>{selected.composite_tier}</span>
+                <span style={{ fontFamily:'var(--mono)', fontSize:'0.62rem', color:TIER_COLORS[selected.composite_tier]||'#888', textTransform:'uppercase' }}>{lbl(selected.composite_tier)}</span>
                 <span style={{ fontFamily:'var(--mono)', fontSize:'0.7rem', color:'var(--paper)', fontWeight:700 }}>{parseFloat(selected.composite_score||0).toFixed(0)}%</span>
               </div>
               <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.6rem' }}>
@@ -884,7 +887,7 @@ export default function MapClient({ orgs=[], stateStats=[], foundingData=[], wit
                 ].filter(([,v]) => v > 0).map(([label, count, color]) => (
                   <div key={label} style={{ display:'flex', alignItems:'center', gap:'0.5rem', padding:'0.3rem 0.5rem', background:'rgba(244,240,232,0.02)' }}>
                     <div style={{ width:7, height:7, borderRadius:'50%', background:color, flexShrink:0 }} />
-                    <span style={{ fontFamily:'var(--mono)', fontSize:'0.62rem', color:'var(--muted)', flex:1 }}>{label}</span>
+                    <span style={{ fontFamily:'var(--mono)', fontSize:'0.62rem', color:'var(--muted)', flex:1 }}>{lbl(label)}</span>
                     <span style={{ fontFamily:'var(--mono)', fontSize:'0.65rem', color:'var(--gold)' }}>{count}</span>
                   </div>
                 ))}
@@ -899,7 +902,7 @@ export default function MapClient({ orgs=[], stateStats=[], foundingData=[], wit
                 <p style={{ fontFamily:'var(--mono)', fontSize:'0.62rem', color:'var(--muted)' }}>Founding city</p>
               </div>
               <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.6rem' }}>
-                {[['Orgs Founded', selected.count], ['Avg Score', `${selected.avg_score}%`], ['Cult / CD', selected.high_control_count]].map(([k,v]) => (
+                {[['Orgs Founded', selected.count], ['Avg Score', `${selected.avg_score}%`], ['High-Control', selected.high_control_count]].map(([k,v]) => (
                   <div key={k} style={{ padding:'0.5rem', background:'rgba(244,240,232,0.03)', border:'1px solid rgba(212,206,196,0.08)' }}>
                     <div style={{ fontFamily:'var(--mono)', fontSize:'0.52rem', textTransform:'uppercase', letterSpacing:'0.1em', color:'var(--muted)', marginBottom:'0.15rem' }}>{k}</div>
                     <div style={{ fontFamily:'var(--mono)', fontSize:'0.75rem', color:'var(--gold)' }}>{v}</div>
@@ -919,7 +922,7 @@ export default function MapClient({ orgs=[], stateStats=[], foundingData=[], wit
               <div key={t} style={{ display:'flex', alignItems:'center', gap:'0.3rem' }}>
                 <div style={{ width:8, height:8, borderRadius:'50%', background:TIER_COLORS[t] }} />
                 <span style={{ fontFamily:'var(--mono)', fontSize:'0.58rem', color:'rgba(212,206,196,0.45)' }}>
-                  {t} ({orgGeojson.features.filter(f => f.properties.composite_tier === t).length})
+                  {lbl(t)} ({orgGeojson.features.filter(f => f.properties.composite_tier === t).length})
                 </span>
               </div>
             ))}

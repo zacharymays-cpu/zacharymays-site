@@ -1,9 +1,11 @@
 import { getActiveCultsTimeline } from '../lib/getActiveCultsTimeline';
 
-// Live stacked-area chart of active culty organizations per year, computed from
+// Live stacked-area chart of active organizations per year, computed from
 // current Supabase data. Static SVG (no client JS) to match the hand-rolled
-// charts elsewhere on the site. Kinda Culty forms the lower band, Super Culty
-// stacks above it, using the same tier colors as the Findings tier distribution.
+// charts elsewhere on the site. Moderate-Control forms the lower band,
+// High-Control stacks above it, using the same tier colors as the Findings
+// tier distribution. (DB tiers Kinda Culty / Super Culty are shown with the
+// softened display labels.)
 const SUPER_COLOR = '#6b1010';
 const KINDA_COLOR = '#7a4a1a';
 const DEFUNCT_COLOR = '#4a90a4';
@@ -64,10 +66,10 @@ export default async function CultsOverTimeChart() {
     <div>
       <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'center', marginBottom: '1rem', fontFamily: 'var(--mono)', fontSize: '0.72rem', letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--muted)' }}>
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem' }}>
-          <span style={{ width: 12, height: 12, background: SUPER_COLOR, display: 'inline-block' }} /> Super Culty
+          <span style={{ width: 12, height: 12, background: SUPER_COLOR, display: 'inline-block' }} /> High-Control
         </span>
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem' }}>
-          <span style={{ width: 12, height: 12, background: KINDA_COLOR, display: 'inline-block' }} /> Kinda Culty
+          <span style={{ width: 12, height: 12, background: KINDA_COLOR, display: 'inline-block' }} /> Moderate-Control
         </span>
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem', color: DEFUNCT_COLOR }}>
           <span style={{ width: 14, height: 0, borderTop: `2px dashed ${DEFUNCT_COLOR}`, display: 'inline-block' }} /> Gone defunct (cumulative · right axis)
@@ -75,7 +77,7 @@ export default async function CultsOverTimeChart() {
       </div>
 
       <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img"
-        aria-label={`Active culty organizations per year from ${startYear} to ${endYear}`}
+        aria-label={`Active organizations per year from ${startYear} to ${endYear}`}
         style={{ display: 'block', overflow: 'visible' }}>
         {/* y gridlines + labels */}
         {yTicks.map((v, i) => (
@@ -103,8 +105,8 @@ export default async function CultsOverTimeChart() {
 
       <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginTop: '1.5rem' }}>
         <Stat n={data.currentTotal} l={`Active in ${endYear}`} />
-        <Stat n={data.currentSuper} l="Super Culty" />
-        <Stat n={data.currentKinda} l="Kinda Culty" />
+        <Stat n={data.currentSuper} l="High-Control" />
+        <Stat n={data.currentKinda} l="Moderate-Control" />
         <Stat n={data.currentDefunct} l={`Gone defunct by ${endYear}`} />
         <Stat n={`+${data.growthSinceStart}`} l={`Since ${startYear}`} />
       </div>
@@ -114,7 +116,7 @@ export default async function CultsOverTimeChart() {
         and has no recorded year of dissolution at or before it. The series begins in {startYear};
         a tail of organizations was founded as far back as {oldestFounding}. Because few
         organizations in the dataset have a recorded dissolution year, the upward trend
-        mainly reflects the accumulating population of still-active culty organizations
+        mainly reflects the accumulating population of still-active organizations
         rather than the rate of new formation. The dashed line tracks the cumulative
         count of organizations that have gone defunct, read against the right-hand axis
         (a much smaller scale than the active population). Figures update as new

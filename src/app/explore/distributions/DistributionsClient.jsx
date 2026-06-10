@@ -2,6 +2,9 @@
 import { useState, useMemo } from 'react';
 
 const TIER_COLORS = { 'Super Culty':'#e8574d','Kinda Culty':'#d99b3e','Not Culty':'#5cb878' };
+// Softer reader-facing labels for the DB tier enum (keys are unchanged).
+const TIER_LABELS = { 'Super Culty':'High-Control','Kinda Culty':'Moderate-Control','Not Culty':'Low-Control' };
+const lbl = (t) => TIER_LABELS[t] || t;
 
 function boxStats(scores) {
   if (!scores.length) return null;

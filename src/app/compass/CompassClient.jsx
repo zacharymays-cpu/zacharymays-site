@@ -8,6 +8,9 @@ const TIER_COLORS = {
   'Not Culty':    '#5cb878',
 };
 const TIERS       = ['Super Culty','Kinda Culty','Not Culty'];
+// Softer reader-facing labels for the DB tier enum (keys are unchanged).
+const TIER_LABELS = { 'Super Culty':'High-Control','Kinda Culty':'Moderate-Control','Not Culty':'Low-Control' };
+const lbl = (t) => TIER_LABELS[t] || t;
 const TRAJECTORIES= ['Stable','Escalating','Declining','Defunct'];
 const QUADRANTS   = ['Authoritarian Left','Authoritarian Right','Libertarian Left','Libertarian Right'];
 
@@ -87,7 +90,7 @@ export default function CompassClient({ orgs=[], regimes=[], presidentialEras=[]
     const bw    = Math.max(name.length*7+16, 130);
     const line2 = isRegime  ? item.description?.slice(0,55)+'…'
                 : isPresEra ? `${item.era_start}–${item.era_end||'present'}`
-                :             `${item.composite_tier} · ${parseFloat(item.composite_score).toFixed(0)}%`;
+                :             `${lbl(item.composite_tier)} · ${parseFloat(item.composite_score).toFixed(0)}%`;
     return (
       <g style={{pointerEvents:'none'}}>
         <rect x={tx-4} y={ty-14} width={bw} height={44}
@@ -109,7 +112,7 @@ export default function CompassClient({ orgs=[], regimes=[], presidentialEras=[]
       {items.map(t=>(
         <label key={t} style={{display:'flex',alignItems:'center',gap:'0.4rem',marginBottom:'0.22rem',cursor:'pointer'}}>
           <input type="checkbox" checked={state.includes(t)} onChange={()=>toggle(t,state,setter)}/>
-          <span style={{fontSize:'0.73rem',color:state.includes(t)?'var(--paper)':'var(--muted)',flex:1,lineHeight:1.3}}>{t}</span>
+          <span style={{fontSize:'0.73rem',color:state.includes(t)?'var(--paper)':'var(--muted)',flex:1,lineHeight:1.3}}>{lbl(t)}</span>
           {counts&&<span style={{fontFamily:'var(--mono)',fontSize:'0.6rem',color:'rgba(212,206,196,0.3)'}}>{counts[t]||0}</span>}
         </label>
       ))}
@@ -317,7 +320,7 @@ export default function CompassClient({ orgs=[], regimes=[], presidentialEras=[]
                   {TIERS.map(tier=>(
                     <div key={tier} style={{display:'flex',alignItems:'center',gap:'0.45rem',marginBottom:'0.38rem'}}>
                       <div style={{width:8,height:8,borderRadius:'50%',background:TIER_COLORS[tier],flexShrink:0}}/>
-                      <span style={{fontFamily:'var(--mono)',fontSize:'0.67rem',color:'var(--muted)',flex:1}}>{tier}</span>
+                      <span style={{fontFamily:'var(--mono)',fontSize:'0.67rem',color:'var(--muted)',flex:1}}>{lbl(tier)}</span>
                       <span style={{fontFamily:'var(--mono)',fontSize:'0.6rem',color:'rgba(212,206,196,0.3)'}}>{tierCounts[tier]||0}</span>
                     </div>
                   ))}
@@ -351,7 +354,7 @@ export default function CompassClient({ orgs=[], regimes=[], presidentialEras=[]
 
           <div style={{marginTop:'2.5rem',padding:'1.25rem',background:'rgba(244,240,232,0.02)',border:'1px solid rgba(212,206,196,0.08)'}}>
             <p style={{fontFamily:'var(--mono)',fontSize:'0.67rem',color:'var(--muted)',margin:0,lineHeight:1.7}}>
-              <span style={{color:'var(--gold)'}}>r = {(typeof r === 'number' ? r : 0.67).toFixed(3)}</span> correlation between authority-axis position and composite cultiness score across the full dataset.
+              <span style={{color:'var(--gold)'}}>r = {(typeof r === 'number' ? r : 0.67).toFixed(3)}</span> correlation between authority-axis position and Group Dynamics score across the full dataset.
               Economic axis: −5 Far Left to +5 Far Right. Authority axis: −5 Libertarian to +5 Authoritarian.
               Scores reflect documented institutional behavior. Historical regimes (◆) and presidential eras (★) are reference anchors, not scored organizations.
             </p>

@@ -6,7 +6,7 @@ import { SUPABASE_URL, ANON_KEY } from '../../lib/supabase/config';
 
 export const metadata = {
   title: 'Political Compass — The Cultiness Spectrum',
-  description: 'Organizations plotted by economic and authority axes, colored by composite cultiness tier.',
+  description: 'Organizations plotted by economic and authority axes, colored by control tier.',
 };
 
 export const revalidate = 3600;

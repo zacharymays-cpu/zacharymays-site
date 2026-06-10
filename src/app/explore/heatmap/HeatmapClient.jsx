@@ -5,6 +5,9 @@ const CRITERIA = ['C1','C2','C3','C4','C5','C6','C7','C8','C9','C10'];
 const C_NAMES = { C1:'Leadership',C2:'Sacred Assumptions',C3:'Mission',C4:'Individuality',C5:'Isolation',C6:'Vernacular',C7:'Us/Them',C8:'Labor',C9:'Exit Costs',C10:'Ends/Means' };
 const TIERS = ['Super Culty','Kinda Culty','Not Culty'];
 const TIER_COLORS = { 'Super Culty':'#e8574d','Kinda Culty':'#d99b3e','Not Culty':'#5cb878' };
+// Softer reader-facing labels for the DB tier enum (keys are unchanged).
+const TIER_LABELS = { 'Super Culty':'High-Control','Kinda Culty':'Moderate-Control','Not Culty':'Low-Control' };
+const lbl = (t) => TIER_LABELS[t] || t;
 
 function scoreColor(v) {
   if (v === null || v === undefined) return 'rgba(212,206,196,0.05)';
@@ -62,7 +65,7 @@ export default function HeatmapClient({ orgs=[], scoreMap={} }) {
             </div>
           </div>
           <p style={{fontSize:'0.82rem',color:'rgba(212,206,196,0.72)',lineHeight:1.5,maxWidth:'54rem',marginTop:'0.6rem'}}>
-            Each row is an organization and each column is one of the ten “cultiness” criteria (C1–C10:
+            Each row is an organization and each column is one of the ten group-dynamics criteria (C1–C10:
             Leadership, Sacred Assumptions, Mission, Individuality, Isolation, Vernacular, Us/Them, Labor,
             Exit Costs, Ends/Means). A cell is that org's score on that criterion, 0–10 —
             <span style={{color:'#5cb878'}}> green = low</span>,
@@ -79,7 +82,7 @@ export default function HeatmapClient({ orgs=[], scoreMap={} }) {
                     background:tierFilter.includes(t)?`rgba(${hexRgb(TIER_COLORS[t])},0.2)`:'transparent',
                     border:`1px solid ${tierFilter.includes(t)?TIER_COLORS[t]:'rgba(212,206,196,0.18)'}`,
                     color:tierFilter.includes(t)?TIER_COLORS[t]:'var(--muted)',cursor:'pointer'}}>
-                  {t}
+                  {lbl(t)}
                 </button>
               ))}
             </div>

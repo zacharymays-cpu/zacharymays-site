@@ -50,6 +50,26 @@ export const TIER_ORDER = [
   'Super Culty', 'Kinda Culty', 'Not Culty'
 ];
 
+// Display labels for the visualizations. The database enum values
+// ('Super Culty' / 'Kinda Culty' / 'Not Culty') are unchanged and remain the
+// keys for TIER_COLORS, TIER_ORDER, comparisons, and Supabase queries. These
+// are the softer, more approachable strings shown to readers. The "Cultiness
+// Spectrum" framework name (Daniella Mestyanek Young & Amy Reed) is retained
+// in the methodology/about prose; only the data-viz labels are softened here.
+export const TIER_LABELS = {
+  'Super Culty':  'High-Control',
+  'Kinda Culty':  'Moderate-Control',
+  'Not Culty':    'Low-Control',
+};
+
+export function tierLabel(tier) {
+  return TIER_LABELS[tier] || tier;
+}
+
+// The metric formerly surfaced as "Cultiness Score" / "Composite Cultiness
+// Score" reads as "Group Dynamics Score" on charts, axes, and tooltips.
+export const SCORE_LABEL = 'Group Dynamics Score';
+
 export const CRITERIA_NAMES = {
   C1:  'Charismatic Leadership',
   C2:  'Sacred Assumptions',

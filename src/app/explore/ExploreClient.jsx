@@ -14,6 +14,10 @@ const TIER_CLASS = {
   'Super Culty':'tier-super-culty','Kinda Culty':'tier-kinda-culty','Not Culty':'tier-not-culty',
 };
 const TIERS = ['Super Culty','Kinda Culty','Not Culty'];
+// Softer reader-facing labels for the DB tier enum (values themselves are
+// unchanged; they stay the keys for colors, filters, and comparisons).
+const TIER_LABELS = { 'Super Culty':'High-Control','Kinda Culty':'Moderate-Control','Not Culty':'Low-Control' };
+const lbl = (t) => TIER_LABELS[t] || t;
 const TRAJECTORIES = ['Stable','Escalating','Declining','Defunct'];
 const CRITERIA = ['C1','C2','C3','C4','C5','C6','C7','C8','C9','C10'];
 const CRITERIA_DETAIL = {
@@ -536,7 +540,7 @@ export default function ExploreClient({ initialOrgs=[] }) {
                 {TIERS.map(t=>(
                   <label key={t} style={{display:'flex',alignItems:'center',gap:'0.5rem',marginBottom:'0.3rem',cursor:'pointer'}}>
                     <input type="checkbox" checked={tierFilter.includes(t)} onChange={()=>toggle(t,tierFilter,setTierFilter)} style={{accentColor:TIER_COLORS[t]}}/>
-                    <span style={{fontSize:'0.77rem',color:tierFilter.includes(t)?'var(--paper)':'var(--muted)',flex:1}}>{t}</span>
+                    <span style={{fontSize:'0.77rem',color:tierFilter.includes(t)?'var(--paper)':'var(--muted)',flex:1}}>{lbl(t)}</span>
                     <span style={{fontFamily:'var(--mono)',fontSize:'0.63rem',color:'var(--muted)'}}>{orgs.filter(o=>o.composite_tier===t).length}</span>
                   </label>
                 ))}
@@ -629,7 +633,7 @@ export default function ExploreClient({ initialOrgs=[] }) {
                       </td>
                       <td style={{padding:'0.65rem 0.75rem',whiteSpace:'nowrap'}}>
                         {org.composite_tier
-                          ? <span style={{fontFamily:'var(--mono)',fontSize:'0.6rem',fontWeight:600,letterSpacing:'0.06em',textTransform:'uppercase',padding:'0.24rem 0.5rem',borderRadius:'2px',color:'#1c1814',background:TIER_COLORS[org.composite_tier],border:`1px solid ${TIER_COLORS[org.composite_tier]}`}}>{org.composite_tier}</span>
+                          ? <span style={{fontFamily:'var(--mono)',fontSize:'0.6rem',fontWeight:600,letterSpacing:'0.06em',textTransform:'uppercase',padding:'0.24rem 0.5rem',borderRadius:'2px',color:'#1c1814',background:TIER_COLORS[org.composite_tier],border:`1px solid ${TIER_COLORS[org.composite_tier]}`}}>{lbl(org.composite_tier)}</span>
                           : <span style={{fontFamily:'var(--mono)',fontSize:'0.62rem',fontStyle:'italic',color:'rgba(212,206,196,0.3)'}}>Pending</span>}
                       </td>
                       <td style={{padding:'0.65rem 0.75rem',fontFamily:'var(--mono)',fontSize:'0.82rem',color:'rgba(212,206,196,0.8)'}}>{org.youngs_score==null?'—':`${org.youngs_score}/10`}</td>

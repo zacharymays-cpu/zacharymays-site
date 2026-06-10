@@ -57,7 +57,7 @@ export async function generateMetadata({ params }) {
   return {
     title: `${org.name} — Cultiness Spectrum`,
     description: scored
-      ? `${org.name} scored ${parseFloat(org.composite_score).toFixed(0)}% (${org.composite_tier}). Young's Score: ${org.youngs_score}/10.`
+      ? `${org.name} scored ${parseFloat(org.composite_score).toFixed(0)}% (${lbl(org.composite_tier)}). Young's Score: ${org.youngs_score}/10.`
       : `${org.name} — assessment pending in the Cultiness Spectrum dataset.`,
   }
 }
@@ -73,6 +73,9 @@ const TIER_BG = {
   'Kinda Culty': 'rgba(181,137,0,0.12)',
   'Not Culty':   'rgba(133,153,0,0.12)',
 }
+// Softer reader-facing labels for the DB tier enum (keys are unchanged).
+const TIER_LABELS = { 'Super Culty':'High-Control','Kinda Culty':'Moderate-Control','Not Culty':'Low-Control' }
+const lbl = (t) => TIER_LABELS[t] || t
 
 const SCORE_COLOR = (s) => {
   if (s == null) return 'rgba(212,206,196,0.4)'
@@ -336,9 +339,9 @@ export default async function OrgPage({ params }) {
               <span style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(2.6rem,7vw,3.6rem)', fontWeight: 700, color: tierText, lineHeight: 0.9 }}>{compositePct}</span>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
                 <span style={{ fontFamily: 'var(--mono)', fontSize: '0.62rem', letterSpacing: '0.1em', textTransform: 'uppercase', padding: '0.2rem 0.5rem', background: tierColor, color: tierText, border: `1px solid ${tierText}55`, alignSelf: 'flex-start' }}>
-                  {org.composite_tier ?? 'Not Yet Scored'}
+                  {org.composite_tier ? lbl(org.composite_tier) : 'Not Yet Scored'}
                 </span>
-                <span style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--muted)' }}>Composite Cultiness</span>
+                <span style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--muted)' }}>Group Dynamics Score</span>
               </div>
             </div>
 

@@ -15,6 +15,9 @@ const TIER_THRESH = [
   {x:41,label:'Kinda Culty'},
   {x:71,label:'Super Culty'},
 ];
+// Softer reader-facing labels for the DB tier enum (keys are unchanged).
+const TIER_LABELS = { 'Super Culty':'High-Control','Kinda Culty':'Moderate-Control','Not Culty':'Low-Control' };
+const lbl = (t) => TIER_LABELS[t] || t;
 const ANNOTATIONS = [
   {score:19, label:'NAACP 19%'},
   {score:36, label:'Dem. Party 36%'},
@@ -151,7 +154,7 @@ export default function FindingsClient({ orgs=[] }) {
             ['Not Culty', pct(scores.length-above41), '0–40%'],
           ].map(([label,value,sub])=>(
             <div key={label} style={{padding:'1.25rem',background:'rgba(244,240,232,0.03)',border:'1px solid rgba(212,206,196,0.12)'}}>
-              <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.14em',textTransform:'uppercase',color:'var(--muted)',marginBottom:'0.4rem'}}>{label}</div>
+              <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.14em',textTransform:'uppercase',color:'var(--muted)',marginBottom:'0.4rem'}}>{lbl(label)}</div>
               <div style={{fontFamily:'var(--serif)',fontSize:'2rem',fontWeight:700,color:'var(--gold)',lineHeight:1}}>{value}</div>
               {sub&&<div style={{fontFamily:'var(--mono)',fontSize:'0.62rem',color:'rgba(212,206,196,0.35)',marginTop:'0.3rem'}}>{sub}</div>}
             </div>
@@ -227,7 +230,7 @@ export default function FindingsClient({ orgs=[] }) {
                   <line x1={histX(x)} y1={HIST_PAD.t} x2={histX(x)} y2={HIST_PAD.t+HIST_INNER_H}
                     stroke="rgba(212,206,196,0.2)" strokeWidth="1" strokeDasharray="3 3"/>
                   <text x={histX(x)-3} y={HIST_PAD.t+8} textAnchor="end"
-                    fill="rgba(212,206,196,0.25)" fontSize={8} transform={`rotate(-90,${histX(x)-3},${HIST_PAD.t+8})`}>{label}</text>
+                    fill="rgba(212,206,196,0.25)" fontSize={8} transform={`rotate(-90,${histX(x)-3},${HIST_PAD.t+8})`}>{lbl(label)}</text>
                 </g>
               ))}
 
@@ -255,7 +258,7 @@ export default function FindingsClient({ orgs=[] }) {
 
               {/* Axis labels */}
               <text x={HIST_PAD.l+HIST_INNER_W/2} y={HIST_H-6}
-                textAnchor="middle" fill="rgba(212,206,196,0.3)" fontSize={10}>Composite Cultiness Score</text>
+                textAnchor="middle" fill="rgba(212,206,196,0.3)" fontSize={10}>Group Dynamics Score</text>
               <text x={14} y={HIST_PAD.t+HIST_INNER_H/2}
                 textAnchor="middle" fill="rgba(212,206,196,0.3)" fontSize={10}
                 transform={`rotate(-90,14,${HIST_PAD.t+HIST_INNER_H/2})`}>Organizations</text>
@@ -274,8 +277,8 @@ export default function FindingsClient({ orgs=[] }) {
             <span style={{color:'var(--gold)'}}>Shape: </span>
             Mean {mu.toFixed(1)}% · Std dev {sigma.toFixed(1)} · Skewness {skew > 0 ? '+' : ''}{skew.toFixed(3)}
             {Math.abs(skew) < 0.5 ? ' (near-symmetric)' : skew > 0 ? ' (right-skewed)' : ' (left-skewed)'}.
-            {' '}The distribution is <strong style={{color:'var(--paper)'}}>roughly bimodal</strong> — a healthy-group cluster below 20% and a
-            mildly-culty-to-high-control cluster in the 30–70% range — with Cult-tier outliers pulling the right tail.
+            {' '}The distribution is <strong style={{color:'var(--paper)'}}>roughly bimodal</strong> — a low-control cluster below 20% and a
+            moderate-to-high-control cluster in the 30–70% range — with high-control outliers pulling the right tail.
           </div>
         </div>
 
@@ -288,7 +291,7 @@ export default function FindingsClient({ orgs=[] }) {
               const pctTier = scores.length ? (100*count/scores.length).toFixed(1) : '0';
               return(
                 <div key={tier} style={{padding:'0.75rem 1rem',borderLeft:`3px solid ${TIER_COLORS[tier]}`,background:'rgba(244,240,232,0.02)'}}>
-                  <div style={{fontFamily:'var(--serif)',fontSize:'0.9rem',fontWeight:700,color:'var(--paper)',marginBottom:'0.15rem'}}>{tier}</div>
+                  <div style={{fontFamily:'var(--serif)',fontSize:'0.9rem',fontWeight:700,color:'var(--paper)',marginBottom:'0.15rem'}}>{lbl(tier)}</div>
                   <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',color:'var(--muted)',marginBottom:'0.35rem'}}>{TIER_RANGES[tier]}</div>
                   <div style={{fontFamily:'var(--mono)',fontSize:'1.1rem',fontWeight:700,color:TIER_COLORS[tier]}}>{count}</div>
                   <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',color:'rgba(212,206,196,0.4)'}}>{pctTier}% of dataset</div>

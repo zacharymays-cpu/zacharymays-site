@@ -5,7 +5,7 @@ import { SUPABASE_URL, ANON_KEY } from '../../../lib/supabase/config';
 
 export const metadata = {
   title: 'Category → Tier Flow — The Cultiness Spectrum',
-  description: 'Sankey diagram showing how each organizational category distributes across cultiness tiers.',
+  description: 'Sankey diagram showing how each organizational category distributes across control tiers.',
 };
 export const revalidate = 3600;
 

@@ -13,6 +13,9 @@ const TIER_META = {
   'Kinda Culty': { range: '41–70%',  color: '#7a4a1a' },
   'Not Culty':   { range: '0–40%',   color: '#2a6b4a' },
 };
+// Softer reader-facing labels for the DB tier enum (keys are unchanged).
+const TIER_LABELS = { 'Super Culty':'High-Control','Kinda Culty':'Moderate-Control','Not Culty':'Low-Control' };
+const lbl = (t) => TIER_LABELS[t] || t;
 
 // Shown only if the live stats fetch fails (rare; values cached hourly).
 const FALLBACK = {
@@ -68,7 +71,7 @@ export default async function FindingsPage() {
 
           <p style={{fontSize: '1.1rem', color: 'var(--cream)', lineHeight: 1.8}}>
             Across the {n} organizations with a scored political position, the
-            correlation between authority-axis position and composite cultiness
+            correlation between authority-axis position and Group Dynamics
             score is <strong style={{color: 'var(--gold)'}}>r = {r.toFixed(3)}</strong>.
           </p>
 
@@ -107,7 +110,7 @@ export default async function FindingsPage() {
                   letterSpacing: '0.08em', textTransform: 'uppercase',
                   color: 'var(--paper)', padding: '0.25rem 0.6rem',
                   background: meta.color,
-                }}>{t.tier}</div>
+                }}>{lbl(t.tier)}</div>
                 <div style={{
                   height: '8px', background: 'rgba(212,206,196,0.1)',
                   borderRadius: '1px', overflow: 'hidden',
@@ -127,7 +130,7 @@ export default async function FindingsPage() {
           </div>
 
           <p style={{color: 'var(--muted)', fontSize: '0.88rem', fontStyle: 'italic'}}>
-            {largest.tier} is the largest single tier, accounting for
+            {lbl(largest.tier)} is the largest single tier, accounting for
             {' '}{largest.pct.toFixed(0)}% of scored organizations. These figures
             update as new assessments are completed.
           </p>
@@ -137,7 +140,7 @@ export default async function FindingsPage() {
           <div className="section__label">Active Organizations Over Time</div>
 
           <p style={{color: 'var(--muted)', marginBottom: '2rem', fontSize: '0.9rem'}}>
-            The number of culty organizations (Kinda Culty or Super Culty) counted
+            The number of organizations (Moderate-Control or High-Control) counted
             as active in the United States in each year:
           </p>
 

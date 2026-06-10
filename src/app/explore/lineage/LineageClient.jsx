@@ -6,6 +6,9 @@ const TIER_COLORS = {
   'Kinda Culty': '#d99b3e',
   'Not Culty':   '#5cb878',
 };
+// Softer reader-facing labels for the DB tier enum (keys are unchanged).
+const TIER_LABELS = { 'Super Culty':'High-Control','Kinda Culty':'Moderate-Control','Not Culty':'Low-Control' };
+const lbl = (t) => TIER_LABELS[t] || t;
 
 // Branch (chain) palette — a qualitative set chosen so co-occurring branches are
 // always distinct (National Socialist red vs White-supremacist green no longer clash).
@@ -274,7 +277,7 @@ export default function LineageClient({ nodes = [], edges = [] }) {
             {Object.entries(TIER_COLORS).map(([tier, c]) => (
               <div key={tier} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                 <span style={{ width: 9, height: 9, borderRadius: 2, background: c }} />
-                <span style={{ fontFamily: 'var(--mono)', fontSize: '0.6rem', color: 'rgba(212,206,196,0.6)' }}>{tier}</span>
+                <span style={{ fontFamily: 'var(--mono)', fontSize: '0.6rem', color: 'rgba(212,206,196,0.6)' }}>{lbl(tier)}</span>
               </div>
             ))}
           </div>
@@ -328,7 +331,7 @@ export default function LineageClient({ nodes = [], edges = [] }) {
                     <rect x={p.x} y={p.y} width={5} height={NODE_H} rx={2} fill={bColor} />
                     <text x={p.x + 13} y={p.y + 19} fontFamily="var(--serif)" fontSize={12.5} fill="var(--paper)" fontWeight={700}>{label}</text>
                     <text x={p.x + 13} y={p.y + 36} fontFamily="var(--mono)" fontSize={9.5} fill={isRoot ? 'var(--gold)' : tierColor} fontWeight={600}>
-                      {isRoot ? 'ORIGIN' : tierText}{!isRoot && hasScore ? ` · ${score.toFixed(0)}%` : ''}
+                      {isRoot ? 'ORIGIN' : lbl(tierText)}{!isRoot && hasScore ? ` · ${score.toFixed(0)}%` : ''}
                     </text>
                   </g>
                 </a>

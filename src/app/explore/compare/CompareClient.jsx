@@ -4,6 +4,9 @@ import { useState, useMemo } from 'react';
 const CRITERIA = ['C1','C2','C3','C4','C5','C6','C7','C8','C9','C10'];
 const C_SHORT = { C1:'Leadership',C2:'Sacred Assump.',C3:'Mission',C4:'Individuality',C5:'Isolation',C6:'Vernacular',C7:'Us/Them',C8:'Labor',C9:'Exit Costs',C10:'Ends/Means' };
 const TIER_COLORS = { 'Super Culty':'#e8574d','Kinda Culty':'#d99b3e','Not Culty':'#5cb878' };
+// Softer reader-facing labels for the DB tier enum (keys are unchanged).
+const TIER_LABELS = { 'Super Culty':'High-Control','Kinda Culty':'Moderate-Control','Not Culty':'Low-Control' };
+const lbl = (t) => TIER_LABELS[t] || t;
 
 // Pre-populated pairs that illustrate the book's core arguments
 const PRESET_PAIRS = [
@@ -123,7 +126,7 @@ export default function CompareClient({ orgs=[], scoreMap={} }) {
             <div style={{display:'flex',alignItems:'center',gap:'0.5rem'}}>
               <div style={{width:7,height:7,borderRadius:'50%',background:TIER_COLORS[data.composite_tier]||'#888',flexShrink:0}}/>
               <span style={{fontFamily:'var(--mono)',fontSize:'0.62rem',color:'var(--muted)'}}>
-                {data.composite_tier} · {parseFloat(data.composite_score).toFixed(0)}%
+                {lbl(data.composite_tier)} · {parseFloat(data.composite_score).toFixed(0)}%
               </span>
             </div>
           )}
@@ -236,7 +239,7 @@ export default function CompareClient({ orgs=[], scoreMap={} }) {
                   </div>
                   <div style={{display:'flex',alignItems:'center',gap:'0.4rem',justifyContent:item.align==='right'?'flex-end':'flex-start',marginBottom:'0.25rem'}}>
                     <div style={{width:7,height:7,borderRadius:'50%',background:TIER_COLORS[item.d.composite_tier]||'#888'}}/>
-                    <span style={{fontFamily:'var(--mono)',fontSize:'0.65rem',color:'var(--muted)'}}>{item.d.composite_tier}</span>
+                    <span style={{fontFamily:'var(--mono)',fontSize:'0.65rem',color:'var(--muted)'}}>{lbl(item.d.composite_tier)}</span>
                   </div>
                   <div style={{fontFamily:'var(--mono)',fontSize:'0.62rem',color:'rgba(212,206,196,0.35)'}}>
                     Young's {item.d.youngs_score}/10 · {item.d.trajectory}

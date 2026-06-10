@@ -5,7 +5,7 @@ import { SUPABASE_URL, ANON_KEY } from '../../../lib/supabase/config';
 
 export const metadata = {
   title: 'Geographic Map — The Cultiness Spectrum',
-  description: 'US map of organizational headquarters, state average scores, founding city origins, and etiological chains — colored by cultiness tier.',
+  description: 'US map of organizational headquarters, state average scores, founding city origins, and etiological chains — colored by control tier.',
 };
 export const revalidate = 3600;
 

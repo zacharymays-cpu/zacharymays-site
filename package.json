@@ -16,7 +16,8 @@
     "maplibre-gl": "^5.24.0",
     "next": "15.3.8",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "string-similarity": "^4.0.4"
   },
   "devDependencies": {
     "@types/node": "^20",
