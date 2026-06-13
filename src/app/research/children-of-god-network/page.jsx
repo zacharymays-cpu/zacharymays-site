@@ -5,10 +5,14 @@ import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import styles from './page.module.css';
 
+const SUPABASE_URL = 'https://shgdrkrqjnwtlyxcdayp.supabase.co';
+const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNoZ2Rya3JxanR3dGx5eGNkYXlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDk3NTczODMsImV4cCI6MTcyNzUzMzM4M30.kbJq8sxP6pZNqpd9Z2Y0i_HHvRLgKF7sDIV46DKEqbQ';
+
 export default function ChildrenOfGodResearch() {
   const mapContainer = useRef(null);
   const map = useRef(null);
   const [geojsonData, setGeojsonData] = useState(null);
+  const [cogData, setCogData] = useState(null);
   const [filters, setFilters] = useState({
     confidence: { HIGH: true, MEDIUM: true, LOW: true },
     facilityType: {
@@ -43,40 +47,41 @@ export default function ChildrenOfGodResearch() {
     return '#2aa198';
   };
 
-  // COG scores from database
-  const cogData = {
-    name: 'Children of God / The Family International',
-    category: 'Religious',
-    composite_score: 100.0,
-    composite_tier: 'Super Culty',
-    youngs_score: 9.9,
-    founding_year: 1968,
-    defunct_year: 1994,
-    trajectory: 'Defunct',
-    summary_text: 'The Children of God (later The Family International) exemplifies a high-control organization with pervasive manipulation, exploitation, and abuse. Founded by David Brandt Berg, the organization exhibits the full spectrum of high-control group dynamics across all ten criteria, with particular severity in leadership control, information isolation, labor exploitation, and exit costs.',
-    criterion_scores: [
-      { criterion: 'C1', score: 10, confidence: 'Definitive', body_text: 'David Brandt Berg exerted absolute charismatic control, positioning himself as God\'s prophet and receiving unquestioned obedience. His letters (Mo Letters) were treated as divine guidance.' },
-      { criterion: 'C2', score: 10, confidence: 'Definitive', body_text: 'Messianic claims about Berg, scriptural reinterpretation ("Flirty Fishing"), apocalyptic narratives, and sacred assumptions about the organization\'s divine mission.' },
-      { criterion: 'C3', score: 10, confidence: 'Definitive', body_text: 'Explicit transcendent mission to "save the world," convert the lost, and prepare for apocalyptic events. Members\' entire identity was subsumed into this mission.' },
-      { criterion: 'C4', score: 9, confidence: 'Definitive', body_text: 'Complete identity sublimation through renaming, collective identity, loss of individual autonomy. Family hierarchy and roles replaced personal identity.' },
-      { criterion: 'C5', score: 10, confidence: 'Definitive', body_text: 'Extreme information isolation: controlled literature, no outside media, "fleeing the system," limited contact with apostates or family members outside the organization.' },
-      { criterion: 'C6', score: 9, confidence: 'Definitive', body_text: 'Specialized terminology, private language (including sexual euphemisms), insider codes that isolated members linguistically from outsiders.' },
-      { criterion: 'C7', score: 10, confidence: 'Definitive', body_text: 'Extreme us-vs-them rhetoric, worldly system portrayed as evil, apostate rhetoric against former members, systemic dehumanization of critics.' },
-      { criterion: 'C8', score: 10, confidence: 'Definitive', body_text: 'Systematic labor exploitation: unpaid labor, constant work demands, "provisioning" (panhandling and solicitation), economic resources flowing to leadership.' },
-      { criterion: 'C9', score: 10, confidence: 'Definitive', body_text: 'Extreme exit costs: social ostracism of defectors, loss of family ties, loss of identity and community, psychological manipulation designed to prevent leaving.' },
-      { criterion: 'C10', score: 10, confidence: 'Definitive', body_text: 'Explicit "ends justify means" theology: child sexual abuse justified, financial deception, reproductive coercion ("Flirty Fishing"), exploitation of women and children.' },
-    ],
-    political_scores: {
-      economic_axis: -1.0,
-      authority_axis: 0.0,
-      political_quadrant: 'Authoritarian Left',
-      scoring_notes: 'Economic axis reflects counter-cultural origins and communal property sharing. Authority axis neutral reflects absolute internal hierarchy with rejection of external state authority.'
-    },
-  };
+  // Fetch org data from Supabase
+  useEffect(() => {
+    const fetchOrgData = async () => {
+      try {
+        const res = await fetch(
+          `${SUPABASE_URL}/rest/v1/organizations?select=id,name,slug,category,composite_score,composite_tier,youngs_score,founding_year,defunct_year,trajectory,summary_text,political_scores(economic_axis,authority_axis,political_quadrant,scoring_notes),criterion_scores(criterion,score,confidence,body_text)&name=eq.Children of God / The Family`,
+          {
+            headers: {
+              apikey: ANON_KEY,
+              Authorization: `Bearer ${ANON_KEY}`,
+            },
+          }
+        );
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data[0]) {
+            const org = data[0];
+            setCogData({
+              ...org,
+              political_scores: Array.isArray(org.political_scores) ? org.political_scores[0] : org.political_scores,
+              criterion_scores: org.criterion_scores || [],
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching org data:', error);
+      }
+    };
 
-  const tierColor = TIER_BG[cogData.composite_tier] ?? 'rgba(212,206,196,0.1)';
-  const tierTextColor = TIER_TEXT[cogData.composite_tier] ?? 'var(--muted)';
-  const compositePct = `${parseFloat(cogData.composite_score).toFixed(0)}%`;
+    fetchOrgData();
+  }, []);
+
+  const tierColor = cogData ? (TIER_BG[cogData.composite_tier] ?? 'rgba(212,206,196,0.1)') : 'rgba(212,206,196,0.1)';
+  const tierTextColor = cogData ? (TIER_TEXT[cogData.composite_tier] ?? 'var(--muted)') : 'var(--muted)';
+  const compositePct = cogData ? `${parseFloat(cogData.composite_score).toFixed(0)}%` : '—';
 
   useEffect(() => {
     if (!mapContainer.current) return;
@@ -212,6 +217,8 @@ export default function ChildrenOfGodResearch() {
 
   return (
     <div className={styles.page}>
+      {cogData && (
+      <>
       {/* ── Org-detail hero header ──────────────────────────────────── */}
       <section style={{ padding: '2.5rem 0 2rem', borderTop: `3px solid ${tierTextColor}`, borderBottom: '1px solid rgba(212,206,196,0.1)' }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 2rem' }}>
@@ -507,6 +514,8 @@ export default function ChildrenOfGodResearch() {
           </section>
         </main>
       </div>
+      </>
+      )}
     </div>
   );
 }
