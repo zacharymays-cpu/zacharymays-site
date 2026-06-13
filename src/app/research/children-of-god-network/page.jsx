@@ -52,7 +52,7 @@ export default function ChildrenOfGodResearch() {
     const fetchOrgData = async () => {
       try {
         const res = await fetch(
-          `${SUPABASE_URL}/rest/v1/organizations?select=id,name,slug,category,composite_score,composite_tier,youngs_score,founding_year,defunct_year,trajectory,summary_text,political_scores(economic_axis,authority_axis,political_quadrant,scoring_notes),criterion_scores(criterion,score,confidence,body_text)&name=eq.Children of God / The Family`,
+          `${SUPABASE_URL}/rest/v1/organizations?select=id,name,slug,category,composite_score,composite_tier,youngs_score,founding_year,defunct_year,trajectory,summary_text,active,membership_count,membership_count_year,revenue_usd,revenue_year,size_tier,size_notes,political_scores(economic_axis,authority_axis,political_quadrant,scoring_notes),criterion_scores(criterion,score,confidence,body_text)&name=eq.Children of God / The Family`,
           {
             headers: {
               apikey: ANON_KEY,
@@ -79,9 +79,39 @@ export default function ChildrenOfGodResearch() {
     fetchOrgData();
   }, []);
 
+  const formatWholeNumber = (value) => {
+    if (value === null || value === undefined || value === '') return null;
+    const n = Number(value);
+    if (!Number.isFinite(n)) return null;
+    return n.toLocaleString('en-US', { maximumFractionDigits: 0 });
+  };
+
+  const formatUsd = (value) => {
+    if (value === null || value === undefined || value === '') return null;
+    const n = Number(value);
+    if (!Number.isFinite(n)) return null;
+    if (Math.abs(n) >= 1_000_000_000) return `$${(n / 1_000_000_000).toFixed(n >= 10_000_000_000 ? 0 : 1)}B`;
+    if (Math.abs(n) >= 1_000_000) return `$${(n / 1_000_000).toFixed(n >= 10_000_000 ? 0 : 1)}M`;
+    if (Math.abs(n) >= 1_000) return `$${(n / 1_000).toFixed(n >= 10_000 ? 0 : 1)}K`;
+    return `$${n.toLocaleString('en-US', { maximumFractionDigits: 0 })}`;
+  };
+
+  const SIZE_TIER_LABELS = {
+    micro: 'Micro scale (<1K)',
+    small: 'Small scale (1K-50K)',
+    medium: 'Medium scale (50K-1M)',
+    large: 'Large scale (1M-10M)',
+    mass: 'Mass scale (>10M)',
+  };
+
   const tierColor = cogData ? (TIER_BG[cogData.composite_tier] ?? 'rgba(212,206,196,0.1)') : 'rgba(212,206,196,0.1)';
   const tierTextColor = cogData ? (TIER_TEXT[cogData.composite_tier] ?? 'var(--muted)') : 'var(--muted)';
   const compositePct = cogData ? `${parseFloat(cogData.composite_score).toFixed(0)}%` : '—';
+
+  const membershipCount = cogData ? formatWholeNumber(cogData.membership_count) : null;
+  const revenueUsd = cogData ? formatUsd(cogData.revenue_usd) : null;
+  const sizeTier = cogData && cogData.size_tier ? (SIZE_TIER_LABELS[cogData.size_tier] ?? cogData.size_tier) : null;
+  const hasScaleData = cogData && Boolean(membershipCount || revenueUsd || sizeTier || cogData.size_notes);
 
   useEffect(() => {
     if (!mapContainer.current) return;
@@ -239,6 +269,14 @@ export default function ChildrenOfGodResearch() {
             {cogData.name}
           </h1>
 
+          {!cogData.active && (
+            <div style={{ marginBottom: '1.5rem', padding: '0.75rem 1rem', background: 'rgba(200,168,75,0.08)', border: '1px solid rgba(200,168,75,0.2)', borderRadius: '4px' }}>
+              <span style={{ fontFamily: 'var(--mono)', fontSize: '0.7rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--gold)' }}>
+                ⚠ Historical organization — no longer active
+              </span>
+            </div>
+          )}
+
           {/* Scoreboard */}
           <div style={{ display: 'flex', alignItems: 'stretch', gap: '1.5rem', flexWrap: 'wrap', marginTop: '1.5rem' }}>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.7rem' }}>
@@ -274,7 +312,55 @@ export default function ChildrenOfGodResearch() {
                 Trajectory
               </span>
             </div>
+
+            {membershipCount && (
+              <>
+                <div style={{ width: 1, background: 'rgba(212,206,196,0.15)' }} />
+                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '0.3rem', minWidth: '6.5rem' }}>
+                  <span style={{ fontFamily: 'var(--serif)', fontSize: '1.15rem', fontWeight: 700, color: 'var(--paper)', lineHeight: 1 }}>
+                    {membershipCount}
+                  </span>
+                  <span style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)' }}>
+                    Membership {cogData.membership_count_year ? `· ${cogData.membership_count_year}` : ''}
+                  </span>
+                </div>
+              </>
+            )}
+
+            {revenueUsd && (
+              <>
+                <div style={{ width: 1, background: 'rgba(212,206,196,0.15)' }} />
+                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '0.3rem', minWidth: '6.5rem' }}>
+                  <span style={{ fontFamily: 'var(--serif)', fontSize: '1.15rem', fontWeight: 700, color: 'var(--paper)', lineHeight: 1 }}>
+                    {revenueUsd}
+                  </span>
+                  <span style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)' }}>
+                    Revenue {cogData.revenue_year ? `· ${cogData.revenue_year}` : ''}
+                  </span>
+                </div>
+              </>
+            )}
+
+            {sizeTier && (
+              <>
+                <div style={{ width: 1, background: 'rgba(212,206,196,0.15)' }} />
+                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '0.3rem', minWidth: '6.5rem' }}>
+                  <span style={{ fontFamily: 'var(--serif)', fontSize: '1.15rem', fontWeight: 700, color: 'var(--paper)', lineHeight: 1 }}>
+                    {sizeTier}
+                  </span>
+                  <span style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)' }}>
+                    Size
+                  </span>
+                </div>
+              </>
+            )}
           </div>
+
+          {cogData.size_notes && hasScaleData && (
+            <p style={{ fontFamily: 'var(--mono)', fontSize: '0.62rem', color: 'rgba(212,206,196,0.55)', lineHeight: 1.6, marginTop: '0.9rem', maxWidth: 860 }}>
+              {cogData.size_notes}
+            </p>
+          )}
         </div>
       </section>
 
