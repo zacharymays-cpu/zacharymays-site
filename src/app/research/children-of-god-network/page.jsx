@@ -1,12 +1,14 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import maplibregl from 'maplibre-gl';
+import 'maplibre-gl/dist/maplibre-gl.css';
 import styles from './page.module.css';
 
 export default function ChildrenOfGodResearch() {
+  const mapContainer = useRef(null);
+  const map = useRef(null);
   const [geojsonData, setGeojsonData] = useState(null);
-  const [map, setMap] = useState(null);
-  const [markers, setMarkers] = useState([]);
   const [filters, setFilters] = useState({
     confidence: { HIGH: true, MEDIUM: true, LOW: true },
     facilityType: {
@@ -22,78 +24,100 @@ export default function ChildrenOfGodResearch() {
   });
 
   useEffect(() => {
-    // Load Leaflet CSS
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-    document.head.appendChild(link);
+    if (!mapContainer.current) return;
 
-    // Load Leaflet JS
-    const script = document.createElement('script');
-    script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-    script.onload = initializeMap;
-    document.body.appendChild(script);
+    const initMap = async () => {
+      try {
+        const response = await fetch('/cog_locations.geojson');
+        const data = await response.json();
+        setGeojsonData(data);
+
+        const mapTilerKey = process.env.NEXT_PUBLIC_MAPTILER_KEY;
+        const mapStyle = mapTilerKey
+          ? `https://api.maptiler.com/maps/streets/style.json?key=${mapTilerKey}`
+          : 'https://demotiles.maplibre.org/style.json';
+
+        map.current = new maplibregl.Map({
+          container: mapContainer.current,
+          style: mapStyle,
+          center: [0, 20],
+          zoom: 2,
+        });
+
+        map.current.on('load', () => {
+          addDataToMap(data, filters);
+        });
+      } catch (error) {
+        console.error('Error loading map or GeoJSON:', error);
+      }
+    };
+
+    initMap();
 
     return () => {
-      if (link.parentNode) link.parentNode.removeChild(link);
-      if (script.parentNode) script.parentNode.removeChild(script);
+      if (map.current) {
+        map.current.remove();
+        map.current = null;
+      }
     };
   }, []);
 
-  const initializeMap = async () => {
-    if (!window.L) return;
+  const addDataToMap = (data, currentFilters) => {
+    if (!map.current || !data) return;
 
-    const mapContainer = document.getElementById('map');
-    if (!mapContainer || mapContainer._leaflet_id) return;
-
-    const newMap = window.L.map('map').setView([20, 0], 2);
-    window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors',
-      maxZoom: 19,
-    }).addTo(newMap);
-
-    setMap(newMap);
-
-    try {
-      const response = await fetch('/cog_locations.geojson');
-      const data = await response.json();
-      setGeojsonData(data);
-      renderMarkers(newMap, data, filters);
-    } catch (error) {
-      console.error('Error loading GeoJSON:', error);
-    }
-  };
-
-  const renderMarkers = (mapInstance, data, currentFilters) => {
-    if (!mapInstance || !data) return;
-
-    // Clear existing markers
-    markers.forEach(m => mapInstance.removeLayer(m));
-    const newMarkers = [];
-
-    data.features.forEach(feature => {
+    const filteredFeatures = data.features.filter(feature => {
       const props = feature.properties;
       const openedYear = parseInt(props.opened_year) || 1968;
 
-      // Apply filters
-      if (!currentFilters.confidence[props.confidence]) return;
-      if (!currentFilters.facilityType[props.facility_type]) return;
-      if (openedYear > currentFilters.year) return;
+      if (!currentFilters.confidence[props.confidence]) return false;
+      if (!currentFilters.facilityType[props.facility_type]) return false;
+      if (openedYear > currentFilters.year) return false;
 
-      const marker = window.L.circleMarker(
-        [feature.geometry.coordinates[1], feature.geometry.coordinates[0]],
-        {
-          radius: 8,
-          fillColor: props.confidence_color,
-          color: props.confidence_color,
-          weight: 2,
-          opacity: 0.8,
-          fillOpacity: 0.7,
-        }
-      );
+      return true;
+    });
+
+    const sourceId = 'cog-locations';
+    const layerId = 'cog-locations-layer';
+
+    // Remove existing layer and source if they exist
+    if (map.current.getLayer(layerId)) {
+      map.current.removeLayer(layerId);
+    }
+    if (map.current.getSource(sourceId)) {
+      map.current.removeSource(sourceId);
+    }
+
+    // Add source
+    map.current.addSource(sourceId, {
+      type: 'geojson',
+      data: {
+        type: 'FeatureCollection',
+        features: filteredFeatures,
+      },
+    });
+
+    // Add circle layer for markers
+    map.current.addLayer({
+      id: layerId,
+      type: 'circle',
+      source: sourceId,
+      paint: {
+        'circle-radius': 8,
+        'circle-color': ['get', 'confidence_color'],
+        'circle-opacity': 0.7,
+        'circle-stroke-width': 2,
+        'circle-stroke-color': ['get', 'confidence_color'],
+        'circle-stroke-opacity': 0.8,
+      },
+    });
+
+    // Add popup on click
+    map.current.on('click', layerId, (e) => {
+      const feature = e.features[0];
+      const props = feature.properties;
 
       const popupHTML = `
-        <div style="font-family: system-ui; min-width: 250px;">
+        <div style="font-family: system-ui;">
           <h3 style="margin: 0 0 8px 0; font-size: 14px; color: #272320;">${props.name}</h3>
           <p style="margin: 0 0 6px 0; font-size: 12px; color: #666;"><strong>${props.city}, ${props.country}</strong></p>
           <p style="margin: 0 0 6px 0; font-size: 12px; color: #666;"><strong>Type:</strong> ${props.facility_type}</p>
@@ -105,12 +129,19 @@ export default function ChildrenOfGodResearch() {
         </div>
       `;
 
-      marker.bindPopup(popupHTML);
-      marker.addTo(mapInstance);
-      newMarkers.push(marker);
+      new maplibregl.Popup()
+        .setLngLat(e.lngLat)
+        .setHTML(popupHTML)
+        .addTo(map.current);
     });
 
-    setMarkers(newMarkers);
+    // Change cursor on hover
+    map.current.on('mouseenter', layerId, () => {
+      map.current.getCanvas().style.cursor = 'pointer';
+    });
+    map.current.on('mouseleave', layerId, () => {
+      map.current.getCanvas().style.cursor = '';
+    });
   };
 
   const handleFilterChange = (type, value) => {
@@ -123,8 +154,8 @@ export default function ChildrenOfGodResearch() {
     }
 
     setFilters(newFilters);
-    if (map && geojsonData) {
-      renderMarkers(map, geojsonData, newFilters);
+    if (map.current && geojsonData) {
+      addDataToMap(geojsonData, newFilters);
     }
   };
 
@@ -189,7 +220,7 @@ export default function ChildrenOfGodResearch() {
         </aside>
 
         <main className={styles.main}>
-          <div id="map" className={styles.map}></div>
+          <div ref={mapContainer} className={styles.map}></div>
 
           <section className={styles.content}>
             <h2>Research Methodology</h2>
