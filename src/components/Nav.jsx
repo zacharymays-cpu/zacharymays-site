@@ -26,6 +26,7 @@ const NAV_ITEMS = [
       { href: '/explore/sankey',          label: 'Category Flow' },
       { href: '/explore/sunburst',        label: 'Sunburst' },
       { href: '/explore/compare',         label: 'Head-to-Head' },
+      { href: '/research/children-of-god-network', label: 'Children of God Network' },
     ],
   },
   {
