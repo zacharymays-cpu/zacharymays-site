@@ -321,7 +321,7 @@ export default function ChildrenOfGodResearch() {
             <h3>Books & Memoirs</h3>
             <ul>
               <li>Jones, Faith (2021). "Sex Cult Nun: Breaking Away from the Children of God"</li>
-              <li>Young, Daniella. "Shattered: One Girl's Journey Through the Darkness"</li>
+              <li>Young, Daniella. "Uncultured"</li>
               <li>The Family International. "The Story of Davidito" (organizational account)</li>
             </ul>
 
