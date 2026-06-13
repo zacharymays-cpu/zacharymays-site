@@ -40,8 +40,9 @@ export default function ChildrenOfGodResearch() {
         map.current = new maplibregl.Map({
           container: mapContainer.current,
           style: mapStyle,
-          center: [0, 20],
-          zoom: 2,
+          center: [0, 0],
+          zoom: 1,
+          maxZoom: 19,
         });
 
         map.current.on('load', () => {
