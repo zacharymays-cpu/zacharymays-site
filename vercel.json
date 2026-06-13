@@ -4,7 +4,7 @@
   "crons": [
     {
       "path": "/api/cron/sync-usaspending",
-      "schedule": "0 9 * * 1"
+      "schedule": "0 2 * * *"
     }
   ]
 }

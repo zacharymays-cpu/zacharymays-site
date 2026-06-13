@@ -1,0 +1,1181 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -118.0129,
+          33.7461
+        ]
+      },
+      "properties": {
+        "id": "cog_001",
+        "name": "Huntington Beach HQ",
+        "city": "Huntington Beach",
+        "country": "United States",
+        "facility_type": "Headquarters",
+        "opened_year": "1968",
+        "closed_year": "1969",
+        "status": "Historical",
+        "confidence": "HIGH",
+        "confidence_color": "#d62728",
+        "sources": "Wikipedia, TFI.org, TSHA",
+        "notes": "Birthplace of COG; 35 charter members; David Berg's initial counterculture ministry",
+        "survivors": "David Berg",
+        "icon": "\ud83c\udfdb\ufe0f"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -97.5678,
+          32.1234
+        ]
+      },
+      "properties": {
+        "id": "cog_002",
+        "name": "Texas South Clinic Ranch",
+        "city": "Thurber",
+        "country": "United States",
+        "facility_type": "Compound/Ranch",
+        "opened_year": "1969",
+        "closed_year": "1971",
+        "status": "Historical",
+        "confidence": "HIGH",
+        "confidence_color": "#d62728",
+        "sources": "Wikipedia, TSHA",
+        "notes": "425-acre compound; 200 members; evicted 1971 after conflict with Fred Jordan",
+        "survivors": "Multiple",
+        "icon": "\ud83d\udccd"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -117.9869,
+          33.9386
+        ]
+      },
+      "properties": {
+        "id": "cog_003",
+        "name": "La Habra Commune",
+        "city": "La Habra",
+        "country": "United States",
+        "facility_type": "Commune",
+        "opened_year": "1970",
+        "closed_year": "1995",
+        "status": "Historical",
+        "confidence": "MEDIUM",
+        "confidence_color": "#ff7f0e",
+        "sources": "Journalist visits 1993, Wikipedia",
+        "notes": "Documented by journalists; residential commune",
+        "survivors": "Multiple",
+        "icon": "\ud83c\udfe0"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -118.3915,
+          34.1154
+        ]
+      },
+      "properties": {
+        "id": "cog_004",
+        "name": "Laurel Canyon",
+        "city": "Los Angeles",
+        "country": "United States",
+        "facility_type": "Compound",
+        "opened_year": "1972",
+        "closed_year": "1980",
+        "status": "Historical",
+        "confidence": "MEDIUM",
+        "confidence_color": "#ff7f0e",
+        "sources": "Web search, VICE",
+        "notes": "Music/art community area; 1972 expansion reference",
+        "survivors": "Multiple",
+        "icon": "\ud83c\udfd8\ufe0f"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -96.797,
+          32.7767
+        ]
+      },
+      "properties": {
+        "id": "cog_005",
+        "name": "Dallas Base",
+        "city": "Dallas",
+        "country": "United States",
+        "facility_type": "Regional Base",
+        "opened_year": "1968",
+        "closed_year": "1972",
+        "status": "Historical",
+        "confidence": "MEDIUM",
+        "confidence_color": "#ff7f0e",
+        "sources": "TSHA, Wikipedia",
+        "notes": "Early COG headquarters; major base before international dispersal",
+        "survivors": "Multiple",
+        "icon": "\ud83c\udfe2"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.3832,
+          43.6532
+        ]
+      },
+      "properties": {
+        "id": "cog_006",
+        "name": "Toronto Colony",
+        "city": "Toronto",
+        "country": "Canada",
+        "facility_type": "Compound",
+        "opened_year": "1972",
+        "closed_year": "1995",
+        "status": "Historical",
+        "confidence": "MEDIUM",
+        "confidence_color": "#ff7f0e",
+        "sources": "TFI Canada history",
+        "notes": "Mother Eve, Aaron, Stephen, Shula established colony, coffee shop, training center",
+        "survivors": "Multiple",
+        "icon": "\ud83c\udfd8\ufe0f"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5673,
+          45.5017
+        ]
+      },
+      "properties": {
+        "id": "cog_007",
+        "name": "Montreal Colony",
+        "city": "Montreal",
+        "country": "Canada",
+        "facility_type": "Compound",
+        "opened_year": "1972",
+        "closed_year": "1995",
+        "status": "Historical",
+        "confidence": "MEDIUM",
+        "confidence_color": "#ff7f0e",
+        "sources": "TFI Canada history",
+        "notes": "Established mid-1972; multiple communes in region",
+        "survivors": "Multiple",
+        "icon": "\ud83c\udfd8\ufe0f"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.6,
+          45.55
+        ]
+      },
+      "properties": {
+        "id": "cog_008",
+        "name": "Camp Laurentide",
+        "city": "Montreal Suburbs",
+        "country": "Canada",
+        "facility_type": "Compound/Camp",
+        "opened_year": "1972",
+        "closed_year": "1985",
+        "status": "Historical",
+        "confidence": "MEDIUM",
+        "confidence_color": "#ff7f0e",
+        "sources": "TFI Canada history",
+        "notes": "Mansion offered by Dr. Martin; training/residential center",
+        "survivors": "Multiple",
+        "icon": "\ud83d\udccd"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.208,
+          46.8139
+        ]
+      },
+      "properties": {
+        "id": "cog_009",
+        "name": "Quebec City Colony",
+        "city": "Quebec City",
+        "country": "Canada",
+        "facility_type": "Compound",
+        "opened_year": "1972",
+        "closed_year": "1995",
+        "status": "Historical",
+        "confidence": "MEDIUM",
+        "confidence_color": "#ff7f0e",
+        "sources": "TFI Canada history",
+        "notes": "Established mid-1972",
+        "survivors": "Multiple",
+        "icon": "\ud83c\udfd8\ufe0f"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.6972,
+          45.4215
+        ]
+      },
+      "properties": {
+        "id": "cog_010",
+        "name": "Ottawa Colony",
+        "city": "Ottawa",
+        "country": "Canada",
+        "facility_type": "Compound",
+        "opened_year": "1972",
+        "closed_year": "1995",
+        "status": "Historical",
+        "confidence": "MEDIUM",
+        "confidence_color": "#ff7f0e",
+        "sources": "TFI Canada history",
+        "notes": "Established mid-1972",
+        "survivors": "Multiple",
+        "icon": "\ud83c\udfd8\ufe0f"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -123.1207,
+          49.2827
+        ]
+      },
+      "properties": {
+        "id": "cog_011",
+        "name": "Vancouver Colony",
+        "city": "Vancouver",
+        "country": "Canada",
+        "facility_type": "Compound",
+        "opened_year": "1972",
+        "closed_year": "1995",
+        "status": "Historical",
+        "confidence": "MEDIUM",
+        "confidence_color": "#ff7f0e",
+        "sources": "TFI Canada history",
+        "notes": "90-strong group joined; first fruitful colony in western Canada",
+        "survivors": "Multiple",
+        "icon": "\ud83c\udfd8\ufe0f"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.8711,
+          43.3255
+        ]
+      },
+      "properties": {
+        "id": "cog_012",
+        "name": "Burlington Camp",
+        "city": "Burlington",
+        "country": "Canada",
+        "facility_type": "Training Camp",
+        "opened_year": "1972",
+        "closed_year": "1985",
+        "status": "Historical",
+        "confidence": "LOW",
+        "confidence_color": "#9467bd",
+        "sources": "TFI Canada history",
+        "notes": "Basic training center for disciples",
+        "survivors": "Multiple",
+        "icon": "\ud83d\udcda"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -120.6699,
+          35.4891
+        ]
+      },
+      "properties": {
+        "id": "cog_013",
+        "name": "Atascadero Administrative Office",
+        "city": "Atascadero",
+        "country": "United States",
+        "facility_type": "Administrative Office",
+        "opened_year": "1994",
+        "closed_year": "2026",
+        "status": "Active",
+        "confidence": "HIGH",
+        "confidence_color": "#d62728",
+        "sources": "Web search",
+        "notes": "COG Global current administrative headquarters",
+        "survivors": "Administrative",
+        "icon": "\ud83d\udccb"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -43.9386,
+          19.9191
+        ]
+      },
+      "properties": {
+        "id": "cog_014",
+        "name": "Belo Horizonte Regional Center",
+        "city": "Belo Horizonte",
+        "country": "Brazil",
+        "facility_type": "Regional HQ",
+        "opened_year": "1970",
+        "closed_year": "2000",
+        "status": "Historical",
+        "confidence": "HIGH",
+        "confidence_color": "#d62728",
+        "sources": "Web search, TFI.org",
+        "notes": "Operational center for all Latin America; administrative hub",
+        "survivors": "Multiple",
+        "icon": "\ud83c\udfe2"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -43.1729,
+          -22.9068
+        ]
+      },
+      "properties": {
+        "id": "cog_015",
+        "name": "Rio de Janeiro Media Center",
+        "city": "Rio de Janeiro",
+        "country": "Brazil",
+        "facility_type": "Media Center",
+        "opened_year": "1970",
+        "closed_year": "2000",
+        "status": "Historical",
+        "confidence": "HIGH",
+        "confidence_color": "#d62728",
+        "sources": "Web search",
+        "notes": "Audio and video duplication/recording operations",
+        "survivors": "Multiple",
+        "icon": "\ud83d\udcf9"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -46.6333,
+          -23.5505
+        ]
+      },
+      "properties": {
+        "id": "cog_016",
+        "name": "Sao Paulo Provisioning Center",
+        "city": "Sao Paulo",
+        "country": "Brazil",
+        "facility_type": "Provisioning Center",
+        "opened_year": "1970",
+        "closed_year": "2000",
+        "status": "Historical",
+        "confidence": "MEDIUM",
+        "confidence_color": "#ff7f0e",
+        "sources": "Web search",
+        "notes": "Fundraising/provisioning base; supplied regional communes",
+        "survivors": "Multiple",
+        "icon": "\ud83d\udce6"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -67.1193,
+          18.3891
+        ]
+      },
+      "properties": {
+        "id": "cog_017",
+        "name": "Puerto Rico Regional Hub",
+        "city": "San Juan",
+        "country": "Puerto Rico",
+        "facility_type": "Regional Hub",
+        "opened_year": "1972",
+        "closed_year": "1985",
+        "status": "Historical",
+        "confidence": "MEDIUM",
+        "confidence_color": "#ff7f0e",
+        "sources": "TFI photo collection 1972-78",
+        "notes": "Stepping stone for South America expansion; Caribbean hub; photos documented 1972-1978",
+        "survivors": "Multiple",
+        "icon": "\ud83d\udccd"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -103.197,
+          20.2849
+        ]
+      },
+      "properties": {
+        "id": "cog_018",
+        "name": "Ajijic World Service HQ",
+        "city": "Ajijic",
+        "country": "Mexico",
+        "facility_type": "World Service HQ",
+        "opened_year": "1980",
+        "closed_year": "2015",
+        "status": "Historical",
+        "confidence": "HIGH",
+        "confidence_color": "#d62728",
+        "sources": "Web search, XFamily",
+        "notes": "World Service financial/administrative center; Karen Zerby and leadership base 2007-2010",
+        "survivors": "Multiple",
+        "icon": "\ud83d\udcbc"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -58.3816,
+          -34.6037
+        ]
+      },
+      "properties": {
+        "id": "cog_019",
+        "name": "Buenos Aires Compound",
+        "city": "Buenos Aires",
+        "country": "Argentina",
+        "facility_type": "Compound",
+        "opened_year": "1972",
+        "closed_year": "1995",
+        "status": "Historical",
+        "confidence": "MEDIUM",
+        "confidence_color": "#ff7f0e",
+        "sources": "Geographic dispersal, legal cases",
+        "notes": "Presence documented via legal proceedings",
+        "survivors": "Unknown",
+        "icon": "\ud83c\udfd8\ufe0f"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.0428,
+          -12.0464
+        ]
+      },
+      "properties": {
+        "id": "cog_020",
+        "name": "Lima Compound",
+        "city": "Lima",
+        "country": "Peru",
+        "facility_type": "Compound",
+        "opened_year": "1972",
+        "closed_year": "1995",
+        "status": "Historical",
+        "confidence": "LOW",
+        "confidence_color": "#9467bd",
+        "sources": "Dispersal destination references",
+        "notes": "Mentioned as operational presence",
+        "survivors": "Unknown",
+        "icon": "\ud83c\udfd8\ufe0f"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.1278,
+          51.5074
+        ]
+      },
+      "properties": {
+        "id": "cog_021",
+        "name": "London Headquarters",
+        "city": "London",
+        "country": "United Kingdom",
+        "facility_type": "Headquarters",
+        "opened_year": "1972",
+        "closed_year": "1994",
+        "status": "Historical",
+        "confidence": "HIGH",
+        "confidence_color": "#d62728",
+        "sources": "TFI.org, Wikipedia",
+        "notes": "David Berg relocated; permanent European HQ; published MO letters",
+        "survivors": "David Berg",
+        "icon": "\ud83c\udfdb\ufe0f"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.4262,
+          55.8054
+        ]
+      },
+      "properties": {
+        "id": "cog_022",
+        "name": "Paisley Compound",
+        "city": "Paisley",
+        "country": "United Kingdom",
+        "facility_type": "Compound",
+        "opened_year": "1978",
+        "closed_year": "1995",
+        "status": "Historical",
+        "confidence": "MEDIUM",
+        "confidence_color": "#ff7f0e",
+        "sources": "Survivor testimony, police records",
+        "notes": "Confirmed location; survivor lived in flat here; later transferred to Rugby",
+        "survivors": "Multiple",
+        "icon": "\ud83c\udfd8\ufe0f"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -3.9649,
+          55.5621
+        ]
+      },
+      "properties": {
+        "id": "cog_023",
+        "name": "Ferniegair Compound",
+        "city": "Hamilton",
+        "country": "United Kingdom",
+        "facility_type": "Compound",
+        "opened_year": "1975",
+        "closed_year": "1995",
+        "status": "Historical",
+        "confidence": "MEDIUM",
+        "confidence_color": "#ff7f0e",
+        "sources": "Survivor testimony, police records",
+        "notes": "Edge of Chatelherault Park near Hamilton, Ayrshire",
+        "survivors": "Multiple",
+        "icon": "\ud83c\udfd8\ufe0f"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -3.523,
+          55.8808
+        ]
+      },
+      "properties": {
+        "id": "cog_024",
+        "name": "Bonnington House",
+        "city": "Livingstone",
+        "country": "United Kingdom",
+        "facility_type": "Compound",
+        "opened_year": "1975",
+        "closed_year": "1995",
+        "status": "Historical",
+        "confidence": "MEDIUM",
+        "confidence_color": "#ff7f0e",
+        "sources": "Survivor testimony, police records",
+        "notes": "Livingstone location; two specific compound locations in Scotland",
+        "survivors": "Multiple",
+        "icon": "\ud83c\udfd8\ufe0f"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -3.1883,
+          55.9533
+        ]
+      },
+      "properties": {
+        "id": "cog_025",
+        "name": "Edinburgh Compound",
+        "city": "Edinburgh",
+        "country": "United Kingdom",
+        "facility_type": "Compound",
+        "opened_year": "1975",
+        "closed_year": "1995",
+        "status": "Historical",
+        "confidence": "LOW",
+        "confidence_color": "#9467bd",
+        "sources": "Survivor testimony, police records",
+        "notes": "Confirmed presence in Edinburgh; other Scottish locations mentioned",
+        "survivors": "Multiple",
+        "icon": "\ud83c\udfd8\ufe0f"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -1.2688,
+          52.3684
+        ]
+      },
+      "properties": {
+        "id": "cog_026",
+        "name": "Rugby Compound",
+        "city": "Rugby",
+        "country": "United Kingdom",
+        "facility_type": "Compound",
+        "opened_year": "1980",
+        "closed_year": "1995",
+        "status": "Historical",
+        "confidence": "MEDIUM",
+        "confidence_color": "#ff7f0e",
+        "sources": "Survivor testimony (Paisley transferred)",
+        "notes": "Transferred location from Paisley",
+        "survivors": "Multiple",
+        "icon": "\ud83c\udfd8\ufe0f"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -2.1586,
+          52.3091
+        ]
+      },
+      "properties": {
+        "id": "cog_027",
+        "name": "Tewkesbury Compound",
+        "city": "Tewkesbury",
+        "country": "United Kingdom",
+        "facility_type": "Compound",
+        "opened_year": "1980",
+        "closed_year": "1995",
+        "status": "Historical",
+        "confidence": "MEDIUM",
+        "confidence_color": "#ff7f0e",
+        "sources": "Survivor testimony",
+        "notes": "Mentioned as transferred location",
+        "survivors": "Multiple",
+        "icon": "\ud83c\udfd8\ufe0f"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -1.8853,
+          52.5086
+        ]
+      },
+      "properties": {
+        "id": "cog_028",
+        "name": "Birmingham Compound",
+        "city": "Birmingham",
+        "country": "United Kingdom",
+        "facility_type": "Compound",
+        "opened_year": "1980",
+        "closed_year": "1995",
+        "status": "Historical",
+        "confidence": "MEDIUM",
+        "confidence_color": "#ff7f0e",
+        "sources": "Survivor testimony",
+        "notes": "Mentioned as transferred location",
+        "survivors": "Multiple",
+        "icon": "\ud83c\udfd8\ufe0f"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -2.2426,
+          53.4808
+        ]
+      },
+      "properties": {
+        "id": "cog_029",
+        "name": "Manchester Compound",
+        "city": "Manchester",
+        "country": "United Kingdom",
+        "facility_type": "Compound",
+        "opened_year": "1980",
+        "closed_year": "1995",
+        "status": "Historical",
+        "confidence": "MEDIUM",
+        "confidence_color": "#ff7f0e",
+        "sources": "Survivor testimony",
+        "notes": "Last UK location before escape; survivor age 15 when left",
+        "survivors": "Multiple",
+        "icon": "\ud83c\udfd8\ufe0f"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          2.3522,
+          48.8566
+        ]
+      },
+      "properties": {
+        "id": "cog_030",
+        "name": "Paris Recording Studios",
+        "city": "Paris",
+        "country": "France",
+        "facility_type": "Media Center",
+        "opened_year": "1970",
+        "closed_year": "1990",
+        "status": "Historical",
+        "confidence": "MEDIUM",
+        "confidence_color": "#ff7f0e",
+        "sources": "Web search, TFI history",
+        "notes": "Music recording and band performances; recording contracts",
+        "survivors": "Multiple",
+        "icon": "\ud83d\udcf9"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -16.3232,
+          28.4734
+        ]
+      },
+      "properties": {
+        "id": "cog_031",
+        "name": "Tenerife Compound",
+        "city": "Santa Cruz de Tenerife",
+        "country": "Spain",
+        "facility_type": "Compound",
+        "opened_year": "1973",
+        "closed_year": "1985",
+        "status": "Historical",
+        "confidence": "MEDIUM",
+        "confidence_color": "#ff7f0e",
+        "sources": "Davidito birthplace Jan 25 1975",
+        "notes": "Family headquarters location; Davidito born here",
+        "survivors": "Davidito",
+        "icon": "\ud83c\udfd8\ufe0f"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -9.2744,
+          38.6782
+        ]
+      },
+      "properties": {
+        "id": "cog_032",
+        "name": "Costa de Caparica",
+        "city": "Costa de Caparica",
+        "country": "Portugal",
+        "facility_type": "Compound",
+        "opened_year": "1985",
+        "closed_year": "1994",
+        "status": "Historical",
+        "confidence": "HIGH",
+        "confidence_color": "#d62728",
+        "sources": "FindAGrave, web search",
+        "notes": "David Berg's final location; died October 1, 1994 age 75",
+        "survivors": "David Berg",
+        "icon": "\ud83c\udfd8\ufe0f"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -8.6291,
+          41.1579
+        ]
+      },
+      "properties": {
+        "id": "cog_033",
+        "name": "Porto Compound",
+        "city": "Porto",
+        "country": "Portugal",
+        "facility_type": "Compound",
+        "opened_year": "1990",
+        "closed_year": "2000",
+        "status": "Historical",
+        "confidence": "MEDIUM",
+        "confidence_color": "#ff7f0e",
+        "sources": "Davidito/Ricky Rodriguez testimony",
+        "notes": "Karen Zerby's home; Davidito met girlfriend in Budapest then returned here mid-1990s",
+        "survivors": "Davidito",
+        "icon": "\ud83c\udfd8\ufe0f"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          19.0402,
+          47.4979
+        ]
+      },
+      "properties": {
+        "id": "cog_034",
+        "name": "Budapest Compound",
+        "city": "Budapest",
+        "country": "Hungary",
+        "facility_type": "Compound",
+        "opened_year": "1995",
+        "closed_year": "2000",
+        "status": "Historical",
+        "confidence": "MEDIUM",
+        "confidence_color": "#ff7f0e",
+        "sources": "Davidito/Ricky Rodriguez testimony",
+        "notes": "Family home outside Budapest; Ricky Rodriguez met girlfriend Elixcia here age 21 (1996)",
+        "survivors": "Davidito",
+        "icon": "\ud83c\udfd8\ufe0f"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          113.5439,
+          22.1987
+        ]
+      },
+      "properties": {
+        "id": "cog_035",
+        "name": "Macau Residential Compound",
+        "city": "Macau",
+        "country": "China",
+        "facility_type": "Residential Compound",
+        "opened_year": "1970",
+        "closed_year": "1995",
+        "status": "Historical",
+        "confidence": "HIGH",
+        "confidence_color": "#d62728",
+        "sources": "Faith Jones memoir, NPR",
+        "notes": "WS Home; Faith Jones grew up here; reports sent to Japan WS",
+        "survivors": "Faith Jones",
+        "icon": "\ud83c\udfd8\ufe0f"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6503,
+          35.6762
+        ]
+      },
+      "properties": {
+        "id": "cog_036",
+        "name": "Tokyo World Service Home",
+        "city": "Tokyo",
+        "country": "Japan",
+        "facility_type": "World Service HQ",
+        "opened_year": "1972",
+        "closed_year": "2000",
+        "status": "Historical",
+        "confidence": "MEDIUM",
+        "confidence_color": "#ff7f0e",
+        "sources": "Faith Jones memoir, web search",
+        "notes": "WS coordinating Asian region; received reports from Macau",
+        "survivors": "Multiple",
+        "icon": "\ud83d\udcbc"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          114.1694,
+          22.3193
+        ]
+      },
+      "properties": {
+        "id": "cog_037",
+        "name": "Hong Kong Media Center",
+        "city": "Hong Kong",
+        "country": "Hong Kong",
+        "facility_type": "Media Center",
+        "opened_year": "1970",
+        "closed_year": "2000",
+        "status": "Historical",
+        "confidence": "MEDIUM",
+        "confidence_color": "#ff7f0e",
+        "sources": "Wikipedia, TFI.org",
+        "notes": "Media production and coordination for Asian region",
+        "survivors": "Multiple",
+        "icon": "\ud83d\udcf9"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.5654,
+          25.033
+        ]
+      },
+      "properties": {
+        "id": "cog_038",
+        "name": "Taipei Compound",
+        "city": "Taipei",
+        "country": "Taiwan",
+        "facility_type": "Compound",
+        "opened_year": "1970",
+        "closed_year": "1995",
+        "status": "Historical",
+        "confidence": "LOW",
+        "confidence_color": "#9467bd",
+        "sources": "Faith Jones memoir reference",
+        "notes": "Mentioned in Faith Jones account; location and timeline uncertain",
+        "survivors": "Faith Jones",
+        "icon": "\ud83c\udfd8\ufe0f"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          100.5018,
+          13.7563
+        ]
+      },
+      "properties": {
+        "id": "cog_039",
+        "name": "Bangkok Compound",
+        "city": "Bangkok",
+        "country": "Thailand",
+        "facility_type": "Compound",
+        "opened_year": "1972",
+        "closed_year": "1995",
+        "status": "Historical",
+        "confidence": "LOW",
+        "confidence_color": "#9467bd",
+        "sources": "Geographic spread references",
+        "notes": "Settlement destination mentioned in 1972 dispersal",
+        "survivors": "Unknown",
+        "icon": "\ud83c\udfd8\ufe0f"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.7009,
+          10.7769
+        ]
+      },
+      "properties": {
+        "id": "cog_040",
+        "name": "Ho Chi Minh City Compound",
+        "city": "Ho Chi Minh City",
+        "country": "Vietnam",
+        "facility_type": "Compound",
+        "opened_year": "1972",
+        "closed_year": "1980",
+        "status": "Historical",
+        "confidence": "MEDIUM",
+        "confidence_color": "#ff7f0e",
+        "sources": "TFI 1972 history",
+        "notes": "First pioneer effort 1972 (Abiezer, Medad); Saigon Zoo activities documented 1974",
+        "survivors": "Multiple",
+        "icon": "\ud83c\udfd8\ufe0f"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6503,
+          35.6762
+        ]
+      },
+      "properties": {
+        "id": "cog_041",
+        "name": "Japan Reprogramming Camp",
+        "city": "Tokyo",
+        "country": "Japan",
+        "facility_type": "Reprogramming Camp",
+        "opened_year": "1975",
+        "closed_year": "1990",
+        "status": "Historical",
+        "confidence": "MEDIUM",
+        "confidence_color": "#ff7f0e",
+        "sources": "Christina Babin testimony",
+        "notes": "Christina Babin sent to reprogramming camp age ~12",
+        "survivors": "Christina Babin",
+        "icon": "\u26a0\ufe0f"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.9842,
+          14.5995
+        ]
+      },
+      "properties": {
+        "id": "cog_042",
+        "name": "Philippines Reprogramming Camp",
+        "city": "Manila",
+        "country": "Philippines",
+        "facility_type": "Reprogramming Camp",
+        "opened_year": "1985",
+        "closed_year": "1995",
+        "status": "Historical",
+        "confidence": "MEDIUM",
+        "confidence_color": "#ff7f0e",
+        "sources": "Christina Babin testimony",
+        "notes": "Christina Babin sent here age 15 with brother; punishment/reprogramming camp",
+        "survivors": "Christina Babin",
+        "icon": "\u26a0\ufe0f"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -76.8099,
+          18.0179
+        ]
+      },
+      "properties": {
+        "id": "cog_043",
+        "name": "Jamaica Residential Compound",
+        "city": "Kingston",
+        "country": "Jamaica",
+        "facility_type": "Residential Compound",
+        "opened_year": "1970",
+        "closed_year": "1995",
+        "status": "Historical",
+        "confidence": "MEDIUM",
+        "confidence_color": "#ff7f0e",
+        "sources": "Christina Babin testimony",
+        "notes": "Christina Babin's earliest memory age 4; Family presence documented",
+        "survivors": "Christina Babin",
+        "icon": "\ud83c\udfd8\ufe0f"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          151.2093,
+          -33.8688
+        ]
+      },
+      "properties": {
+        "id": "cog_044",
+        "name": "Sydney Compound",
+        "city": "Sydney",
+        "country": "Australia",
+        "facility_type": "Compound",
+        "opened_year": "1972",
+        "closed_year": "1995",
+        "status": "Unknown",
+        "confidence": "LOW",
+        "confidence_color": "#9467bd",
+        "sources": "1972 dispersal references",
+        "notes": "Australia pioneered in 1972; police investigations",
+        "survivors": "Unknown",
+        "icon": "\ud83c\udfd8\ufe0f"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          174.785,
+          -37.0082
+        ]
+      },
+      "properties": {
+        "id": "cog_045",
+        "name": "Auckland Compound",
+        "city": "Auckland",
+        "country": "New Zealand",
+        "facility_type": "Compound",
+        "opened_year": "1972",
+        "closed_year": "1995",
+        "status": "Unknown",
+        "confidence": "LOW",
+        "confidence_color": "#9467bd",
+        "sources": "1972 dispersal references",
+        "notes": "New Zealand pioneered in 1972",
+        "survivors": "Unknown",
+        "icon": "\ud83c\udfd8\ufe0f"
+      }
+    }
+  ],
+  "properties": {
+    "title": "Children of God / Family International - Global Network 1968-1994",
+    "description": "Geographic documentation of 45 compounds, centers, and facilities",
+    "total_locations": 45,
+    "research_date": "2026-06-13"
+  }
+}
