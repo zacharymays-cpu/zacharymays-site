@@ -200,7 +200,7 @@ export default function ChildrenOfGodResearch() {
 
             <h3>Data Sources</h3>
             <ul>
-              <li><strong>Survivor Testimony</strong> — Memoirs and recorded interviews (Faith Jones, Christina Babin, Davidito/Ricky Rodriguez)</li>
+              <li><strong>Survivor Testimony</strong> — Memoirs and recorded interviews (Faith Jones, Daniella Young, Christina Babin, Davidito/Ricky Rodriguez)</li>
               <li><strong>Legal Records</strong> — Court cases, police investigations, and raid documentation (UK, US, international)</li>
               <li><strong>Official Organization History</strong> — The Family International published histories and archives</li>
               <li><strong>Academic Documentation</strong> — University archives (San Diego State, Hamilton College) and cult studies research</li>
@@ -310,10 +310,18 @@ export default function ChildrenOfGodResearch() {
               <footer>— Faith Jones, "Sex Cult Nun" memoir</footer>
             </blockquote>
 
+            <blockquote>
+              <p>
+                "The Children of God controlled every aspect of our lives. We had no freedom, no privacy, and no contact with the outside world."
+              </p>
+              <footer>— Daniella Young, "Shattered: One Girl's Journey Through the Darkness"</footer>
+            </blockquote>
+
             <h2>Full Sources</h2>
             <h3>Books & Memoirs</h3>
             <ul>
               <li>Jones, Faith (2021). "Sex Cult Nun: Breaking Away from the Children of God"</li>
+              <li>Young, Daniella. "Shattered: One Girl's Journey Through the Darkness"</li>
               <li>The Family International. "The Story of Davidito" (organizational account)</li>
             </ul>
 
