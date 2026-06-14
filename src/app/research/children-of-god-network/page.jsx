@@ -18,22 +18,21 @@ export default async function ChildrenOfGodPage() {
         `&slug=eq.children-of-god-the-family`,
       opts
     ),
-    // NOTE: cog_compounds also contains 15 Twelve Tribes communes (loaded by a
-    // mistaken Phase-4 integration) identifiable by their snake_case
-    // facility_type vocab. Exclude them so only genuine Children of God
-    // locations appear here. Until the data is properly partitioned by org,
-    // this filter is the guard.
+    // Children of God locations now live in the unified organization_locations
+    // table, scoped by org_id (this is what makes cross-org contamination
+    // structurally impossible). Columns are aliased back to the compound_* names
+    // the client map already expects.
     fetch(
-      `${SUPABASE_URL}/rest/v1/cog_compounds` +
-        `?select=id,compound_name,city,country,facility_type,opened_year,closed_year,status,confidence,latitude,longitude,sources,notes` +
-        `&facility_type=not.in.(communal_residence,communal_residence_business,communal_farm)` +
-        `&compound_name=not.ilike.Test*` +
+      `${SUPABASE_URL}/rest/v1/organization_locations` +
+        `?select=id,compound_name:location_name,city,country,facility_type:location_type,opened_year,closed_year,status:operational_status,confidence,latitude,longitude,sources,notes:location_notes` +
+        `&org_id=eq.471e1fab-c57c-6a63-e539-dd4a93b7e47d` +
+        `&visible=eq.true` +
         `&order=opened_year.asc`,
       opts
     ),
     fetch(
       `${SUPABASE_URL}/rest/v1/survivor_journeys` +
-        `?select=person_id,compound_from_id,compound_to_id,year_from,year_to,confidence`,
+        `?select=person_id,from_location_id,to_location_id,year_from,year_to,confidence`,
       opts
     ),
     fetch(
@@ -52,12 +51,12 @@ export default async function ChildrenOfGodPage() {
     (Array.isArray(personRows) ? personRows : []).map((p) => [p.id, p.canonical_name])
   );
   const journeys = (Array.isArray(journeyRows) ? journeyRows : [])
-    .filter((j) => j.compound_from_id && j.compound_to_id)
+    .filter((j) => j.from_location_id && j.to_location_id)
     .map((j) => ({
       person_id: j.person_id,
       person_name: personMap[j.person_id] || 'Unknown',
-      from_compound_id: j.compound_from_id,
-      to_compound_id: j.compound_to_id,
+      from_compound_id: j.from_location_id,
+      to_compound_id: j.to_location_id,
       year_from: j.year_from,
       year_to: j.year_to,
       confidence: j.confidence,
