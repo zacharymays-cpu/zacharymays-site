@@ -8,52 +8,23 @@ import SurvivorMovements from './SurvivorMovements';
 
 import { SUPABASE_URL, ANON_KEY } from '../../../lib/supabase/config';
 
-// MapTiler basemap configuration (supports satellite/hybrid)
-const MAPTILER_KEY = process.env.NEXT_PUBLIC_MAPTILER_KEY;
-const MAPTILER_STYLE = process.env.NEXT_PUBLIC_MAPTILER_STYLE || 'streets-v2';
-const USING_MAPTILER = Boolean(MAPTILER_KEY);
-
-const CARTO_FALLBACK = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json';
-
-const styleUrl = (id) => (USING_MAPTILER
-  ? `https://api.maptiler.com/maps/${id}/style.json?key=${MAPTILER_KEY}`
-  : CARTO_FALLBACK);
-
-const STYLE_OPTIONS = [
-  { id: 'streets-v2',   label: 'Streets' },
-  { id: 'satellite',    label: 'Satellite' },
-  { id: 'hybrid',       label: 'Hybrid' },
-  { id: 'topo-v2',      label: 'Terrain' },
-  { id: 'dataviz-dark', label: 'Dark' },
-];
-
 export default function ChildrenOfGodResearch() {
   const [activeTab, setActiveTab] = useState('compounds');
   const mapContainer = useRef(null);
   const map = useRef(null);
-  const viewRef = useRef(null);
-  const [mapStyle, setMapStyle] = useState(MAPTILER_STYLE);
-  const [compounds, setCompounds] = useState(null);
-  const [survivorRoutes, setSurvivorRoutes] = useState(null);
+  const [geojsonData, setGeojsonData] = useState(null);
   const [cogData, setCogData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
     confidence: { HIGH: true, MEDIUM: true, LOW: true },
     facilityType: {
       'Headquarters': true,
-      'Compound': true,
-      'Compound/Ranch': true,
-      'Commune': true,
-      'Regional Base': true,
       'Regional HQ': true,
-      'Administrative Office': true,
+      'Compound': true,
       'Media Center': true,
       'World Service HQ': true,
       'Training Camp': true,
       'Reprogramming Camp': true,
-      'Provisioning Center': true,
-      'Regional Hub': true,
-      'Residential Compound': true,
     },
     year: 1994,
   });
@@ -78,13 +49,12 @@ export default function ChildrenOfGodResearch() {
     return '#2aa198';
   };
 
-  // Fetch org, compound, and survivor journey data from Supabase
+  // Fetch org data from Supabase
   useEffect(() => {
-    const fetchAllData = async () => {
+    const fetchOrgData = async () => {
       setLoading(true);
       try {
-        // Fetch organization scoring data
-        const orgRes = await fetch(
+        const res = await fetch(
           `${SUPABASE_URL}/rest/v1/organizations?select=id,name,slug,category,composite_score,composite_tier,youngs_score,founding_year,defunct_year,trajectory,summary_text,active,membership_count,membership_count_year,revenue_usd,revenue_year,size_tier,size_notes,political_scores(economic_axis,authority_axis,political_quadrant,scoring_notes),criterion_scores(criterion,score,confidence,body_text),organization_research_narratives(id,narrative_type,title,content,summary,confidence_level,sources)&slug=eq.children-of-god-the-family`,
           {
             headers: {
@@ -93,8 +63,8 @@ export default function ChildrenOfGodResearch() {
             },
           }
         );
-        if (orgRes.ok) {
-          const data = await orgRes.json();
+        if (res.ok) {
+          const data = await res.json();
           if (data && data[0]) {
             const org = data[0];
             setCogData({
@@ -105,44 +75,14 @@ export default function ChildrenOfGodResearch() {
             });
           }
         }
-
-        // Fetch all cog_compounds locations
-        const compoundsRes = await fetch(
-          `${SUPABASE_URL}/rest/v1/cog_compounds?select=*&order=opened_year.asc`,
-          {
-            headers: {
-              apikey: ANON_KEY,
-              Authorization: `Bearer ${ANON_KEY}`,
-            },
-          }
-        );
-        if (compoundsRes.ok) {
-          const compoundData = await compoundsRes.json();
-          setCompounds(compoundData || []);
-        }
-
-        // Fetch survivor journeys with common movement routes
-        const routesRes = await fetch(
-          `${SUPABASE_URL}/rest/v1/rpc/get_common_movement_routes?min_frequency=1`,
-          {
-            headers: {
-              apikey: ANON_KEY,
-              Authorization: `Bearer ${ANON_KEY}`,
-            },
-          }
-        );
-        if (routesRes.ok) {
-          const routeData = await routesRes.json();
-          setSurvivorRoutes(routeData || []);
-        }
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching org data:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchAllData();
+    fetchOrgData();
   }, []);
 
   const formatWholeNumber = (value) => {
@@ -180,24 +120,36 @@ export default function ChildrenOfGodResearch() {
   const hasScaleData = cogData && Boolean(membershipCount || revenueUsd || sizeTier || cogData.size_notes);
 
   useEffect(() => {
-    if (activeTab !== 'compounds' || !cogData || compounds === null || !mapContainer.current) return;
+    // Only initialize once the compounds view is rendered and the org data has
+    // loaded — the map container div is gated behind `cogData` and the
+    // compounds tab, so it isn't in the DOM on first mount. Re-running on these
+    // deps ensures the map initializes when the container actually mounts.
+    if (activeTab !== 'compounds' || !cogData || !mapContainer.current) return;
 
     const initMap = async () => {
       try {
+        const response = await fetch('/cog_locations.geojson');
+        const data = await response.json();
+        setGeojsonData(data);
+
+        const mapTilerKey = process.env.NEXT_PUBLIC_MAPTILER_KEY;
+        const mapStyle = mapTilerKey
+          ? `https://api.maptiler.com/maps/streets/style.json?key=${mapTilerKey}`
+          : 'https://demotiles.maplibre.org/style.json';
+
         map.current = new maplibregl.Map({
           container: mapContainer.current,
-          style: styleUrl(mapStyle),
+          style: mapStyle,
           center: [0, 0],
-          zoom: 2,
+          zoom: 1,
           maxZoom: 19,
         });
 
         map.current.on('load', () => {
-          addDataToMap(compounds, filters);
-          if (survivorRoutes) addSurvivorRoutes(survivorRoutes);
+          addDataToMap(data, filters);
         });
       } catch (error) {
-        console.error('Error initializing map:', error);
+        console.error('Error loading map or GeoJSON:', error);
       }
     };
 
@@ -209,61 +161,21 @@ export default function ChildrenOfGodResearch() {
         map.current = null;
       }
     };
-  }, [cogData, compounds, activeTab, mapStyle]);
+  }, [cogData, activeTab]);
 
-  const handleStyleChange = (newStyle) => {
-    if (!map.current) return;
-    setMapStyle(newStyle);
-    viewRef.current = {
-      center: map.current.getCenter(),
-      zoom: map.current.getZoom(),
-    };
-    map.current.setStyle(styleUrl(newStyle));
-    setTimeout(() => {
-      if (map.current && viewRef.current) {
-        map.current.easeTo({
-          center: viewRef.current.center,
-          zoom: viewRef.current.zoom,
-          duration: 0,
-        });
-        if (compounds) addDataToMap(compounds, filters);
-        if (survivorRoutes) addSurvivorRoutes(survivorRoutes);
-      }
-    }, 100);
-  };
+  const addDataToMap = (data, currentFilters) => {
+    if (!map.current || !data) return;
 
-  const getConfidenceColor = (confidence) => {
-    const colors = { HIGH: '#d62728', MEDIUM: '#ff7f0e', LOW: '#9467bd' };
-    return colors[confidence] || '#999';
-  };
+    const filteredFeatures = data.features.filter(feature => {
+      const props = feature.properties;
+      const openedYear = parseInt(props.opened_year) || 1968;
 
-  const addDataToMap = (compoundList, currentFilters) => {
-    if (!map.current || !compoundList) return;
-
-    const filteredCompounds = compoundList.filter(compound => {
-      const openedYear = compound.opened_year || 1968;
-      if (!currentFilters.confidence[compound.confidence]) return false;
-      if (!currentFilters.facilityType[compound.facility_type]) return false;
+      if (!currentFilters.confidence[props.confidence]) return false;
+      if (!currentFilters.facilityType[props.facility_type]) return false;
       if (openedYear > currentFilters.year) return false;
-      return compound.latitude && compound.longitude;
-    });
 
-    const features = filteredCompounds.map(c => ({
-      type: 'Feature',
-      geometry: { type: 'Point', coordinates: [parseFloat(c.longitude), parseFloat(c.latitude)] },
-      properties: {
-        id: c.id,
-        name: c.compound_name,
-        city: c.city,
-        country: c.country,
-        facility_type: c.facility_type,
-        opened_year: c.opened_year,
-        closed_year: c.closed_year,
-        status: c.status,
-        confidence: c.confidence,
-        notes: c.notes,
-      },
-    }));
+      return true;
+    });
 
     const sourceId = 'cog-locations';
     const layerId = 'cog-locations-layer';
@@ -277,7 +189,10 @@ export default function ChildrenOfGodResearch() {
 
     map.current.addSource(sourceId, {
       type: 'geojson',
-      data: { type: 'FeatureCollection', features },
+      data: {
+        type: 'FeatureCollection',
+        features: filteredFeatures,
+      },
     });
 
     map.current.addLayer({
@@ -286,113 +201,43 @@ export default function ChildrenOfGodResearch() {
       source: sourceId,
       paint: {
         'circle-radius': 8,
-        'circle-color': ['case', ['==', ['get', 'confidence'], 'HIGH'], '#d62728', ['==', ['get', 'confidence'], 'MEDIUM'], '#ff7f0e', '#9467bd'],
+        'circle-color': ['get', 'confidence_color'],
         'circle-opacity': 0.7,
         'circle-stroke-width': 2,
-        'circle-stroke-color': ['case', ['==', ['get', 'confidence'], 'HIGH'], '#d62728', ['==', ['get', 'confidence'], 'MEDIUM'], '#ff7f0e', '#9467bd'],
+        'circle-stroke-color': ['get', 'confidence_color'],
         'circle-stroke-opacity': 0.8,
       },
     });
 
     map.current.on('click', layerId, (e) => {
-      const props = e.features[0].properties;
+      const feature = e.features[0];
+      const props = feature.properties;
+
       const popupHTML = `
-        <div style="font-family: system-ui; font-size: 12px;">
-          <h3 style="margin: 0 0 8px 0; font-size: 14px; color: #272320;">${props.name || 'Unknown'}</h3>
-          <p style="margin: 0 0 4px 0;"><strong>${props.city}, ${props.country}</strong></p>
-          <p style="margin: 0 0 4px 0;"><strong>Type:</strong> ${props.facility_type}</p>
-          <p style="margin: 0 0 4px 0;"><strong>Timeline:</strong> ${props.opened_year || '?'}–${props.closed_year || '?'}</p>
-          <p style="margin: 0 0 8px 0;"><strong>Status:</strong> ${props.status || 'Unknown'}</p>
-          <div style="padding: 4px 8px; border-radius: 3px; font-size: 11px; font-weight: 600; color: white; background: ${getConfidenceColor(props.confidence)};">
+        <div style="font-family: system-ui;">
+          <h3 style="margin: 0 0 8px 0; font-size: 14px; color: #272320;">${props.name}</h3>
+          <p style="margin: 0 0 6px 0; font-size: 12px; color: #666;"><strong>${props.city}, ${props.country}</strong></p>
+          <p style="margin: 0 0 6px 0; font-size: 12px; color: #666;"><strong>Type:</strong> ${props.facility_type}</p>
+          <p style="margin: 0 0 6px 0; font-size: 12px; color: #666;"><strong>Timeline:</strong> ${props.opened_year}–${props.closed_year}</p>
+          <p style="margin: 0 0 6px 0; font-size: 12px; color: #666;"><strong>Status:</strong> ${props.status}</p>
+          <div style="display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 11px; font-weight: 600; color: white; margin-top: 8px; background: ${props.confidence_color};">
             ${props.confidence} Confidence
           </div>
-          ${props.notes ? `<p style="margin-top: 8px; font-size: 11px; color: #666;">${props.notes}</p>` : ''}
         </div>
       `;
-      new maplibregl.Popup().setLngLat(e.lngLat).setHTML(popupHTML).addTo(map.current);
+
+      new maplibregl.Popup()
+        .setLngLat(e.lngLat)
+        .setHTML(popupHTML)
+        .addTo(map.current);
     });
 
-    map.current.on('mouseenter', layerId, () => { map.current.getCanvas().style.cursor = 'pointer'; });
-    map.current.on('mouseleave', layerId, () => { map.current.getCanvas().style.cursor = ''; });
-  };
-
-  const addSurvivorRoutes = (routes) => {
-    if (!map.current || !routes || routes.length === 0) return;
-
-    // Build location lookup for coordinates
-    const locationMap = {};
-    if (compounds) {
-      compounds.forEach(c => {
-        locationMap[c.compound_name] = { lat: parseFloat(c.latitude), lng: parseFloat(c.longitude) };
-      });
-    }
-
-    const lineFeatures = routes
-      .filter(r => locationMap[r.compound_from_name] && locationMap[r.compound_to_name])
-      .map((route, idx) => ({
-        type: 'Feature',
-        id: idx,
-        geometry: {
-          type: 'LineString',
-          coordinates: [
-            [locationMap[route.compound_from_name].lng, locationMap[route.compound_from_name].lat],
-            [locationMap[route.compound_to_name].lng, locationMap[route.compound_to_name].lat],
-          ],
-        },
-        properties: {
-          from: route.compound_from_name,
-          to: route.compound_to_name,
-          journey_count: route.journey_count,
-          unique_people: route.unique_people,
-        },
-      }));
-
-    const sourceId = 'survivor-routes';
-    const layerId = 'survivor-routes-layer';
-
-    if (map.current.getLayer(layerId)) {
-      map.current.removeLayer(layerId);
-    }
-    if (map.current.getSource(sourceId)) {
-      map.current.removeSource(sourceId);
-    }
-
-    if (lineFeatures.length > 0) {
-      map.current.addSource(sourceId, {
-        type: 'geojson',
-        data: { type: 'FeatureCollection', features: lineFeatures },
-      });
-
-      map.current.addLayer(
-        {
-          id: layerId,
-          type: 'line',
-          source: sourceId,
-          paint: {
-            'line-color': 'rgba(220,100,100,0.6)',
-            'line-width': ['interpolate', ['linear'], ['get', 'journey_count'], 1, 1, 10, 4],
-            'line-opacity': ['interpolate', ['linear'], ['get', 'journey_count'], 1, 0.3, 10, 0.8],
-          },
-          layout: {
-            'line-join': 'round',
-            'line-cap': 'round',
-          },
-        },
-        'cog-locations-layer'
-      );
-
-      map.current.on('click', layerId, (e) => {
-        const props = e.features[0].properties;
-        const popupHTML = `
-          <div style="font-family: system-ui; font-size: 12px;">
-            <p style="margin: 0 0 4px 0;"><strong>${props.from}</strong> → <strong>${props.to}</strong></p>
-            <p style="margin: 0 0 2px 0;"><strong>Journeys:</strong> ${props.journey_count}</p>
-            <p style="margin: 0;"><strong>People:</strong> ${props.unique_people}</p>
-          </div>
-        `;
-        new maplibregl.Popup().setLngLat(e.lngLat).setHTML(popupHTML).addTo(map.current);
-      });
-    }
+    map.current.on('mouseenter', layerId, () => {
+      map.current.getCanvas().style.cursor = 'pointer';
+    });
+    map.current.on('mouseleave', layerId, () => {
+      map.current.getCanvas().style.cursor = '';
+    });
   };
 
   const handleFilterChange = (type, value) => {
@@ -405,8 +250,8 @@ export default function ChildrenOfGodResearch() {
     }
 
     setFilters(newFilters);
-    if (map.current && compounds) {
-      addDataToMap(compounds, newFilters);
+    if (map.current && geojsonData) {
+      addDataToMap(geojsonData, newFilters);
     }
   };
 
@@ -637,41 +482,7 @@ export default function ChildrenOfGodResearch() {
 
         {/* Main content */}
         <main className={styles.main}>
-          <div style={{ position: 'relative' }}>
-            <div ref={mapContainer} className={styles.map}></div>
-            {USING_MAPTILER && (
-              <div style={{
-                position: 'absolute',
-                top: '12px',
-                right: '12px',
-                display: 'flex',
-                gap: '6px',
-                zIndex: 10,
-                backgroundColor: 'rgba(0,0,0,0.7)',
-                padding: '8px',
-                borderRadius: '4px',
-              }}>
-                {STYLE_OPTIONS.map(opt => (
-                  <button
-                    key={opt.id}
-                    onClick={() => handleStyleChange(opt.id)}
-                    style={{
-                      padding: '6px 10px',
-                      fontSize: '12px',
-                      border: mapStyle === opt.id ? '2px solid var(--gold)' : '1px solid rgba(255,255,255,0.3)',
-                      background: mapStyle === opt.id ? 'rgba(200,168,75,0.3)' : 'transparent',
-                      color: '#fff',
-                      cursor: 'pointer',
-                      borderRadius: '3px',
-                      transition: 'all 0.2s ease',
-                    }}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+          <div ref={mapContainer} className={styles.map}></div>
 
           <section className={styles.content}>
             {/* Assessment Summary */}
