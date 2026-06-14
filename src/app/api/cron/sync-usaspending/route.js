@@ -1,7 +1,9 @@
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const EDGE_FUNCTION_URL = 'https://shgdrkrqjnwtlyxcdayp.functions.supabase.co/sync-usaspending-awards';
+const EDGE_FUNCTION_URL =
+  process.env.EDGE_FUNCTION_URL ||
+  'https://shgdrkrqjnwtlyxcdayp.functions.supabase.co/sync-usaspending-awards';
 
 export async function GET(request) {
   const authHeader = request.headers.get('authorization');
@@ -31,7 +33,20 @@ export async function GET(request) {
       timeout: 300000, // 5 minutes
     });
 
-    const payload = await response.json().catch(() => ({}));
+    let payload;
+    try {
+      payload = await response.json();
+    } catch (parseError) {
+      console.error('JSON parse error from edge function:', response.status, parseError);
+      return Response.json(
+        {
+          success: false,
+          status: response.status,
+          error: 'Edge function returned invalid JSON',
+        },
+        { status: 502 },
+      );
+    }
 
     if (!response.ok) {
       console.error('Edge function error:', response.status, payload);
@@ -40,7 +55,6 @@ export async function GET(request) {
           success: false,
           status: response.status,
           error: payload.error || 'Edge function failed',
-          payload,
         },
         { status: 502 },
       );
@@ -51,10 +65,10 @@ export async function GET(request) {
     return Response.json({
       success: true,
       schedule: request.headers.get('x-vercel-cron-schedule'),
-      sync_run_id: payload.sync_run_id,
-      awards_fetched: payload.awards_fetched,
-      awards_stored: payload.awards_stored,
-      message: payload.message,
+      runId: payload.runId,
+      organizationsChecked: payload.organizationsChecked,
+      matchedOrgCount: payload.matchedOrgCount,
+      awardCount: payload.awardCount,
     });
   } catch (error) {
     console.error('Cron error:', error);
