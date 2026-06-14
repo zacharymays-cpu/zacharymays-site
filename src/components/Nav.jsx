@@ -39,6 +39,19 @@ const NAV_ITEMS = [
       { href: '/oci/dataset',         label: 'Dataset Overview' },
     ],
   },
+  {
+    label: 'Research System',
+    items: [
+      { href: '/research-system',                    label: 'Overview' },
+      { href: '/research-system/v4-anchor-heuristic', label: 'V4.0: Anchor Heuristic' },
+      { href: '/research-system/v5-0-evidence-jury',  label: 'V5.0: Evidence Jury' },
+      { href: '/research-system/v5-1-formal-validation', label: 'V5.1: Formal Validation' },
+      { href: '/research-system/v5-2-deepseek-case-study', label: 'V5.2: Case Study' },
+      { href: '/research-system/v6-0-lifton-framework', label: 'V6.0: Lifton Framework' },
+      { href: '/research-system/v6-1-permanence-aware', label: 'V6.1: Permanence-Aware' },
+      { href: '/research-system/evolution-timeline', label: 'Evolution Timeline' },
+    ],
+  },
   { href: '/about',  label: 'About' },
   { href: '/donate', label: 'Support' },
 ];
