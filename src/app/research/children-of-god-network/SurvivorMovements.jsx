@@ -36,57 +36,9 @@ export default function SurvivorMovements() {
 
   // Fetch survivor journey data with compound coordinates
   useEffect(() => {
-    const fetchMovementData = async () => {
-      try {
-        // Fetch all survivor journeys (without the nested persons query which may not work)
-        const res = await fetch(
-          `${SUPABASE_URL}/rest/v1/survivor_journeys?select=person_id,compound_from_id,compound_to_id,year_from,year_to,confidence`,
-          {
-            headers: {
-              apikey: ANON_KEY,
-              Authorization: `Bearer ${ANON_KEY}`,
-            },
-          }
-        );
-        if (res.ok) {
-          const data = await res.json();
-          // Fetch person names separately
-          const personRes = await fetch(
-            `${SUPABASE_URL}/rest/v1/persons?select=id,canonical_name`,
-            {
-              headers: {
-                apikey: ANON_KEY,
-                Authorization: `Bearer ${ANON_KEY}`,
-              },
-            }
-          );
-
-          let personMap = {};
-          if (personRes.ok) {
-            const persons = await personRes.json();
-            personMap = Object.fromEntries(persons.map(p => [p.id, p.canonical_name]));
-          }
-
-          // Transform data for easier processing
-          const transformed = data.map(journey => ({
-            person_id: journey.person_id,
-            person_name: personMap[journey.person_id] || 'Unknown',
-            from_compound_id: journey.compound_from_id,
-            to_compound_id: journey.compound_to_id,
-            year_from: journey.year_from,
-            year_to: journey.year_to,
-            confidence: journey.confidence,
-          })).filter(j => j.from_compound_id && j.to_compound_id);
-
-          setMovementData(transformed);
-        }
-      } catch (error) {
-        console.error('Error fetching movement data:', error);
-      }
-    };
-
     const fetchCompounds = async () => {
       try {
+        // Try Supabase first
         const res = await fetch(
           `${SUPABASE_URL}/rest/v1/cog_compounds?select=id,compound_name,latitude,longitude,country,city,facility_type,opened_year,closed_year`,
           {
@@ -98,16 +50,35 @@ export default function SurvivorMovements() {
         );
         if (res.ok) {
           const data = await res.json();
-          // Filter to only compounds with valid coordinates
           const validData = data.filter(c => c.latitude && c.longitude);
-          setCompounds(validData);
+          if (validData.length > 0) {
+            setCompounds(validData);
+            return;
+          }
         }
       } catch (error) {
-        console.error('Error fetching compounds:', error);
+        console.error('Error fetching from Supabase:', error);
+      }
+
+      // Fallback to static GeoJSON
+      try {
+        const geoRes = await fetch('/cog_locations.geojson');
+        const geoData = await geoRes.json();
+        const converted = geoData.features.map((f, idx) => ({
+          id: f.properties.id || `fallback_${idx}`,
+          compound_name: f.properties.name,
+          latitude: f.geometry.coordinates[1],
+          longitude: f.geometry.coordinates[0],
+          country: f.properties.country,
+          city: f.properties.city,
+          facility_type: f.properties.facility_type,
+        }));
+        setCompounds(converted);
+      } catch (error) {
+        console.error('Error loading fallback GeoJSON:', error);
       }
     };
 
-    fetchMovementData();
     fetchCompounds();
   }, []);
 
