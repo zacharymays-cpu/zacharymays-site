@@ -38,9 +38,9 @@ export default function SurvivorMovements() {
   useEffect(() => {
     const fetchMovementData = async () => {
       try {
-        // Fetch all survivor journeys with person and compound data
+        // Fetch all survivor journeys with person data
         const res = await fetch(
-          `${SUPABASE_URL}/rest/v1/survivor_journeys?select=person_id,persons(canonical_name),compound_from_id,compound_to_id,year_from,year_to,confidence,cog_compounds!fk_from(id,compound_name,latitude,longitude),cog_compounds!fk_to(id,compound_name,latitude,longitude)`,
+          `${SUPABASE_URL}/rest/v1/survivor_journeys?select=person_id,persons(canonical_name),compound_from_id,compound_to_id,year_from,year_to,confidence`,
           {
             headers: {
               apikey: ANON_KEY,
