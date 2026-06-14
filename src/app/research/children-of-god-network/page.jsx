@@ -145,10 +145,6 @@ export default function ChildrenOfGodResearch() {
   const hasScaleData = cogData && Boolean(membershipCount || revenueUsd || sizeTier || cogData.size_notes);
 
   useEffect(() => {
-    // Only initialize once the compounds view is rendered and the org data has
-    // loaded — the map container div is gated behind `cogData` and the
-    // compounds tab, so it isn't in the DOM on first mount. Re-running on these
-    // deps ensures the map initializes when the container actually mounts.
     if (activeTab !== 'compounds' || !cogData || !mapContainer.current) return;
 
     const initMap = async () => {
@@ -159,7 +155,7 @@ export default function ChildrenOfGodResearch() {
 
         map.current = new maplibregl.Map({
           container: mapContainer.current,
-          style: styleUrl(mapStyle),
+          style: styleUrl('streets'),
           center: [0, 0],
           zoom: 1,
           maxZoom: 19,
@@ -182,7 +178,7 @@ export default function ChildrenOfGodResearch() {
         map.current = null;
       }
     };
-  }, [cogData, activeTab, mapStyle]);
+  }, [cogData, activeTab]);
 
   const addDataToMap = (data, currentFilters) => {
     if (!map.current || !data) return;
@@ -277,10 +273,16 @@ export default function ChildrenOfGodResearch() {
   };
 
   const handleStyleChange = (newStyle) => {
-    if (map.current && viewRef.current) {
+    if (map.current && geojsonData && viewRef.current) {
       viewRef.current = { center: map.current.getCenter(), zoom: map.current.getZoom() };
       map.current.setStyle(styleUrl(newStyle));
       setMapStyle(newStyle);
+
+      // Re-add the layer after style change
+      map.current.on('load', () => {
+        map.current.easeTo({ center: viewRef.current.center, zoom: viewRef.current.zoom, duration: 0 });
+        addDataToMap(geojsonData, filters);
+      });
     }
   };
 
