@@ -119,7 +119,11 @@ export default function ChildrenOfGodResearch() {
   const hasScaleData = cogData && Boolean(membershipCount || revenueUsd || sizeTier || cogData.size_notes);
 
   useEffect(() => {
-    if (!mapContainer.current) return;
+    // Only initialize once the compounds view is rendered and the org data has
+    // loaded — the map container div is gated behind `cogData` and the
+    // compounds tab, so it isn't in the DOM on first mount. Re-running on these
+    // deps ensures the map initializes when the container actually mounts.
+    if (activeTab !== 'compounds' || !cogData || !mapContainer.current) return;
 
     const initMap = async () => {
       try {
@@ -156,7 +160,7 @@ export default function ChildrenOfGodResearch() {
         map.current = null;
       }
     };
-  }, []);
+  }, [cogData, activeTab]);
 
   const addDataToMap = (data, currentFilters) => {
     if (!map.current || !data) return;
