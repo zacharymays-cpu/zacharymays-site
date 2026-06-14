@@ -38,9 +38,9 @@ export default function SurvivorMovements() {
   useEffect(() => {
     const fetchMovementData = async () => {
       try {
-        // Fetch all survivor journeys with person data
+        // Fetch all survivor journeys (without the nested persons query which may not work)
         const res = await fetch(
-          `${SUPABASE_URL}/rest/v1/survivor_journeys?select=person_id,persons(canonical_name),compound_from_id,compound_to_id,year_from,year_to,confidence`,
+          `${SUPABASE_URL}/rest/v1/survivor_journeys?select=person_id,compound_from_id,compound_to_id,year_from,year_to,confidence`,
           {
             headers: {
               apikey: ANON_KEY,
@@ -50,16 +50,34 @@ export default function SurvivorMovements() {
         );
         if (res.ok) {
           const data = await res.json();
+          // Fetch person names separately
+          const personRes = await fetch(
+            `${SUPABASE_URL}/rest/v1/persons?select=id,canonical_name`,
+            {
+              headers: {
+                apikey: ANON_KEY,
+                Authorization: `Bearer ${ANON_KEY}`,
+              },
+            }
+          );
+
+          let personMap = {};
+          if (personRes.ok) {
+            const persons = await personRes.json();
+            personMap = Object.fromEntries(persons.map(p => [p.id, p.canonical_name]));
+          }
+
           // Transform data for easier processing
           const transformed = data.map(journey => ({
             person_id: journey.person_id,
-            person_name: journey.persons?.canonical_name || 'Unknown',
+            person_name: personMap[journey.person_id] || 'Unknown',
             from_compound_id: journey.compound_from_id,
             to_compound_id: journey.compound_to_id,
             year_from: journey.year_from,
             year_to: journey.year_to,
             confidence: journey.confidence,
           })).filter(j => j.from_compound_id && j.to_compound_id);
+
           setMovementData(transformed);
         }
       } catch (error) {
@@ -80,7 +98,9 @@ export default function SurvivorMovements() {
         );
         if (res.ok) {
           const data = await res.json();
-          setCompounds(data);
+          // Filter to only compounds with valid coordinates
+          const validData = data.filter(c => c.latitude && c.longitude);
+          setCompounds(validData);
         }
       } catch (error) {
         console.error('Error fetching compounds:', error);
