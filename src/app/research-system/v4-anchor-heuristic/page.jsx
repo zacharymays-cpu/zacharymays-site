@@ -9,13 +9,13 @@ export default function V4Page() {
       <section className="hero">
         <div className="container--narrow">
           <span className="hero__eyebrow"><a href="/research-system">Research System Architecture</a></span>
-          <h1 className="hero__title">V4.0: Anchor-Based Heuristic</h1>
-          <p className="hero__subtitle">Single-model scoring with calibration exemplars. The foundation approach.</p>
+          <h1 className="hero__title hero__title--compact">V4.0: Anchor-Based Heuristic</h1>
+          <p className="hero__subtitle hero__subtitle--compact">Single-model scoring with calibration exemplars. The foundation approach.</p>
         </div>
       </section>
 
       <section className="section">
-        <div className="container--narrow">
+        <div className="container--wide">
           <div className="section__label">Objective</div>
           <div className="pull-quote">
             <p className="pull-quote__text">V4.0 established the first systematic approach to scoring. The key innovation was using calibration exemplars to anchor the scoring range and improve consistency.</p>
@@ -25,7 +25,7 @@ export default function V4Page() {
       </section>
 
       <section className="section">
-        <div className="container--narrow">
+        <div className="container--wide">
           <div className="section__label">System Architecture</div>
           <svg viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg" style={{ width: '100%', marginTop: '1.5rem', marginBottom: '2rem' }}>
             <defs>
@@ -67,7 +67,7 @@ export default function V4Page() {
       </section>
 
       <section className="section">
-        <div className="container--narrow">
+        <div className="container--wide">
           <div className="section__label">Core Components</div>
 
           <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.4rem', marginTop: '2rem', marginBottom: '1rem', color: '#f4f0e8' }}>Calibration Exemplars</h3>
@@ -85,7 +85,7 @@ export default function V4Page() {
       </section>
 
       <section className="section">
-        <div className="container--narrow">
+        <div className="container--wide">
           <div className="section__label">Limitations & Trade-offs</div>
           <div className="pull-quote">
             <p className="pull-quote__text">V4.0 revealed a critical limitation: anchor overcalibration. Organizations tended to cluster near the injected exemplars, creating a 15-20 point ceiling effect. Additionally, single-model scoring has inherent bias risks and no inter-rater validation.</p>
@@ -105,7 +105,7 @@ export default function V4Page() {
       </section>
 
       <section className="section">
-        <div className="container--narrow">
+        <div className="container--wide">
           <div className="section__label">Implementation</div>
           <p>V4.0 implementation retained in the codebase for provenance and back-comparison:</p>
           <ul style={{ marginTop: '1rem', paddingLeft: '2rem', color: '#f4f0e8' }}>
@@ -120,7 +120,7 @@ export default function V4Page() {
       </section>
 
       <section className="section">
-        <div className="container--narrow">
+        <div className="container--wide">
           <div style={{ display: 'flex', gap: '2rem', justifyContent: 'space-between', alignItems: 'center', marginTop: '2rem' }}>
             <p style={{ fontSize: '0.9rem', color: '#6b6560' }}>← Previous version not applicable</p>
             <a href="/research-system/v5-0-evidence-jury" style={{ color: '#f4f0e8', textDecoration: 'none', borderBottom: '1px solid #c8a84b', paddingBottom: '0.25rem' }}>

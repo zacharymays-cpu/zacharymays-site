@@ -9,13 +9,13 @@ export default function V61Page() {
       <section className="hero">
         <div className="container--narrow">
           <span className="hero__eyebrow"><a href="/research-system">Research System Architecture</a></span>
-          <h1 className="hero__title">V6.1: Permanence-Aware Totalism</h1>
-          <p className="hero__subtitle">Separates intensity of totalizing behavior from system permanence design. Proposed refinement ready for review.</p>
+          <h1 className="hero__title hero__title--compact">V6.1: Permanence-Aware Totalism</h1>
+          <p className="hero__subtitle hero__subtitle--compact">Separates intensity of totalizing behavior from system permanence design. Proposed refinement ready for review.</p>
         </div>
       </section>
 
       <section className="section">
-        <div className="container--narrow">
+        <div className="container--wide">
           <div className="section__label">Problem V6.0 Missed</div>
           <div className="pull-quote">
             <p className="pull-quote__text">V6.0 conflates totalizing intensity with system permanence. US Marines score 7.96 (penalized for temporary structure) but jury detects 9.7 intensity. CIA units are similarly underscored despite high totalism. V6.1 separates these components.</p>
@@ -25,7 +25,7 @@ export default function V61Page() {
       </section>
 
       <section className="section">
-        <div className="container--narrow">
+        <div className="container--wide">
           <div className="section__label">Three-Component Scoring</div>
 
           <svg viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg" style={{ width: '100%', marginTop: '1.5rem', marginBottom: '2rem' }}>
@@ -64,7 +64,7 @@ export default function V61Page() {
       </section>
 
       <section className="section">
-        <div className="container--narrow">
+        <div className="container--wide">
           <div className="section__label">Component Definitions</div>
 
           <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.4rem', marginBottom: '1rem', color: '#f4f0e8' }}>Intensity Score (1-10)</h3>
@@ -87,7 +87,7 @@ export default function V61Page() {
       </section>
 
       <section className="section">
-        <div className="container--narrow">
+        <div className="container--wide">
           <div className="section__label">Examples</div>
 
           <table style={{ width: '100%', marginTop: '1.5rem', borderCollapse: 'collapse' }}>
@@ -128,7 +128,7 @@ export default function V61Page() {
       </section>
 
       <section className="section">
-        <div className="container--narrow">
+        <div className="container--wide">
           <div className="section__label">Status</div>
 
           <table style={{ width: '100%', marginTop: '1.5rem', borderCollapse: 'collapse' }}>
@@ -149,7 +149,7 @@ export default function V61Page() {
       </section>
 
       <section className="section">
-        <div className="container--narrow">
+        <div className="container--wide">
           <div style={{ display: 'flex', gap: '2rem', justifyContent: 'space-between', alignItems: 'center', marginTop: '2rem' }}>
             <a href="/research-system/v6-0-lifton-framework" style={{ color: '#f4f0e8', textDecoration: 'none', borderBottom: '1px solid #c8a84b', paddingBottom: '0.25rem' }}>
               ← See V6.0's dual-track approach

@@ -9,13 +9,13 @@ export default function V52Page() {
       <section className="hero">
         <div className="container--narrow">
           <span className="hero__eyebrow"><a href="/research-system">Research System Architecture</a></span>
-          <h1 className="hero__title" style={{ color: '#8b2020' }}>V5.2: The Deepseek Experiment</h1>
-          <p className="hero__subtitle">A deliberate test of five-model jury consensus. Why it was attempted, why it failed, and what we learned.</p>
+          <h1 className="hero__title hero__title--compact" style={{ color: '#8b2020' }}>V5.2: The Deepseek Experiment</h1>
+          <p className="hero__subtitle hero__subtitle--compact">A deliberate test of five-model jury consensus. Why it was attempted, why it failed, and what we learned.</p>
         </div>
       </section>
 
       <section className="section">
-        <div className="container--narrow">
+        <div className="container--wide">
           <div className="section__label">Case Study Overview</div>
           <div className="pull-quote">
             <p className="pull-quote__text">V5.2 attempted to extend the four-model jury (V5.1) by adding Deepseek. The hypothesis was that a fifth diverse model would improve consensus. Testing revealed this assumption was incorrect, and the experiment was rejected. This case study documents why methodological rejection is sometimes the right decision.</p>
@@ -25,7 +25,7 @@ export default function V52Page() {
       </section>
 
       <section className="section">
-        <div className="container--narrow">
+        <div className="container--wide">
           <div className="section__label">Why Test V5.2?</div>
 
           <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.4rem', marginBottom: '1rem', color: '#f4f0e8' }}>Hypothesis</h3>
@@ -43,7 +43,7 @@ export default function V52Page() {
       </section>
 
       <section className="section">
-        <div className="container--narrow">
+        <div className="container--wide">
           <div className="section__label">Experimental Results</div>
 
           <table style={{ width: '100%', marginTop: '1.5rem', borderCollapse: 'collapse' }}>
@@ -82,7 +82,7 @@ export default function V52Page() {
       </section>
 
       <section className="section">
-        <div className="container--narrow">
+        <div className="container--wide">
           <div className="section__label">Why V5.2 Failed</div>
 
           <div className="pull-quote">
@@ -97,7 +97,7 @@ export default function V52Page() {
       </section>
 
       <section className="section">
-        <div className="container--narrow">
+        <div className="container--wide">
           <div className="section__label">Lessons Learned</div>
 
           <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.4rem', marginBottom: '1rem', color: '#f4f0e8' }}>For Model Selection</h3>
@@ -120,7 +120,7 @@ export default function V52Page() {
       </section>
 
       <section className="section">
-        <div className="container--narrow">
+        <div className="container--wide">
           <div style={{ display: 'flex', gap: '2rem', justifyContent: 'space-between', alignItems: 'center', marginTop: '2rem' }}>
             <a href="/research-system/v5-1-formal-validation" style={{ color: '#f4f0e8', textDecoration: 'none', borderBottom: '1px solid #c8a84b', paddingBottom: '0.25rem' }}>
               ← Back to V5.1 (which was retained)

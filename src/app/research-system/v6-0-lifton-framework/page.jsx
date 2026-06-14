@@ -9,13 +9,13 @@ export default function V60Page() {
       <section className="hero">
         <div className="container--narrow">
           <span className="hero__eyebrow"><a href="/research-system">Research System Architecture</a></span>
-          <h1 className="hero__title">V6.0: Lifton Framework Track</h1>
-          <p className="hero__subtitle">Dual-track jury system extending evidence-based scoring to Lifton's totalism framework. New C11 criterion. Production-ready 2026-06-12.</p>
+          <h1 className="hero__title hero__title--compact">V6.0: Lifton Framework Track</h1>
+          <p className="hero__subtitle hero__subtitle--compact">Dual-track jury system extending evidence-based scoring to Lifton's totalism framework. New C11 criterion. Production-ready 2026-06-12.</p>
         </div>
       </section>
 
       <section className="section">
-        <div className="container--narrow">
+        <div className="container--wide">
           <div className="section__label">Why Extend Beyond Young?</div>
           <div className="pull-quote">
             <p className="pull-quote__text">Young & Reed's 10 criteria are excellent for cult detection. However, Robert Jay Lifton's 8-point framework for ideological totalism offers a complementary lens—especially for understanding permanence and system design. V6.0 adds a parallel track using Lifton's framework alongside Young's.</p>
@@ -25,7 +25,7 @@ export default function V60Page() {
       </section>
 
       <section className="section">
-        <div className="container--narrow">
+        <div className="container--wide">
           <div className="section__label">Dual-Track System</div>
 
           <svg viewBox="0 0 700 400" xmlns="http://www.w3.org/2000/svg" style={{ width: '100%', marginTop: '1.5rem', marginBottom: '2rem' }}>
@@ -72,7 +72,7 @@ export default function V60Page() {
       </section>
 
       <section className="section">
-        <div className="container--narrow">
+        <div className="container--wide">
           <div className="section__label">Core Concepts</div>
 
           <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.4rem', marginBottom: '1rem', color: '#f4f0e8' }}>Young's 10 Criteria (C1-C10)</h3>
@@ -100,7 +100,7 @@ export default function V60Page() {
       </section>
 
       <section className="section">
-        <div className="container--narrow">
+        <div className="container--wide">
           <div className="section__label">Production Status</div>
 
           <table style={{ width: '100%', marginTop: '1.5rem', borderCollapse: 'collapse' }}>
@@ -129,7 +129,7 @@ export default function V60Page() {
       </section>
 
       <section className="section">
-        <div className="container--narrow">
+        <div className="container--wide">
           <div style={{ display: 'flex', gap: '2rem', justifyContent: 'space-between', alignItems: 'center', marginTop: '2rem' }}>
             <a href="/research-system/v5-2-deepseek-case-study" style={{ color: '#f4f0e8', textDecoration: 'none', borderBottom: '1px solid #c8a84b', paddingBottom: '0.25rem' }}>
               ← See the V5.2 rejection decision

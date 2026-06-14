@@ -9,13 +9,13 @@ export default function EvolutionTimelinePage() {
       <section className="hero">
         <div className="container--narrow">
           <span className="hero__eyebrow"><a href="/research-system">Research System Architecture</a></span>
-          <h1 className="hero__title">Evolution Timeline</h1>
-          <p className="hero__subtitle">How a research evaluation system evolved through systematic iteration, testing, and principled rejection.</p>
+          <h1 className="hero__title hero__title--compact">Evolution Timeline</h1>
+          <p className="hero__subtitle hero__subtitle--compact">How a research evaluation system evolved through systematic iteration, testing, and principled rejection.</p>
         </div>
       </section>
 
       <section className="section">
-        <div className="container--narrow">
+        <div className="container--wide">
           <div className="section__label">The Journey</div>
 
           <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.4rem', marginTop: '2rem', marginBottom: '1rem', color: '#f4f0e8' }}>V4.0: Single-Model Anchor Heuristic</h3>
@@ -58,7 +58,7 @@ export default function EvolutionTimelinePage() {
       </section>
 
       <section className="section">
-        <div className="container--narrow">
+        <div className="container--wide">
           <div className="section__label">Design Philosophy</div>
 
           <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.4rem', marginBottom: '1rem', color: '#f4f0e8' }}>Core Principles</h3>
@@ -83,7 +83,7 @@ export default function EvolutionTimelinePage() {
       </section>
 
       <section className="section">
-        <div className="container--narrow">
+        <div className="container--wide">
           <div className="section__label">Lessons for Future Methodology Work</div>
 
           <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.4rem', marginBottom: '1rem', color: '#f4f0e8' }}>Before Testing</h3>
@@ -113,7 +113,7 @@ export default function EvolutionTimelinePage() {
       </section>
 
       <section className="section">
-        <div className="container--narrow">
+        <div className="container--wide">
           <div style={{ textAlign: 'center', marginTop: '2rem' }}>
             <p style={{ fontSize: '0.95rem', color: '#6b6560' }}>
               Each methodology is documented separately for deep-dive reference:

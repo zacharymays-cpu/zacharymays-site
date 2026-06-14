@@ -9,13 +9,13 @@ export default function V50Page() {
       <section className="hero">
         <div className="container--narrow">
           <span className="hero__eyebrow"><a href="/research-system">Research System Architecture</a></span>
-          <h1 className="hero__title">V5.0: Evidence-Based Multi-Model Jury</h1>
-          <p className="hero__subtitle">Three independent models with evidence-weighted scoring and jury consensus logic. Current production system adopted 2026-06-01.</p>
+          <h1 className="hero__title hero__title--compact">V5.0: Evidence-Based Multi-Model Jury</h1>
+          <p className="hero__subtitle hero__subtitle--compact">Three independent models with evidence-weighted scoring and jury consensus logic. Current production system adopted 2026-06-01.</p>
         </div>
       </section>
 
       <section className="section">
-        <div className="container--narrow">
+        <div className="container--wide">
           <div className="section__label">What V4.0 Missed</div>
           <div className="pull-quote">
             <p className="pull-quote__text">V4.0's anchor overcalibration and single-model bias revealed that rigor requires: (1) evidence-based scoring (not exemplar anchoring), (2) multi-model consensus (not single-point estimates), (3) formal inter-rater validation, and (4) human governance gates.</p>
@@ -25,7 +25,7 @@ export default function V50Page() {
       </section>
 
       <section className="section">
-        <div className="container--narrow">
+        <div className="container--wide">
           <div className="section__label">System Architecture</div>
 
           <svg viewBox="0 0 700 500" xmlns="http://www.w3.org/2000/svg" style={{ width: '100%', marginTop: '1.5rem', marginBottom: '2rem' }}>
@@ -91,7 +91,7 @@ export default function V50Page() {
       </section>
 
       <section className="section">
-        <div className="container--narrow">
+        <div className="container--wide">
           <div className="section__label">Core Components</div>
 
           <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.4rem', marginBottom: '1rem', color: '#f4f0e8' }}>Three-Model Jury</h3>
@@ -125,7 +125,7 @@ export default function V50Page() {
       </section>
 
       <section className="section">
-        <div className="container--narrow">
+        <div className="container--wide">
           <div className="section__label">Production Status</div>
 
           <table style={{ width: '100%', marginTop: '1.5rem', borderCollapse: 'collapse' }}>
@@ -150,7 +150,7 @@ export default function V50Page() {
       </section>
 
       <section className="section">
-        <div className="container--narrow">
+        <div className="container--wide">
           <div style={{ display: 'flex', gap: '2rem', justifyContent: 'space-between', alignItems: 'center', marginTop: '2rem' }}>
             <a href="/research-system/v4-anchor-heuristic" style={{ color: '#f4f0e8', textDecoration: 'none', borderBottom: '1px solid #c8a84b', paddingBottom: '0.25rem' }}>
               ← See V4.0's approach
