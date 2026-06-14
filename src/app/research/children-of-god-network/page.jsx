@@ -8,25 +8,50 @@ import SurvivorMovements from './SurvivorMovements';
 
 import { SUPABASE_URL, ANON_KEY } from '../../../lib/supabase/config';
 
+const MAPTILER_KEY = process.env.NEXT_PUBLIC_MAPTILER_KEY;
+const USING_MAPTILER = Boolean(MAPTILER_KEY);
+const CARTO_FALLBACK = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json';
+
+const styleUrl = (id) => (USING_MAPTILER
+  ? `https://api.maptiler.com/maps/${id}/style.json?key=${MAPTILER_KEY}`
+  : CARTO_FALLBACK);
+
+const STYLE_OPTIONS = [
+  { id: 'streets', label: 'Streets' },
+  { id: 'satellite', label: 'Satellite' },
+  { id: 'hybrid', label: 'Hybrid' },
+  { id: 'topo', label: 'Terrain' },
+  { id: 'dataviz-dark', label: 'Dark' },
+];
+
 export default function ChildrenOfGodResearch() {
   const [activeTab, setActiveTab] = useState('compounds');
   const mapContainer = useRef(null);
   const map = useRef(null);
+  const viewRef = useRef(null);
   const [geojsonData, setGeojsonData] = useState(null);
   const [cogData, setCogData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [mapStyle, setMapStyle] = useState('streets');
   const [filters, setFilters] = useState({
     confidence: { HIGH: true, MEDIUM: true, LOW: true },
     facilityType: {
       'Headquarters': true,
       'Regional HQ': true,
+      'Regional Hub': true,
       'Compound': true,
+      'Compound/Ranch': true,
+      'Residential Compound': true,
+      'Commune': true,
       'Media Center': true,
       'World Service HQ': true,
+      'World Service Home': true,
+      'Administrative Office': true,
+      'Provisioning Center': true,
       'Training Camp': true,
       'Reprogramming Camp': true,
     },
-    year: 1994,
+    year: 2000,
   });
 
   // Org detail styling constants
@@ -132,20 +157,16 @@ export default function ChildrenOfGodResearch() {
         const data = await response.json();
         setGeojsonData(data);
 
-        const mapTilerKey = process.env.NEXT_PUBLIC_MAPTILER_KEY;
-        const mapStyle = mapTilerKey
-          ? `https://api.maptiler.com/maps/streets/style.json?key=${mapTilerKey}`
-          : 'https://demotiles.maplibre.org/style.json';
-
         map.current = new maplibregl.Map({
           container: mapContainer.current,
-          style: mapStyle,
+          style: styleUrl(mapStyle),
           center: [0, 0],
           zoom: 1,
           maxZoom: 19,
         });
 
         map.current.on('load', () => {
+          viewRef.current = { center: map.current.getCenter(), zoom: map.current.getZoom() };
           addDataToMap(data, filters);
         });
       } catch (error) {
@@ -161,7 +182,7 @@ export default function ChildrenOfGodResearch() {
         map.current = null;
       }
     };
-  }, [cogData, activeTab]);
+  }, [cogData, activeTab, mapStyle]);
 
   const addDataToMap = (data, currentFilters) => {
     if (!map.current || !data) return;
@@ -252,6 +273,14 @@ export default function ChildrenOfGodResearch() {
     setFilters(newFilters);
     if (map.current && geojsonData) {
       addDataToMap(geojsonData, newFilters);
+    }
+  };
+
+  const handleStyleChange = (newStyle) => {
+    if (map.current && viewRef.current) {
+      viewRef.current = { center: map.current.getCenter(), zoom: map.current.getZoom() };
+      map.current.setStyle(styleUrl(newStyle));
+      setMapStyle(newStyle);
     }
   };
 
@@ -482,7 +511,32 @@ export default function ChildrenOfGodResearch() {
 
         {/* Main content */}
         <main className={styles.main}>
-          <div ref={mapContainer} className={styles.map}></div>
+          <div style={{ position: 'relative', marginBottom: '2rem' }}>
+            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
+              {STYLE_OPTIONS.map(style => (
+                <button
+                  key={style.id}
+                  onClick={() => handleStyleChange(style.id)}
+                  style={{
+                    padding: '0.5rem 1rem',
+                    borderRadius: '4px',
+                    border: mapStyle === style.id ? '2px solid var(--gold)' : '1px solid rgba(212,206,196,0.2)',
+                    background: mapStyle === style.id ? 'rgba(200,168,75,0.15)' : 'rgba(212,206,196,0.05)',
+                    color: mapStyle === style.id ? 'var(--gold)' : 'var(--muted)',
+                    cursor: 'pointer',
+                    fontSize: '0.9rem',
+                    fontWeight: mapStyle === style.id ? 600 : 400,
+                    transition: 'all 0.2s ease',
+                  }}
+                  onMouseEnter={e => e.target.style.borderColor = 'var(--gold)'}
+                  onMouseLeave={e => e.target.style.borderColor = mapStyle === style.id ? '2px solid var(--gold)' : '1px solid rgba(212,206,196,0.2)'}
+                >
+                  {style.label}
+                </button>
+              ))}
+            </div>
+            <div ref={mapContainer} className={styles.map}></div>
+          </div>
 
           <section className={styles.content}>
             {/* Assessment Summary */}
