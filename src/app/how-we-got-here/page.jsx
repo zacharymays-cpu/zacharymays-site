@@ -12,15 +12,15 @@ export default function HowWeGotHerePage() {
       <section className="hero">
         <div className="container--narrow">
           <span className="hero__eyebrow animate-up">A Book by Zachary S. Mays</span>
-          <h1 className="hero__title animate-up-2">How We Got Here</h1>
-          <p className="hero__subtitle animate-up-3">
+          <h1 className="hero__title hero__title--compact animate-up-2">How We Got Here</h1>
+          <p className="hero__subtitle hero__subtitle--compact animate-up-3">
             The Formation of a Population Built Not to Know
           </p>
         </div>
       </section>
 
       <section className="section">
-        <div className="container--narrow">
+        <div className="container--wide">
           <div className="section__label">The Argument</div>
 
           <p style={{fontSize: '1.1rem', color: 'var(--cream)', lineHeight: 1.8}}>

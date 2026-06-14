@@ -16,8 +16,8 @@ export default function AiMethodologyPage() {
             {' '}—{' '}
             <Link href="/oci/methodology" style={{color: 'var(--gold)'}}>Methodology</Link>
           </span>
-          <h1 className="hero__title animate-up-2">AI-Enabled<br />Scoring</h1>
-          <p className="hero__subtitle animate-up-3">
+          <h1 className="hero__title hero__title--compact animate-up-2">AI-Enabled<br />Scoring</h1>
+          <p className="hero__subtitle hero__subtitle--compact animate-up-3">
             Full transparency on how artificial intelligence is used in
             this project — what it does, what it cannot do, why the
             approach was chosen, and where the risks are.
@@ -26,7 +26,7 @@ export default function AiMethodologyPage() {
       </section>
 
       <section className="section">
-        <div className="container--narrow">
+        <div className="container--wide">
 
           <div className="section__label">The Short Version</div>
 

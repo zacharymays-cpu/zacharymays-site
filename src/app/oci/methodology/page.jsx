@@ -27,8 +27,8 @@ export default function MethodologyPage() {
             <Link href="/oci" style={{color: 'var(--gold)'}}>The Organizational Coercion Index</Link>
             {' '}— Methodology
           </span>
-          <h1 className="hero__title animate-up-2">How the<br />Scoring Works</h1>
-          <p className="hero__subtitle animate-up-3">
+          <h1 className="hero__title hero__title--compact animate-up-2">How the<br />Scoring Works</h1>
+          <p className="hero__subtitle hero__subtitle--compact animate-up-3">
             The framework, the dual-metric system, the scoring rules,
             and why each design decision was made.
           </p>
@@ -36,7 +36,7 @@ export default function MethodologyPage() {
       </section>
 
       <section className="section">
-        <div className="container--narrow">
+        <div className="container--wide">
 
           <div className="section__label">The Source Framework</div>
 

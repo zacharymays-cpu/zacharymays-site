@@ -22,10 +22,10 @@ export default function CultinessPage() {
           <span className="hero__eyebrow animate-up">
             An independent public research project
           </span>
-          <h1 className="hero__title animate-up-2">
+          <h1 className="hero__title hero__title--compact animate-up-2">
             The Organizational<br />Coercion Index
           </h1>
-          <p className="hero__subtitle animate-up-3">
+          <p className="hero__subtitle hero__subtitle--compact animate-up-3">
             A systematic, evenhanded application of the Young-Reed
             framework across American institutional life — openly
             documented, publicly available, and ongoing.
@@ -34,7 +34,7 @@ export default function CultinessPage() {
       </section>
 
       <section className="section">
-        <div className="container--narrow">
+        <div className="container--wide">
 
           <div className="section__label">What This Is</div>
 

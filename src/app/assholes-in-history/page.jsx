@@ -43,11 +43,11 @@ export default function AssholesPage() {
           <span className="hero__eyebrow animate-up">
             Temper Temper Publications
           </span>
-          <h1 className="hero__title animate-up-2">
+          <h1 className="hero__title hero__title--compact animate-up-2">
             <span style={{display:'block', color:'var(--accent-text)'}}>Assholes</span>
             <span style={{display:'block'}}>in History</span>
           </h1>
-          <p className="hero__subtitle animate-up-3">
+          <p className="hero__subtitle hero__subtitle--compact animate-up-3">
             A Comprehensive Survey of Catastrophic Leadership, Spectacular Ego,
             and the Recurring Human Failure to Say Temper, Temper
           </p>
@@ -55,7 +55,7 @@ export default function AssholesPage() {
       </section>
 
       <section className="section">
-        <div className="container--narrow">
+        <div className="container--wide">
           <div className="section__label">The Book</div>
 
           <p style={{fontSize: '1.1rem', color: 'var(--cream)', lineHeight: 1.8}}>

@@ -56,8 +56,8 @@ export default async function FindingsPage() {
             <Link href="/oci" style={{color: 'var(--gold)'}}>The Organizational Coercion Index</Link>
             {' '}— Findings
           </span>
-          <h1 className="hero__title animate-up-2">What the<br />Data Shows</h1>
-          <p className="hero__subtitle animate-up-3">
+          <h1 className="hero__title hero__title--compact animate-up-2">What the<br />Data Shows</h1>
+          <p className="hero__subtitle hero__subtitle--compact animate-up-3">
             Selected findings from systematic application of the
             Young-Reed framework across {scored} scored American organizations.
           </p>
@@ -65,7 +65,7 @@ export default async function FindingsPage() {
       </section>
 
       <section className="section">
-        <div className="container--narrow">
+        <div className="container--wide">
 
           <div className="section__label">The Headline Finding</div>
 

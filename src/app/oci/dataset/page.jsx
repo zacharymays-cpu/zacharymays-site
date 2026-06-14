@@ -27,8 +27,8 @@ export default function DatasetPage() {
             <Link href="/oci" style={{color: 'var(--gold)'}}>The Organizational Coercion Index</Link>
             {' '}— The Dataset
           </span>
-          <h1 className="hero__title animate-up-2">What Was<br />Assessed</h1>
-          <p className="hero__subtitle animate-up-3">
+          <h1 className="hero__title hero__title--compact animate-up-2">What Was<br />Assessed</h1>
+          <p className="hero__subtitle hero__subtitle--compact animate-up-3">
             <OrgCount /> active American organizations. 37 calibration anchors.
             Publicly available, openly documented, and ongoing.
           </p>
@@ -36,7 +36,7 @@ export default function DatasetPage() {
       </section>
 
       <section className="section">
-        <div className="container--narrow">
+        <div className="container--wide">
 
           <div className="section__label">Structure</div>
 
