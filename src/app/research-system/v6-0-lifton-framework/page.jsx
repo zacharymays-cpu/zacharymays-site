@@ -84,6 +84,17 @@ export default function V60Page() {
           <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.4rem', marginTop: '2rem', marginBottom: '1rem', color: '#f4f0e8' }}>Configural Scoring</h3>
           <p>Rather than averaging tracks, V6.0 uses non-compensatory logic: preponderance of evidence from either track can determine final classification.</p>
 
+          <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.4rem', marginTop: '2rem', marginBottom: '1rem', color: '#f4f0e8' }}>Scoring Outputs (Generated in Parallel)</h3>
+          <p>V6.0 generates three scoring outputs simultaneously for each organization:</p>
+          <ul style={{ marginTop: '1rem', paddingLeft: '2rem', color: '#f4f0e8' }}>
+            <li><strong>Young's Original Score:</strong> 0-10 binary checklist from C1-C10 jury track</li>
+            <li><strong>Composite Score:</strong> 0-100% formula-based from C1-C10 jury track</li>
+            <li><strong>Lifton's Totalism Score:</strong> 0-10 from C11 jury track (ideological totalism framework)</li>
+          </ul>
+          <p style={{ marginTop: '1rem' }}>
+            All three scores are generated from the same evidence package via parallel jury processing. Users receive all three perspectives on each organization—Young's behavior-based analysis, Composite evidence-weighted prevalence, and Lifton's system-level totalism assessment.
+          </p>
+
           <hr className="rule" />
         </div>
       </section>

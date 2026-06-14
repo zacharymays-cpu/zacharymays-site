@@ -27,6 +27,7 @@ export default function EvolutionTimelinePage() {
           <p><strong>Problem solved:</strong> V4.0's anchor bias and single-model limitations.</p>
           <p><strong>Innovation:</strong> Three independent models (Claude, GPT-4o, Gemini) scoring evidence-weighted packages. Jury consensus with formal spread thresholds.</p>
           <p><strong>Key decision:</strong> Human review gate is non-negotiable. ≥2/3 jury required for acceptance.</p>
+          <p><strong>Scoring outputs (generated in parallel):</strong> Young's Original Score (0-10 binary) + Composite Score (0-100% formula). Both provided for each organization.</p>
           <p><strong>Adoption:</strong> 2026-06-01. 565+ organizations scored with V5.0 provenance.</p>
 
           <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.4rem', marginTop: '2rem', marginBottom: '1rem', color: '#f4f0e8' }}>V5.1: Formal Validation Metrics</h3>
@@ -43,6 +44,7 @@ export default function EvolutionTimelinePage() {
           <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.4rem', marginTop: '2rem', marginBottom: '1rem', color: '#f4f0e8' }}>V6.0: Framework Extension (Lifton Totalism)</h3>
           <p><strong>Problem solved:</strong> V5 only covered Young & Reed's 10 criteria. Need complementary framework for totalism.</p>
           <p><strong>Innovation:</strong> Dual-track system. Young track (C1-C10) + Lifton track (C11 totalism). Configural (non-compensatory) scoring combining both signals.</p>
+          <p><strong>Scoring outputs (generated in parallel):</strong> Young's Original Score (0-10 binary) + Composite Score (0-100%) + Lifton's Totalism Score (0-10). Three perspectives provided for each organization.</p>
           <p><strong>Validation:</strong> Krippendorff's α = 0.81 (≥0.80 threshold met). Young's YCDI concordance r = 0.78 (p &lt; 0.001).</p>
           <p><strong>Adoption:</strong> 2026-06-12. Production-ready. 536+ organizations fully scored.</p>
 

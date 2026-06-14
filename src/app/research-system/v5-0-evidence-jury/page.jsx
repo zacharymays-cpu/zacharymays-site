@@ -110,6 +110,16 @@ export default function V50Page() {
           <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.4rem', marginTop: '2rem', marginBottom: '1rem', color: '#f4f0e8' }}>Human Review Gate</h3>
           <p>Jury proposals require human review before acceptance based on spread thresholds.</p>
 
+          <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.4rem', marginTop: '2rem', marginBottom: '1rem', color: '#f4f0e8' }}>Scoring Outputs (Generated in Parallel)</h3>
+          <p>V5.0 generates two scoring outputs simultaneously for each organization:</p>
+          <ul style={{ marginTop: '1rem', paddingLeft: '2rem', color: '#f4f0e8' }}>
+            <li><strong>Young's Original Score:</strong> 0-10 binary checklist across the 10 criteria. How many of Young's indicators are present?</li>
+            <li><strong>Composite Score:</strong> 0-100% formula-based: (Breadth ÷ 10) × (Mean Intensity ÷ 10) × 100. Measures evidence-weighted prevalence and intensity.</li>
+          </ul>
+          <p style={{ marginTop: '1rem' }}>
+            Both scores are generated from the same jury consensus and evidence package. Users receive both perspectives on each organization.
+          </p>
+
           <hr className="rule" />
         </div>
       </section>

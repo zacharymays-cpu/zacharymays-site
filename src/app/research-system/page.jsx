@@ -24,10 +24,21 @@ export default function ResearchSystemHub() {
         <div className="container--narrow">
           <div className="section__label">What This System Does</div>
           <p>
-            This documentation explains a reusable framework for AI-driven research evaluation. Rather than domain-specific, this system is designed to work across any research domain requiring: consistent evidence assessment, multi-model consensus, human review governance, and rigorous validation.
+            This documentation explains a reusable framework for AI-driven research evaluation scoring methodologies. Rather than domain-specific, this system is designed to work across any research domain requiring: consistent evidence assessment, multi-model consensus, human review governance, and rigorous validation.
           </p>
           <p>
-            The system evolved through six versions (V4.0 → V6.1) plus one deliberate rejection (V5.2). Each iteration solved specific problems and introduced new capabilities. This documentation is for researchers, academics, and practitioners interested in building similar evaluation systems.
+            <strong>Current production system (V5.0 + V6.0):</strong> Generates three scoring outputs simultaneously for each organization:
+          </p>
+          <ul style={{ marginTop: '1rem', paddingLeft: '2rem', color: '#f4f0e8' }}>
+            <li><strong>Young's Original Score:</strong> 0-10 binary checklist (Young & Reed's 10 criteria)</li>
+            <li><strong>Composite Score:</strong> 0-100% formula-based (evidence-weighted across all criteria)</li>
+            <li><strong>Lifton's Totalism Score:</strong> System-level analysis of ideological totalism (C11 criterion)</li>
+          </ul>
+          <p style={{ marginTop: '1.5rem' }}>
+            All three are generated in parallel by the jury consensus process. Users receive all three perspectives on each organization. These scoring methodologies describe HOW organizations are evaluated, not changes to previously published scores or organizational records.
+          </p>
+          <p>
+            The system evolved through six versions (V4.0 → V6.1) plus one deliberate rejection (V5.2). Each iteration solved specific problems and introduced new capabilities. This documentation is for researchers, academics, and practitioners interested in building or understanding similar evaluation systems.
           </p>
         </div>
       </section>
