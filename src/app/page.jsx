@@ -3,7 +3,7 @@ import OrgCount from '../components/OrgCount';
 
 export const metadata = {
   title: 'Zachary S. Mays — Author',
-  description: 'Author of How We Got Here and Assholes in History. Home of the Cultiness Spectrum dataset.',
+  description: 'Author of How We Got Here and Assholes in History. Home of the Organizational Coercion Index dataset.',
 };
 
 export default function HomePage() {
@@ -69,7 +69,7 @@ export default function HomePage() {
           <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'4rem',alignItems:'center'}}>
             <div>
               <span style={{fontFamily:'var(--mono)',fontSize:'0.68rem',letterSpacing:'0.2em',textTransform:'uppercase',color:'var(--gold)',display:'block',marginBottom:'1.25rem'}}>
-                The Cultiness Spectrum
+                The Organizational Coercion Index
               </span>
               <h2 style={{fontFamily:'var(--serif)',fontSize:'clamp(1.8rem,3vw,2.8rem)',lineHeight:1.15,letterSpacing:'-0.02em',color:'var(--paper)',marginBottom:'1.25rem'}}>
                 <OrgCount /> American organizations.<br />One framework.
@@ -85,15 +85,15 @@ export default function HomePage() {
               </p>
               <div style={{display:'flex',gap:'1rem',flexWrap:'wrap'}}>
                 <Link href="/explore" className="btn-primary">Explore the Dataset</Link>
-                <Link href="/cultiness" className="btn-secondary">About the Project</Link>
+                <Link href="/oci" className="btn-secondary">About the Project</Link>
               </div>
             </div>
             <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'2px'}}>
               {[
                 {href:'/explore',         label:'Dataset Explorer',    desc:'Search, filter, and browse the full dataset'},
                 {href:'/compass',         label:'Political Compass',   desc:'Organizations plotted by political and authority axes'},
-                {href:'/cultiness/methodology',    label:'Methodology',         desc:'How the scoring works, criteria, and N/A rules'},
-                {href:'/cultiness/findings',       label:'Key Findings',        desc:'The headline correlation, tier distribution, and benchmark comparisons'},
+                {href:'/oci/methodology',    label:'Methodology',         desc:'How the scoring works, criteria, and N/A rules'},
+                {href:'/oci/findings',       label:'Key Findings',        desc:'The headline correlation, tier distribution, and benchmark comparisons'},
               ].map((item,i) => (
                 <Link key={i} href={item.href} style={{
                   display:'block', padding:'1.25rem',

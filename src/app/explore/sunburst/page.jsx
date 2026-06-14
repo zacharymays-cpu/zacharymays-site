@@ -5,7 +5,7 @@ import { SUPABASE_URL, ANON_KEY } from '../../../lib/supabase/config';
 
 export const metadata = {
   title: 'Tier Distribution — The Cultiness Spectrum',
-  description: 'Sunburst chart showing the distribution of 401 organizations by tier and category in the Cultiness Spectrum dataset.',
+  description: 'Sunburst chart showing the distribution of 609 organizations by tier and category in the Cultiness Spectrum dataset.',
 };
 export const revalidate = 3600;
 

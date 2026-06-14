@@ -62,7 +62,9 @@ jobs:
       - name: Fetch live dataset stats
         id: fetch_stats
         run: |
-          STATS=$(curl -sf "${{ vars.SITE_URL }}/api/dataset-stats")
+          SITE_URL="${{ vars.SITE_URL }}"
+          SITE_URL="${SITE_URL%/}"  # Remove trailing slash if present
+          STATS=$(curl -sf "$SITE_URL/api/dataset-stats")
           echo "stats=$STATS" >> $GITHUB_OUTPUT
           echo "Live stats: $STATS"
 

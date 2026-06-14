@@ -6,8 +6,8 @@ export const revalidate = 3600;
 const STATIC_PATHS = [
   '', '/about', '/donate', '/terms',
   '/how-we-got-here', '/assholes-in-history',
-  '/cultiness', '/cultiness/methodology', '/cultiness/ai-methodology',
-  '/cultiness/findings', '/cultiness/dataset', '/findings',
+  '/oci', '/oci/methodology', '/oci/ai-methodology',
+  '/oci/findings', '/oci/dataset', '/findings',
   '/explore', '/explore/heatmap', '/explore/distributions', '/explore/timeline',
   '/explore/correlations', '/explore/lineage', '/explore/sankey', '/explore/sunburst',
   '/explore/compare', '/explore/map', '/compass',

@@ -2,8 +2,8 @@ import Link from 'next/link';
 import OrgCount from '../../../components/OrgCount';
 
 export const metadata = {
-  title: 'The Dataset — The Cultiness Spectrum',
-  description: 'What the Cultiness Spectrum Dataset contains, how it is structured, and how to access it.',
+  title: 'The Dataset — The Organizational Coercion Index',
+  description: 'What the Organizational Coercion Index Dataset contains, how it is structured, and how to access it.',
 };
 
 const CATEGORIES = [
@@ -15,7 +15,7 @@ const CATEGORIES = [
   { name: 'Media institutions',               count: '~20', note: 'Broadcast, print, digital, and ideological media formations' },
   { name: 'Educational institutions',         count: '~15', note: 'Universities, K-12 systems, and homeschool formations' },
   { name: 'Advocacy & civil society',         count: '~30', note: 'Civil rights, labor, environmental, and ideological advocacy organizations' },
-  { name: 'Historical calibration anchors',  count: '38',  note: 'Domestic and international historical formations used to bracket the scoring spectrum' },
+  { name: 'Historical calibration anchors',  count: '37',  note: 'Domestic and international historical formations used to bracket the scoring spectrum' },
 ];
 
 export default function DatasetPage() {
@@ -24,12 +24,12 @@ export default function DatasetPage() {
       <section className="hero">
         <div className="container--narrow">
           <span className="hero__eyebrow animate-up">
-            <Link href="/cultiness" style={{color: 'var(--gold)'}}>The Cultiness Spectrum</Link>
+            <Link href="/oci" style={{color: 'var(--gold)'}}>The Organizational Coercion Index</Link>
             {' '}— The Dataset
           </span>
           <h1 className="hero__title animate-up-2">What Was<br />Assessed</h1>
           <p className="hero__subtitle animate-up-3">
-            <OrgCount /> active American organizations. 38 calibration anchors.
+            <OrgCount /> active American organizations. 37 calibration anchors.
             Publicly available, openly documented, and ongoing.
           </p>
         </div>
@@ -102,7 +102,7 @@ export default function DatasetPage() {
           <div className="section__label">Calibration Anchors</div>
 
           <p>
-            The dataset includes 38 calibration anchors — historical and
+            The dataset includes 37 calibration anchors — historical and
             international organizations used to bracket the scoring spectrum
             and ensure consistency across assessment sessions. Anchors span
             from organizations scoring at the Super Culty ceiling (100% composite,
@@ -165,7 +165,7 @@ export default function DatasetPage() {
               full audit trail are publicly available on GitHub.
             </p>
             <a
-              href="https://github.com/zacharymays-cpu/cultiness-spectrum"
+              href="https://github.com/zacharymays-cpu/oci-spectrum"
               target="_blank"
               rel="noopener noreferrer"
               className="btn-primary"
@@ -206,8 +206,8 @@ export default function DatasetPage() {
           </p>
 
           <div style={{marginTop: '3rem', display: 'flex', gap: '1rem', flexWrap: 'wrap'}}>
-            <Link href="/cultiness/methodology" className="btn-primary">Read the Methodology</Link>
-            <Link href="/cultiness/findings" className="btn-secondary">See the Findings</Link>
+            <Link href="/oci/methodology" className="btn-primary">Read the Methodology</Link>
+            <Link href="/oci/findings" className="btn-secondary">See the Findings</Link>
           </div>
 
         </div>

@@ -35,7 +35,7 @@ export default function ExploreNav({ title, meta }) {
               fontWeight: 700, color: 'var(--paper)', margin: 0, lineHeight: 1.1,
             }}>{title}</h1>
           ) : (
-            <Link href="/cultiness" style={{
+            <Link href="/oci" style={{
               fontFamily: 'var(--mono)', fontSize: '0.6rem', letterSpacing: '0.16em',
               textTransform: 'uppercase', color: 'var(--gold)', textDecoration: 'none',
             }}>The Cultiness Spectrum</Link>

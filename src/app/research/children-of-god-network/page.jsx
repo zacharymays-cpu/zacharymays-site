@@ -4,11 +4,17 @@ import React, { useEffect, useRef, useState } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import styles from './page.module.css';
+import SurvivorMovements from './SurvivorMovements';
+
+import { SUPABASE_URL, ANON_KEY } from '../../../lib/supabase/config';
 
 export default function ChildrenOfGodResearch() {
+  const [activeTab, setActiveTab] = useState('compounds');
   const mapContainer = useRef(null);
   const map = useRef(null);
   const [geojsonData, setGeojsonData] = useState(null);
+  const [cogData, setCogData] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
     confidence: { HIGH: true, MEDIUM: true, LOW: true },
     facilityType: {
@@ -23,8 +29,101 @@ export default function ChildrenOfGodResearch() {
     year: 1994,
   });
 
+  // Org detail styling constants
+  const TIER_TEXT = { 'Super Culty': '#dc322f', 'Kinda Culty': '#b58900', 'Not Culty': '#859900' };
+  const TIER_BG = { 'Super Culty': 'rgba(220,50,47,0.12)', 'Kinda Culty': 'rgba(181,137,0,0.12)', 'Not Culty': 'rgba(133,153,0,0.12)' };
+  const TIER_LABELS = { 'Super Culty': 'High-Control', 'Kinda Culty': 'Moderate-Control', 'Not Culty': 'Low-Control' };
+  const lbl = (t) => TIER_LABELS[t] || t;
+  const CRITERIA = {
+    C1: 'Charismatic Leadership', C2: 'Sacred Assumptions', C3: 'Transcendent Mission',
+    C4: 'Identity Sublimation', C5: 'Information Isolation', C6: 'Private Vernacular',
+    C7: 'Us-vs-Them Dynamics', C8: 'Labor Exploitation', C9: 'Exit Costs',
+    C10: 'Ends Justify Means',
+  };
+  const SCORE_COLOR = (s) => {
+    if (s == null) return 'rgba(212,206,196,0.4)';
+    if (s >= 9) return '#dc322f';
+    if (s >= 7) return '#cb4b16';
+    if (s >= 5) return '#b58900';
+    if (s >= 3) return '#859900';
+    return '#2aa198';
+  };
+
+  // Fetch org data from Supabase
   useEffect(() => {
-    if (!mapContainer.current) return;
+    const fetchOrgData = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(
+          `${SUPABASE_URL}/rest/v1/organizations?select=id,name,slug,category,composite_score,composite_tier,youngs_score,founding_year,defunct_year,trajectory,summary_text,active,membership_count,membership_count_year,revenue_usd,revenue_year,size_tier,size_notes,political_scores(economic_axis,authority_axis,political_quadrant,scoring_notes),criterion_scores(criterion,score,confidence,body_text)&slug=eq.children-of-god-the-family`,
+          {
+            headers: {
+              apikey: ANON_KEY,
+              Authorization: `Bearer ${ANON_KEY}`,
+            },
+          }
+        );
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data[0]) {
+            const org = data[0];
+            setCogData({
+              ...org,
+              political_scores: Array.isArray(org.political_scores) ? org.political_scores[0] : org.political_scores,
+              criterion_scores: org.criterion_scores || [],
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching org data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrgData();
+  }, []);
+
+  const formatWholeNumber = (value) => {
+    if (value === null || value === undefined || value === '') return null;
+    const n = Number(value);
+    if (!Number.isFinite(n)) return null;
+    return n.toLocaleString('en-US', { maximumFractionDigits: 0 });
+  };
+
+  const formatUsd = (value) => {
+    if (value === null || value === undefined || value === '') return null;
+    const n = Number(value);
+    if (!Number.isFinite(n)) return null;
+    if (Math.abs(n) >= 1_000_000_000) return `$${(n / 1_000_000_000).toFixed(n >= 10_000_000_000 ? 0 : 1)}B`;
+    if (Math.abs(n) >= 1_000_000) return `$${(n / 1_000_000).toFixed(n >= 10_000_000 ? 0 : 1)}M`;
+    if (Math.abs(n) >= 1_000) return `$${(n / 1_000).toFixed(n >= 10_000 ? 0 : 1)}K`;
+    return `$${n.toLocaleString('en-US', { maximumFractionDigits: 0 })}`;
+  };
+
+  const SIZE_TIER_LABELS = {
+    micro: 'Micro scale (<1K)',
+    small: 'Small scale (1K-50K)',
+    medium: 'Medium scale (50K-1M)',
+    large: 'Large scale (1M-10M)',
+    mass: 'Mass scale (>10M)',
+  };
+
+  const tierColor = cogData ? (TIER_BG[cogData.composite_tier] ?? 'rgba(212,206,196,0.1)') : 'rgba(212,206,196,0.1)';
+  const tierTextColor = cogData ? (TIER_TEXT[cogData.composite_tier] ?? 'var(--muted)') : 'var(--muted)';
+  const compositePct = cogData ? `${parseFloat(cogData.composite_score).toFixed(0)}%` : '—';
+
+  const membershipCount = cogData ? formatWholeNumber(cogData.membership_count) : null;
+  const revenueUsd = cogData ? formatUsd(cogData.revenue_usd) : null;
+  const sizeTier = cogData && cogData.size_tier ? (SIZE_TIER_LABELS[cogData.size_tier] ?? cogData.size_tier) : null;
+  const hasScaleData = cogData && Boolean(membershipCount || revenueUsd || sizeTier || cogData.size_notes);
+
+  useEffect(() => {
+    // Only initialize once the compounds view is rendered and the org data has
+    // loaded — the map container div is gated behind `cogData` and the
+    // compounds tab, so it isn't in the DOM on first mount. Re-running on these
+    // deps ensures the map initializes when the container actually mounts.
+    if (activeTab !== 'compounds' || !cogData || !mapContainer.current) return;
 
     const initMap = async () => {
       try {
@@ -61,7 +160,7 @@ export default function ChildrenOfGodResearch() {
         map.current = null;
       }
     };
-  }, []);
+  }, [cogData, activeTab]);
 
   const addDataToMap = (data, currentFilters) => {
     if (!map.current || !data) return;
@@ -80,7 +179,6 @@ export default function ChildrenOfGodResearch() {
     const sourceId = 'cog-locations';
     const layerId = 'cog-locations-layer';
 
-    // Remove existing layer and source if they exist
     if (map.current.getLayer(layerId)) {
       map.current.removeLayer(layerId);
     }
@@ -88,7 +186,6 @@ export default function ChildrenOfGodResearch() {
       map.current.removeSource(sourceId);
     }
 
-    // Add source
     map.current.addSource(sourceId, {
       type: 'geojson',
       data: {
@@ -97,7 +194,6 @@ export default function ChildrenOfGodResearch() {
       },
     });
 
-    // Add circle layer for markers
     map.current.addLayer({
       id: layerId,
       type: 'circle',
@@ -112,7 +208,6 @@ export default function ChildrenOfGodResearch() {
       },
     });
 
-    // Add popup on click
     map.current.on('click', layerId, (e) => {
       const feature = e.features[0];
       const props = feature.properties;
@@ -136,7 +231,6 @@ export default function ChildrenOfGodResearch() {
         .addTo(map.current);
     });
 
-    // Change cursor on hover
     map.current.on('mouseenter', layerId, () => {
       map.current.getCanvas().style.cursor = 'pointer';
     });
@@ -160,19 +254,184 @@ export default function ChildrenOfGodResearch() {
     }
   };
 
+  // Render appropriate view based on active tab
+  if (activeTab === 'movements') {
+    return <SurvivorMovements />;
+  }
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className={styles.page} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
+        <div style={{ textAlign: 'center', color: 'var(--muted)' }}>
+          <p style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>Loading research data...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.page}>
-      <header className={styles.header}>
-        <h1>Children of God / Family International</h1>
-        <p className={styles.subtitle}>
-          Geographic Network Documentation (1968–1994)
-        </p>
-        <p className={styles.byline}>
-          45 compounds across 22 countries, sourced from survivor testimony and legal records
-        </p>
-      </header>
+      {cogData && (
+      <>
+      {/* ── Tab Navigation ──────────────────────────────────── */}
+      <div style={{ background: 'rgba(200,168,75,0.04)', borderBottom: '1px solid rgba(212,206,196,0.1)' }}>
+        <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 2rem', display: 'flex', gap: '2rem' }}>
+          <button
+            onClick={() => setActiveTab('compounds')}
+            style={{
+              padding: '1rem 0',
+              border: 'none',
+              background: 'none',
+              cursor: 'pointer',
+              fontFamily: 'var(--serif)',
+              fontSize: '0.95rem',
+              fontWeight: activeTab === 'compounds' ? 700 : 400,
+              color: activeTab === 'compounds' ? 'var(--gold)' : 'var(--muted)',
+              borderBottom: activeTab === 'compounds' ? '2px solid var(--gold)' : 'none',
+              transition: 'all 0.2s ease',
+            }}
+          >
+            📍 Compound Network
+          </button>
+          <button
+            onClick={() => setActiveTab('movements')}
+            style={{
+              padding: '1rem 0',
+              border: 'none',
+              background: 'none',
+              cursor: 'pointer',
+              fontFamily: 'var(--serif)',
+              fontSize: '0.95rem',
+              fontWeight: activeTab === 'movements' ? 700 : 400,
+              color: activeTab === 'movements' ? 'var(--gold)' : 'var(--muted)',
+              borderBottom: activeTab === 'movements' ? '2px solid var(--gold)' : 'none',
+              transition: 'all 0.2s ease',
+            }}
+          >
+            🛤️ Survivor Movements
+          </button>
+        </div>
+      </div>
 
+      {/* ── Org-detail hero header ──────────────────────────────────── */}
+      <section style={{ padding: '2.5rem 0 2rem', borderTop: `3px solid ${tierTextColor}`, borderBottom: '1px solid rgba(212,206,196,0.1)' }}>
+        <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 2rem' }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.6rem', flexWrap: 'wrap', marginBottom: '0.75rem' }}>
+            <span style={{ fontFamily: 'var(--mono)', fontSize: '0.6rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--gold)' }}>
+              Research Documentation
+            </span>
+            <span style={{ color: 'rgba(212,206,196,0.3)', fontFamily: 'var(--mono)', fontSize: '0.6rem' }}>—</span>
+            <span style={{ fontFamily: 'var(--mono)', fontSize: '0.6rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)' }}>
+              {cogData.category}
+            </span>
+            <span style={{ color: 'rgba(212,206,196,0.3)', fontFamily: 'var(--mono)', fontSize: '0.6rem' }}>—</span>
+            <span style={{ fontFamily: 'var(--mono)', fontSize: '0.6rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)' }}>
+              Founded {cogData.founding_year} — Defunct {cogData.defunct_year}
+            </span>
+          </div>
+          <h1 style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(1.8rem,4vw,3rem)', fontWeight: 700, color: 'var(--paper)', marginBottom: '1rem', lineHeight: 1.15 }}>
+            {cogData.name}
+          </h1>
+
+          {!cogData.active && (
+            <div style={{ marginBottom: '1.5rem', padding: '0.75rem 1rem', background: 'rgba(200,168,75,0.08)', border: '1px solid rgba(200,168,75,0.2)', borderRadius: '4px' }}>
+              <span style={{ fontFamily: 'var(--mono)', fontSize: '0.7rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--gold)' }}>
+                ⚠ Historical organization — no longer active
+              </span>
+            </div>
+          )}
+
+          {/* Scoreboard */}
+          <div style={{ display: 'flex', alignItems: 'stretch', gap: '1.5rem', flexWrap: 'wrap', marginTop: '1.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.7rem' }}>
+              <span style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(2.6rem,7vw,3.6rem)', fontWeight: 700, color: tierTextColor, lineHeight: 0.9 }}>
+                {compositePct}
+              </span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                <span style={{ fontFamily: 'var(--mono)', fontSize: '0.62rem', letterSpacing: '0.1em', textTransform: 'uppercase', padding: '0.2rem 0.5rem', background: tierColor, color: tierTextColor, border: `1px solid ${tierTextColor}55`, alignSelf: 'flex-start' }}>
+                  {lbl(cogData.composite_tier)}
+                </span>
+                <span style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--muted)' }}>
+                  Group Dynamics Score
+                </span>
+              </div>
+            </div>
+
+            <div style={{ width: 1, background: 'rgba(212,206,196,0.15)' }} />
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '0.3rem' }}>
+              <span style={{ fontFamily: 'var(--serif)', fontSize: '1.5rem', fontWeight: 700, color: 'var(--paper)', lineHeight: 1 }}>
+                {cogData.youngs_score}<span style={{ fontSize: '0.9rem', color: 'var(--muted)' }}>/10</span>
+              </span>
+              <span style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)' }}>
+                Young's Score
+              </span>
+            </div>
+
+            <div style={{ width: 1, background: 'rgba(212,206,196,0.15)' }} />
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '0.3rem' }}>
+              <span style={{ fontFamily: 'var(--serif)', fontSize: '1.15rem', fontWeight: 700, color: 'var(--paper)', lineHeight: 1 }}>
+                — {cogData.trajectory}
+              </span>
+              <span style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)' }}>
+                Trajectory
+              </span>
+            </div>
+
+            {membershipCount && (
+              <>
+                <div style={{ width: 1, background: 'rgba(212,206,196,0.15)' }} />
+                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '0.3rem', minWidth: '6.5rem' }}>
+                  <span style={{ fontFamily: 'var(--serif)', fontSize: '1.15rem', fontWeight: 700, color: 'var(--paper)', lineHeight: 1 }}>
+                    {membershipCount}
+                  </span>
+                  <span style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)' }}>
+                    Membership {cogData.membership_count_year ? `· ${cogData.membership_count_year}` : ''}
+                  </span>
+                </div>
+              </>
+            )}
+
+            {revenueUsd && (
+              <>
+                <div style={{ width: 1, background: 'rgba(212,206,196,0.15)' }} />
+                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '0.3rem', minWidth: '6.5rem' }}>
+                  <span style={{ fontFamily: 'var(--serif)', fontSize: '1.15rem', fontWeight: 700, color: 'var(--paper)', lineHeight: 1 }}>
+                    {revenueUsd}
+                  </span>
+                  <span style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)' }}>
+                    Revenue {cogData.revenue_year ? `· ${cogData.revenue_year}` : ''}
+                  </span>
+                </div>
+              </>
+            )}
+
+            {sizeTier && (
+              <>
+                <div style={{ width: 1, background: 'rgba(212,206,196,0.15)' }} />
+                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '0.3rem', minWidth: '6.5rem' }}>
+                  <span style={{ fontFamily: 'var(--serif)', fontSize: '1.15rem', fontWeight: 700, color: 'var(--paper)', lineHeight: 1 }}>
+                    {sizeTier}
+                  </span>
+                  <span style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)' }}>
+                    Size
+                  </span>
+                </div>
+              </>
+            )}
+          </div>
+
+          {cogData.size_notes && hasScaleData && (
+            <p style={{ fontFamily: 'var(--mono)', fontSize: '0.62rem', color: 'rgba(212,206,196,0.55)', lineHeight: 1.6, marginTop: '0.9rem', maxWidth: 860 }}>
+              {cogData.size_notes}
+            </p>
+          )}
+        </div>
+      </section>
+
+      {/* ── Sidebar + Main layout ──────────────────────────────────── */}
       <div className={styles.layout}>
+        {/* Sidebar with filters */}
         <aside className={styles.sidebar}>
           <div className={styles.filterGroup}>
             <h3 className={styles.filterTitle}>Confidence Level</h3>
@@ -220,157 +479,203 @@ export default function ChildrenOfGodResearch() {
           </div>
         </aside>
 
+        {/* Main content */}
         <main className={styles.main}>
           <div ref={mapContainer} className={styles.map}></div>
 
           <section className={styles.content}>
-            <h2>Research Methodology</h2>
-            <p>
-              This dataset documents the global network of the Children of God (later known as The Family International),
-              a high-control religious organization founded by David Brandt Berg in 1968.
+            {/* Assessment Summary */}
+            {cogData.summary_text && (
+              <div style={{ marginBottom: '3rem' }}>
+                <div style={{ fontFamily: 'var(--mono)', fontSize: '0.62rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                  Assessment Summary
+                  <span style={{ flex: 1, height: 1, background: 'rgba(212,206,196,0.15)' }} />
+                </div>
+                <p style={{ fontSize: '1.05rem', color: '#e8e4dc', lineHeight: 1.8, margin: 0 }}>
+                  {cogData.summary_text}
+                </p>
+              </div>
+            )}
+
+            {/* Political Position */}
+            {cogData.political_scores && (
+              <div style={{ marginBottom: '3rem' }}>
+                <div style={{ fontFamily: 'var(--mono)', fontSize: '0.62rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                  Political Position
+                  <span style={{ flex: 1, height: 1, background: 'rgba(212,206,196,0.15)' }} />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '2px' }}>
+                  <div style={{ background: 'rgba(244,240,232,0.025)', border: '1px solid rgba(212,206,196,0.08)', padding: '1.25rem', textAlign: 'center' }}>
+                    <div style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '0.35rem' }}>Economic Axis</div>
+                    <div style={{ fontFamily: 'var(--serif)', fontSize: '1.3rem', fontWeight: 700, color: 'var(--paper)', lineHeight: 1 }}>
+                      {cogData.political_scores.economic_axis > 0 ? '+' : ''}{cogData.political_scores.economic_axis}
+                    </div>
+                    <div style={{ fontFamily: 'var(--mono)', fontSize: '0.58rem', color: 'var(--muted)', marginTop: '0.25rem' }}>
+                      {cogData.political_scores.economic_axis > 0 ? 'Right' : cogData.political_scores.economic_axis < 0 ? 'Left' : 'Center'}
+                    </div>
+                  </div>
+                  <div style={{ background: 'rgba(244,240,232,0.025)', border: '1px solid rgba(212,206,196,0.08)', padding: '1.25rem', textAlign: 'center' }}>
+                    <div style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '0.35rem' }}>Authority Axis</div>
+                    <div style={{ fontFamily: 'var(--serif)', fontSize: '1.3rem', fontWeight: 700, color: 'var(--paper)', lineHeight: 1 }}>
+                      {cogData.political_scores.authority_axis > 0 ? '+' : ''}{cogData.political_scores.authority_axis}
+                    </div>
+                    <div style={{ fontFamily: 'var(--mono)', fontSize: '0.58rem', color: 'var(--muted)', marginTop: '0.25rem' }}>
+                      {cogData.political_scores.authority_axis > 0 ? 'Authoritarian' : cogData.political_scores.authority_axis < 0 ? 'Libertarian' : 'Neutral'}
+                    </div>
+                  </div>
+                  <div style={{ background: 'rgba(244,240,232,0.025)', border: '1px solid rgba(212,206,196,0.08)', padding: '1.25rem', textAlign: 'center' }}>
+                    <div style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '0.35rem' }}>Quadrant</div>
+                    <div style={{ fontFamily: 'var(--serif)', fontSize: '1.3rem', fontWeight: 700, color: 'var(--paper)', lineHeight: 1 }}>
+                      {cogData.political_scores.political_quadrant}
+                    </div>
+                  </div>
+                </div>
+                {cogData.political_scores.scoring_notes && (
+                  <p style={{ fontSize: '0.85rem', color: 'rgba(212,206,196,0.75)', lineHeight: 1.7, marginTop: '0.75rem', marginBottom: 0 }}>
+                    {cogData.political_scores.scoring_notes}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* Ten Criteria */}
+            <div style={{ fontFamily: 'var(--mono)', fontSize: '0.62rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              Ten Criteria
+              <span style={{ flex: 1, height: 1, background: 'rgba(212,206,196,0.15)' }} />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginBottom: '3rem' }}>
+              {cogData.criterion_scores.map(({ criterion, score, confidence, body_text }) => {
+                const sColor = SCORE_COLOR(score);
+                return (
+                  <div key={criterion} style={{ background: 'rgba(244,240,232,0.025)', border: '1px solid rgba(212,206,196,0.08)', borderLeft: `3px solid ${sColor}`, padding: '1.25rem 1.25rem 1.25rem 1.5rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: body_text ? '0.75rem' : 0, gap: '1rem', flexWrap: 'wrap' }}>
+                      <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.6rem' }}>
+                        <span style={{ fontFamily: 'var(--mono)', fontSize: '0.58rem', letterSpacing: '0.12em', color: 'rgba(212,206,196,0.4)', textTransform: 'uppercase' }}>
+                          {criterion}
+                        </span>
+                        <span style={{ fontFamily: 'var(--serif)', fontSize: '0.95rem', fontWeight: 700, color: 'var(--paper)' }}>
+                          {CRITERIA[criterion]}
+                        </span>
+                      </div>
+                      <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexShrink: 0 }}>
+                        {confidence && (
+                          <span style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(212,206,196,0.4)', padding: '0.15rem 0.45rem', border: '1px solid rgba(212,206,196,0.12)' }}>
+                            {confidence}
+                          </span>
+                        )}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <div style={{ width: 48, height: 4, background: 'rgba(212,206,196,0.1)', borderRadius: 2 }}>
+                            <div style={{ width: `${(score/10)*100}%`, height: '100%', background: sColor, borderRadius: 2 }} />
+                          </div>
+                          <span style={{ fontFamily: 'var(--mono)', fontSize: '0.95rem', fontWeight: 700, color: sColor, minWidth: '2.8rem', textAlign: 'right' }}>
+                            {score}/10
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    {body_text && (
+                      <p style={{ fontSize: '0.9rem', color: '#d4cec4', margin: 0, lineHeight: 1.8 }}>
+                        {body_text}
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Research Methodology & Sources */}
+            <h2 style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(1.5rem, 2.5vw, 1.8rem)', fontWeight: 700, margin: '2rem 0 1rem', color: 'var(--paper)', lineHeight: 1.15, letterSpacing: '-0.01em' }}>
+              Research Methodology
+            </h2>
+            <p style={{ fontSize: '1rem', lineHeight: 1.75, color: 'var(--muted)', marginBottom: '1.25em' }}>
+              This dataset documents the global network of the Children of God (later known as The Family International), a high-control religious organization founded by David Brandt Berg in 1968. The cultiness scores reflect extensive survivor testimony, legal records, and academic documentation.
             </p>
 
-            <h3>Data Sources</h3>
-            <ul>
-              <li><strong>Survivor Testimony</strong> — Memoirs and recorded interviews (Faith Jones, Daniella Young, Christina Babin, Davidito/Ricky Rodriguez)</li>
-              <li><strong>Legal Records</strong> — Court cases, police investigations, and raid documentation (UK, US, international)</li>
-              <li><strong>Official Organization History</strong> — The Family International published histories and archives</li>
-              <li><strong>Academic Documentation</strong> — University archives (San Diego State, Hamilton College) and cult studies research</li>
-              <li><strong>News Archives</strong> — Investigative journalism and media coverage (1970s-1990s)</li>
+            <h3 style={{ fontFamily: 'var(--serif)', fontSize: '1.2rem', fontWeight: 700, margin: '1.5rem 0 0.75rem', color: 'var(--cream)', lineHeight: 1.15 }}>
+              Data Sources
+            </h3>
+            <ul style={{ marginLeft: '1.5rem', marginBottom: '1.25em', color: 'var(--muted)' }}>
+              <li style={{ marginBottom: '0.75rem', lineHeight: 1.6 }}>
+                <strong>Survivor Testimony</strong> — Memoirs and recorded interviews (Faith Jones, Christina Babin, Davidita/Ricky Rodriguez, Daniella Young)
+              </li>
+              <li style={{ marginBottom: '0.75rem', lineHeight: 1.6 }}>
+                <strong>Legal Records</strong> — Court cases, police investigations, and raid documentation (UK, US, international)
+              </li>
+              <li style={{ marginBottom: '0.75rem', lineHeight: 1.6 }}>
+                <strong>Official Organization History</strong> — The Family International published histories and archives
+              </li>
+              <li style={{ marginBottom: '0.75rem', lineHeight: 1.6 }}>
+                <strong>Academic Documentation</strong> — University archives (San Diego State, Hamilton College) and cult studies research
+              </li>
+              <li style={{ marginBottom: '0.75rem', lineHeight: 1.6 }}>
+                <strong>News Archives</strong> — Investigative journalism and media coverage (1970s-1990s)
+              </li>
             </ul>
 
-            <h3>Confidence Levels</h3>
-            <dl>
-              <dt>HIGH Confidence (9 locations)</dt>
-              <dd>
-                Multiple independent sources, specific addresses or coordinates, detailed survivor testimony,
-                or official organization records.
-              </dd>
-
-              <dt>MEDIUM Confidence (29 locations)</dt>
-              <dd>
-                One credible source (survivor memoir, police record, official history) or reasonable geographic inference
-                based on documented presence.
-              </dd>
-
-              <dt>LOW Confidence (7 locations)</dt>
-              <dd>
-                Inferred from regional expansion references or single unconfirmed mentions.
-              </dd>
-            </dl>
-
-            <h2>Geographic Distribution</h2>
-            <table className={styles.distributionTable}>
-              <thead>
+            <h3 style={{ fontFamily: 'var(--serif)', fontSize: '1.2rem', fontWeight: 700, margin: '1.5rem 0 0.75rem', color: 'var(--cream)', lineHeight: 1.15 }}>
+              Geographic Distribution
+            </h3>
+            <table style={{ width: '100%', borderCollapse: 'collapse', margin: '1.5rem 0', border: '1px solid rgba(212,206,196,0.15)' }}>
+              <thead style={{ background: 'rgba(200,168,75,0.08)' }}>
                 <tr>
-                  <th>Region</th>
-                  <th>Locations</th>
-                  <th>Countries</th>
-                  <th>Key Centers</th>
+                  <th style={{ padding: '1rem', textAlign: 'left', fontWeight: 700, color: 'var(--gold)', borderBottom: '1px solid rgba(212,206,196,0.15)', fontFamily: 'var(--serif)', fontSize: '0.9rem' }}>Region</th>
+                  <th style={{ padding: '1rem', textAlign: 'left', fontWeight: 700, color: 'var(--gold)', borderBottom: '1px solid rgba(212,206,196,0.15)', fontFamily: 'var(--serif)', fontSize: '0.9rem' }}>Locations</th>
+                  <th style={{ padding: '1rem', textAlign: 'left', fontWeight: 700, color: 'var(--gold)', borderBottom: '1px solid rgba(212,206,196,0.15)', fontFamily: 'var(--serif)', fontSize: '0.9rem' }}>Countries</th>
+                  <th style={{ padding: '1rem', textAlign: 'left', fontWeight: 700, color: 'var(--gold)', borderBottom: '1px solid rgba(212,206,196,0.15)', fontFamily: 'var(--serif)', fontSize: '0.9rem' }}>Key Centers</th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>North America</td>
-                  <td>13</td>
-                  <td>2 (USA, Canada)</td>
-                  <td>Huntington Beach HQ, Toronto, Vancouver</td>
-                </tr>
-                <tr>
-                  <td>Europe</td>
-                  <td>11</td>
-                  <td>6</td>
-                  <td>London HQ, Paris, Paisley, Budapest</td>
-                </tr>
-                <tr>
-                  <td>Latin America</td>
-                  <td>7</td>
-                  <td>5</td>
-                  <td>Belo Horizonte (regional hub), Rio de Janeiro</td>
-                </tr>
-                <tr>
-                  <td>East Asia</td>
-                  <td>8</td>
-                  <td>6</td>
-                  <td>Macau, Hong Kong, Tokyo, Manila</td>
-                </tr>
-                <tr>
-                  <td>Caribbean/Oceania</td>
-                  <td>6</td>
-                  <td>3</td>
-                  <td>Jamaica, Puerto Rico, Sydney</td>
-                </tr>
+                {[
+                  { region: 'North America', locations: 13, countries: '2 (USA, Canada)', centers: 'Huntington Beach HQ, Toronto, Vancouver' },
+                  { region: 'Europe', locations: 11, countries: '6', centers: 'London HQ, Paris, Paisley, Budapest' },
+                  { region: 'Latin America', locations: 7, countries: '5', centers: 'Belo Horizonte (regional hub), Rio de Janeiro' },
+                  { region: 'East Asia', locations: 8, countries: '6', centers: 'Macau, Hong Kong, Tokyo, Manila' },
+                  { region: 'Caribbean/Oceania', locations: 6, countries: '3', centers: 'Jamaica, Puerto Rico, Sydney' },
+                ].map(row => (
+                  <tr key={row.region} style={{ ':hover': { background: 'rgba(212,206,196,0.03)' } }}>
+                    <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid rgba(212,206,196,0.1)', color: 'var(--muted)' }}>{row.region}</td>
+                    <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid rgba(212,206,196,0.1)', color: 'var(--muted)' }}>{row.locations}</td>
+                    <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid rgba(212,206,196,0.1)', color: 'var(--muted)' }}>{row.countries}</td>
+                    <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid rgba(212,206,196,0.1)', color: 'var(--muted)' }}>{row.centers}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
 
-            <h2>Timeline: Phases of Expansion</h2>
-            <dl>
-              <dt>Phase 1: Founding (1968–1972)</dt>
-              <dd>
-                Started in Huntington Beach with 35 members. After David Berg's 1969 earthquake prophecy,
-                relocated to Texas compound (1969-1971). By 1972, had 130 communities worldwide.
-              </dd>
-
-              <dt>Phase 2: Global Dispersal (1972–1980)</dt>
-              <dd>
-                "Flee as a Bird to Your Mountain" (1972) dispersal sent followers globally.
-                Established regional hubs: Belo Horizonte (Latin America), London (Europe), Tokyo (Asia).
-                By mid-1970s, ~70 countries with presence.
-              </dd>
-
-              <dt>Phase 3: Consolidation & Controversy (1980–1994)</dt>
-              <dd>
-                Established administrative centers (World Service in Mexico, 1980s). UK raids (1991-1992).
-                David Berg died in Costa de Caparica, Portugal (October 1, 1994, age 75).
-              </dd>
-            </dl>
-
-            <h2>Survivor Testimony</h2>
-            <blockquote>
-              <p>
-                "We were constantly moved around, from Paisley I was sent to Rugby, Tewkesbury, Birmingham and Manchester
-                before I finally managed to get out aged barely 15."
-              </p>
-              <footer>— UK survivor testimony</footer>
-            </blockquote>
-
-            <blockquote>
-              <p>
-                "I grew up in an isolated village in Macau... the cult sent their Tithe's Report Forms to the World Service
-                Home in Japan since Macau was too small to operate one."
-              </p>
-              <footer>— Faith Jones, "Sex Cult Nun" memoir</footer>
-            </blockquote>
-
-            <blockquote>
-              <p>
-                "The Children of God controlled every aspect of our lives. We had no freedom, no privacy, and no contact with the outside world."
-              </p>
-              <footer>— Daniella Young, "Shattered: One Girl's Journey Through the Darkness"</footer>
-            </blockquote>
-
-            <h2>Full Sources</h2>
-            <h3>Books & Memoirs</h3>
-            <ul>
-              <li>Jones, Faith (2021). "Sex Cult Nun: Breaking Away from the Children of God"</li>
-              <li>Young, Daniella (2019). "Uncultured: A Memoir"</li>
-              <li>The Family International. "The Story of Davidito" (organizational account)</li>
+            <h3 style={{ fontFamily: 'var(--serif)', fontSize: '1.2rem', fontWeight: 700, margin: '1.5rem 0 0.75rem', color: 'var(--cream)', lineHeight: 1.15 }}>
+              Full Sources
+            </h3>
+            <h4 style={{ fontFamily: 'var(--serif)', fontSize: '1rem', fontWeight: 700, margin: '1rem 0 0.5rem', color: 'var(--paper)' }}>Books & Memoirs</h4>
+            <ul style={{ marginLeft: '1.5rem', marginBottom: '1.25em', color: 'var(--muted)' }}>
+              <li style={{ marginBottom: '0.75rem' }}>Jones, Faith (2021). "Sex Cult Nun: Breaking Away from the Children of God"</li>
+              <li style={{ marginBottom: '0.75rem' }}>Young, Daniella (2019). "Uncultured: A Memoir"</li>
+              <li style={{ marginBottom: '0.75rem' }}>The Family International. "The Story of Davidito" (organizational account)</li>
             </ul>
 
-            <h3>Archives</h3>
-            <ul>
-              <li>San Diego State University — Family International Records (1940-2009)</li>
-              <li>Hamilton College Archives — Children of God Collection</li>
-              <li>XFamily.org — Survivor testimony database</li>
+            <h4 style={{ fontFamily: 'var(--serif)', fontSize: '1rem', fontWeight: 700, margin: '1rem 0 0.5rem', color: 'var(--paper)' }}>Archives</h4>
+            <ul style={{ marginLeft: '1.5rem', marginBottom: '1.25em', color: 'var(--muted)' }}>
+              <li style={{ marginBottom: '0.75rem' }}>San Diego State University — Family International Records (1940-2009)</li>
+              <li style={{ marginBottom: '0.75rem' }}>Hamilton College Archives — Children of God Collection</li>
+              <li style={{ marginBottom: '0.75rem' }}>XFamily.org — Survivor testimony database</li>
             </ul>
 
-            <p className={styles.disclaimer}>
-              This research is provided for educational purposes and to support survivor advocacy and academic study.
-              All information is sourced from public records and published survivor testimony.
+            <p style={{ background: 'rgba(139,32,32,0.1)', border: '3px solid var(--accent)', padding: '1.5rem', marginTop: '2rem', color: 'var(--accent-text)', fontStyle: 'italic' }}>
+              This research is provided for educational purposes and to support survivor advocacy and academic study. All information is sourced from public records and published survivor testimony. Cultiness scores reflect the organization's systematic control mechanisms and documented harm to members.
             </p>
           </section>
         </main>
       </div>
+      </>
+      )}
+      {!cogData && !loading && (
+        <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '2rem' }}>
+          <div style={{ background: 'rgba(220, 50, 47, 0.1)', border: '1px solid rgba(220, 50, 47, 0.3)', padding: '2rem', borderRadius: '4px', textAlign: 'center' }}>
+            <p style={{ color: 'var(--accent)', fontSize: '1.1rem', margin: '0' }}>
+              Unable to load organization data. Please check back later or contact support.
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
