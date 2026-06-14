@@ -32,7 +32,7 @@ export default function ChildrenOfGodResearch() {
   const [geojsonData, setGeojsonData] = useState(null);
   const [cogData, setCogData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [mapStyle, setMapStyle] = useState('streets');
+  const [mapStyle, setMapStyle] = useState('hybrid');
   const [filters, setFilters] = useState({
     confidence: { HIGH: true, MEDIUM: true, LOW: true },
     facilityType: {
@@ -155,7 +155,7 @@ export default function ChildrenOfGodResearch() {
 
         map.current = new maplibregl.Map({
           container: mapContainer.current,
-          style: styleUrl('streets'),
+          style: styleUrl('hybrid'),
           center: [0, 0],
           zoom: 1,
           maxZoom: 19,
