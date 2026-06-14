@@ -55,7 +55,7 @@ export default function ChildrenOfGodResearch() {
       setLoading(true);
       try {
         const res = await fetch(
-          `${SUPABASE_URL}/rest/v1/organizations?select=id,name,slug,category,composite_score,composite_tier,youngs_score,founding_year,defunct_year,trajectory,summary_text,active,membership_count,membership_count_year,revenue_usd,revenue_year,size_tier,size_notes,political_scores(economic_axis,authority_axis,political_quadrant,scoring_notes),criterion_scores(criterion,score,confidence,body_text)&slug=eq.children-of-god-the-family`,
+          `${SUPABASE_URL}/rest/v1/organizations?select=id,name,slug,category,composite_score,composite_tier,youngs_score,founding_year,defunct_year,trajectory,summary_text,active,membership_count,membership_count_year,revenue_usd,revenue_year,size_tier,size_notes,political_scores(economic_axis,authority_axis,political_quadrant,scoring_notes),criterion_scores(criterion,score,confidence,body_text),organization_research_narratives(id,narrative_type,title,content,summary,confidence_level,sources)&slug=eq.children-of-god-the-family`,
           {
             headers: {
               apikey: ANON_KEY,
@@ -71,6 +71,7 @@ export default function ChildrenOfGodResearch() {
               ...org,
               political_scores: Array.isArray(org.political_scores) ? org.political_scores[0] : org.political_scores,
               criterion_scores: org.criterion_scores || [],
+              research_narratives: Array.isArray(org.organization_research_narratives) ? org.organization_research_narratives : [],
             });
           }
         }
@@ -495,6 +496,46 @@ export default function ChildrenOfGodResearch() {
                   {cogData.summary_text}
                 </p>
               </div>
+            )}
+
+            {/* Research Narratives (Movement Patterns, etc.) */}
+            {cogData.research_narratives && cogData.research_narratives.length > 0 && (
+              <>
+                {cogData.research_narratives.map((narrative) => (
+                  <div key={narrative.id} style={{ marginBottom: '3rem' }}>
+                    <div style={{ fontFamily: 'var(--mono)', fontSize: '0.62rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                      {narrative.title}
+                      <span style={{ flex: 1, height: 1, background: 'rgba(212,206,196,0.15)' }} />
+                    </div>
+                    {narrative.summary && (
+                      <p style={{ fontSize: '0.95rem', color: '#d4cec4', lineHeight: 1.8, marginBottom: '1rem' }}>
+                        {narrative.summary}
+                      </p>
+                    )}
+                    <div style={{ fontSize: '0.92rem', color: '#d4cec4', lineHeight: 1.85, marginBottom: '1.5rem' }}>
+                      {narrative.content.split('\n\n').map((para, i) => (
+                        <p key={i} style={{ marginBottom: '1rem', margin: 0 }}>
+                          {para}
+                        </p>
+                      ))}
+                    </div>
+                    {narrative.sources && narrative.sources.length > 0 && (
+                      <div style={{ fontSize: '0.82rem', color: 'var(--muted)', marginTop: '1.5rem', padding: '1rem', background: 'rgba(244,240,232,0.02)', border: '1px solid rgba(212,206,196,0.08)', borderRadius: '3px' }}>
+                        <div style={{ fontFamily: 'var(--mono)', fontSize: '0.6rem', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '0.75rem', color: 'var(--gold)' }}>
+                          Sources
+                        </div>
+                        <ul style={{ margin: 0, paddingLeft: '1.25rem' }}>
+                          {narrative.sources.map((source, i) => (
+                            <li key={i} style={{ marginBottom: '0.5rem', lineHeight: 1.6 }}>
+                              {source.source} {source.confidence && <span style={{ color: 'rgba(212,206,196,0.6)' }}>· {source.confidence}</span>}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </>
             )}
 
             {/* Political Position */}
