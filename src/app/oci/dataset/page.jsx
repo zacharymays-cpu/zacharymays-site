@@ -24,7 +24,7 @@ export default function DatasetPage() {
       <section className="hero">
         <div className="container--narrow">
           <span className="hero__eyebrow animate-up">
-            <Link href="/cultiness" style={{color: 'var(--gold)'}}>The Organizational Coercion Index</Link>
+            <Link href="/oci" style={{color: 'var(--gold)'}}>The Organizational Coercion Index</Link>
             {' '}— The Dataset
           </span>
           <h1 className="hero__title animate-up-2">What Was<br />Assessed</h1>
@@ -165,7 +165,7 @@ export default function DatasetPage() {
               full audit trail are publicly available on GitHub.
             </p>
             <a
-              href="https://github.com/zacharymays-cpu/cultiness-spectrum"
+              href="https://github.com/zacharymays-cpu/oci-spectrum"
               target="_blank"
               rel="noopener noreferrer"
               className="btn-primary"
@@ -206,8 +206,8 @@ export default function DatasetPage() {
           </p>
 
           <div style={{marginTop: '3rem', display: 'flex', gap: '1rem', flexWrap: 'wrap'}}>
-            <Link href="/cultiness/methodology" className="btn-primary">Read the Methodology</Link>
-            <Link href="/cultiness/findings" className="btn-secondary">See the Findings</Link>
+            <Link href="/oci/methodology" className="btn-primary">Read the Methodology</Link>
+            <Link href="/oci/findings" className="btn-secondary">See the Findings</Link>
           </div>
 
         </div>

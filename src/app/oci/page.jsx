@@ -8,10 +8,10 @@ export const metadata = {
 };
 
 const NAV_ITEMS = [
-  { href: '/cultiness/methodology',      label: 'Methodology',   desc: 'How the scoring works' },
-  { href: '/cultiness/ai-methodology',   label: 'AI & Scoring',  desc: 'How AI is used and why' },
-  { href: '/cultiness/findings',         label: 'Findings',      desc: 'What the data shows' },
-  { href: '/cultiness/dataset',          label: 'The Dataset',   desc: 'What was assessed' },
+  { href: '/oci/methodology',      label: 'Methodology',   desc: 'How the scoring works' },
+  { href: '/oci/ai-methodology',   label: 'AI & Scoring',  desc: 'How AI is used and why' },
+  { href: '/oci/findings',         label: 'Findings',      desc: 'What the data shows' },
+  { href: '/oci/dataset',          label: 'The Dataset',   desc: 'What was assessed' },
 ];
 
 export default function CultinessPage() {

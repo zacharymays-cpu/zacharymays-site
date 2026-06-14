@@ -24,7 +24,7 @@ export default function MethodologyPage() {
       <section className="hero">
         <div className="container--narrow">
           <span className="hero__eyebrow animate-up">
-            <Link href="/cultiness" style={{color: 'var(--gold)'}}>The Organizational Coercion Index</Link>
+            <Link href="/oci" style={{color: 'var(--gold)'}}>The Organizational Coercion Index</Link>
             {' '}— Methodology
           </span>
           <h1 className="hero__title animate-up-2">How the<br />Scoring Works</h1>
@@ -268,8 +268,8 @@ export default function MethodologyPage() {
           </p>
 
           <div style={{marginTop: '3rem', display: 'flex', gap: '1rem', flexWrap: 'wrap'}}>
-            <Link href="/cultiness/findings" className="btn-primary">See the Findings</Link>
-            <Link href="/cultiness/dataset" className="btn-secondary">Explore the Dataset</Link>
+            <Link href="/oci/findings" className="btn-primary">See the Findings</Link>
+            <Link href="/oci/dataset" className="btn-secondary">Explore the Dataset</Link>
           </div>
 
         </div>

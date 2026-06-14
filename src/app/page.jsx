@@ -85,15 +85,15 @@ export default function HomePage() {
               </p>
               <div style={{display:'flex',gap:'1rem',flexWrap:'wrap'}}>
                 <Link href="/explore" className="btn-primary">Explore the Dataset</Link>
-                <Link href="/cultiness" className="btn-secondary">About the Project</Link>
+                <Link href="/oci" className="btn-secondary">About the Project</Link>
               </div>
             </div>
             <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'2px'}}>
               {[
                 {href:'/explore',         label:'Dataset Explorer',    desc:'Search, filter, and browse the full dataset'},
                 {href:'/compass',         label:'Political Compass',   desc:'Organizations plotted by political and authority axes'},
-                {href:'/cultiness/methodology',    label:'Methodology',         desc:'How the scoring works, criteria, and N/A rules'},
-                {href:'/cultiness/findings',       label:'Key Findings',        desc:'The headline correlation, tier distribution, and benchmark comparisons'},
+                {href:'/oci/methodology',    label:'Methodology',         desc:'How the scoring works, criteria, and N/A rules'},
+                {href:'/oci/findings',       label:'Key Findings',        desc:'The headline correlation, tier distribution, and benchmark comparisons'},
               ].map((item,i) => (
                 <Link key={i} href={item.href} style={{
                   display:'block', padding:'1.25rem',

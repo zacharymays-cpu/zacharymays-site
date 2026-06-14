@@ -133,8 +133,8 @@ export default function DonatePage() {
               {
                 action: 'Engage with the GitHub repository',
                 desc: 'The dataset is public. Stars, forks, and issues on the repository help establish its credibility as a research resource.',
-                link: 'https://github.com/zacharymays-cpu/cultiness-spectrum',
-                linkLabel: 'github.com/zacharymays-cpu/cultiness-spectrum',
+                link: 'https://github.com/zacharymays-cpu/oci-spectrum',
+                linkLabel: 'github.com/zacharymays-cpu/oci-spectrum',
               },
             ].map((row, i) => (
               <div key={i} style={{padding: '1.25rem 0', borderBottom: '1px solid rgba(212,206,196,0.08)'}}>

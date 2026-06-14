@@ -14,7 +14,7 @@ const NAV_ITEMS = [
   {
     label: 'Organizational Coercion Index',
     items: [
-      { href: '/cultiness',               label: 'Overview' },
+      { href: '/oci',               label: 'Overview' },
       { href: '/explore',                 label: 'Dataset Explorer' },
       { href: '/explore/map',             label: 'Geographic Map' },
       { href: '/compass',                 label: 'Political Compass' },
@@ -32,11 +32,11 @@ const NAV_ITEMS = [
   {
     label: 'Methodology',
     items: [
-      { href: '/cultiness/methodology',     label: 'Scoring Methodology' },
-      { href: '/cultiness/ai-methodology',  label: 'AI & Scoring' },
-      { href: '/cultiness/findings',        label: 'Key Findings' },
+      { href: '/oci/methodology',     label: 'Scoring Methodology' },
+      { href: '/oci/ai-methodology',  label: 'AI & Scoring' },
+      { href: '/oci/findings',        label: 'Key Findings' },
       { href: '/findings',                  label: 'Distribution Analysis' },
-      { href: '/cultiness/dataset',         label: 'Dataset Overview' },
+      { href: '/oci/dataset',         label: 'Dataset Overview' },
     ],
   },
   { href: '/about',  label: 'About' },

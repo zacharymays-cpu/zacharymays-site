@@ -53,7 +53,7 @@ export default async function FindingsPage() {
       <section className="hero">
         <div className="container--narrow">
           <span className="hero__eyebrow animate-up">
-            <Link href="/cultiness" style={{color: 'var(--gold)'}}>The Organizational Coercion Index</Link>
+            <Link href="/oci" style={{color: 'var(--gold)'}}>The Organizational Coercion Index</Link>
             {' '}— Findings
           </span>
           <h1 className="hero__title animate-up-2">What the<br />Data Shows</h1>
@@ -240,9 +240,9 @@ export default async function FindingsPage() {
           </p>
 
           <div style={{marginTop: '3rem', display: 'flex', gap: '1rem', flexWrap: 'wrap'}}>
-            <Link href="/cultiness/dataset" className="btn-primary">Explore the Dataset</Link>
+            <Link href="/oci/dataset" className="btn-primary">Explore the Dataset</Link>
             <Link href="/findings" className="btn-secondary">Live Distribution Analysis</Link>
-            <Link href="/cultiness/methodology" className="btn-secondary">Review the Methodology</Link>
+            <Link href="/oci/methodology" className="btn-secondary">Review the Methodology</Link>
           </div>
 
         </div>

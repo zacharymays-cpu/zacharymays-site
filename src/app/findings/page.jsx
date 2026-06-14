@@ -25,7 +25,7 @@ export default async function FindingsPage() {
       <section className="hero">
         <div className="container--narrow">
           <span className="hero__eyebrow animate-up">
-            <Link href="/cultiness/findings" style={{color:'var(--gold)'}}>Findings</Link>
+            <Link href="/oci/findings" style={{color:'var(--gold)'}}>Findings</Link>
             {' '}— Live Distribution Analysis
           </span>
           <h1 className="hero__title animate-up-2">Distribution<br />&amp; Variance</h1>
@@ -33,7 +33,7 @@ export default async function FindingsPage() {
             Score distribution and composite-vs-Young's instrument variance across
             {' '}{orgs.length} assessed organizations, computed directly from the current
             dataset. For the headline findings and benchmark comparisons, see{' '}
-            <Link href="/cultiness/findings" style={{color:'var(--gold)'}}>Findings</Link>.
+            <Link href="/oci/findings" style={{color:'var(--gold)'}}>Findings</Link>.
           </p>
         </div>
       </section>

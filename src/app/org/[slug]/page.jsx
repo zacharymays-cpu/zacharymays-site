@@ -559,7 +559,7 @@ export default async function OrgPage({ params }) {
                     <em>The Culting of America</em>
                   </a>{' '}
                   (Otterpine, 2026).{' '}
-                  <Link href="/cultiness/methodology" style={{ color: 'var(--gold)' }}>Full methodology →</Link>
+                  <Link href="/oci/methodology" style={{ color: 'var(--gold)' }}>Full methodology →</Link>
                 </p>
               </div>
 

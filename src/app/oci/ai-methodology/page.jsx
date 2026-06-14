@@ -12,9 +12,9 @@ export default function AiMethodologyPage() {
       <section className="hero">
         <div className="container--narrow">
           <span className="hero__eyebrow animate-up">
-            <Link href="/cultiness" style={{color: 'var(--gold)'}}>The Organizational Coercion Index</Link>
+            <Link href="/oci" style={{color: 'var(--gold)'}}>The Organizational Coercion Index</Link>
             {' '}—{' '}
-            <Link href="/cultiness/methodology" style={{color: 'var(--gold)'}}>Methodology</Link>
+            <Link href="/oci/methodology" style={{color: 'var(--gold)'}}>Methodology</Link>
           </span>
           <h1 className="hero__title animate-up-2">AI-Enabled<br />Scoring</h1>
           <p className="hero__subtitle animate-up-3">
@@ -266,8 +266,8 @@ export default function AiMethodologyPage() {
           </div>
 
           <div style={{marginTop: '3rem', display: 'flex', gap: '1rem', flexWrap: 'wrap'}}>
-            <Link href="/cultiness/methodology" className="btn-primary">Full Methodology</Link>
-            <Link href="/cultiness/findings" className="btn-secondary">See the Findings</Link>
+            <Link href="/oci/methodology" className="btn-primary">Full Methodology</Link>
+            <Link href="/oci/findings" className="btn-secondary">See the Findings</Link>
           </div>
 
         </div>
