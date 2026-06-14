@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export const metadata = {
   title: 'Methodology — The Cultiness Spectrum',
-  description: 'How the Cultiness Spectrum scoring system works: the ten criteria, the dual-metric system, N/A discipline, and the evenhandedness standard.',
+  description: 'How the Cultiness Spectrum scoring system works: the ten criteria, the dual-metric system, N/A discipline, evidence-based jury methodology, and the evenhandedness standard. Current version: V5.0 (June 2026).',
 };
 
 const CRITERIA = [
@@ -10,11 +10,11 @@ const CRITERIA = [
   { id: 'C2',  name: 'Sacred Assumptions',            desc: 'Certain beliefs maintained against counter-evidence, with mantras repeated and alternatives dismissed. The key test is not whether beliefs exist but whether they are enforced against documented contradicting evidence. The most extreme form is architectural prevention of counter-evidence from being generated at all.' },
   { id: 'C3',  name: 'Transcendent Mission',          desc: 'A mission so large it justifies sacrifice, treats doubts as betrayal, and provides meaning in ways that override individual judgment. Organizations that structurally encourage internal dissent as an improvement mechanism score N/A — the structural opposite of this criterion.' },
   { id: 'C4',  name: 'Sublimation of Individuality',  desc: 'Identity demands, appearance and lifestyle conformity, and rest-as-weakness culture. Includes institutional statements that inflate membership value, creating a reputational double-bind where departure signals either rejection or poor judgment.' },
-  { id: 'C5',  name: 'Isolation',                     desc: 'Information environment narrows, outside perspectives are dismissed, the world shrinks. Isolation through institutional ecosystem completeness — parallel schools, hospitals, media, employment — scores equivalently to geographic compound isolation. The developmental outcome is functionally identical.' },
+  { id: 'C5',  name: 'Isolation',                     desc: 'Information environment narrows, outside perspectives are dismissed, the world shrinks. Isolation through institutional ecosystem completeness — parallel schools, hospitals, media, employment — scores equivalently to geographic compound isolation. Mechanism specificity: institutional enforcement of isolation scores 8–10; algorithmic or voluntarily mediated isolation scores 5–7.' },
   { id: 'C6',  name: 'Private Vernacular',            desc: 'Specialized vocabulary that marks membership identity, encodes a way of understanding reality difficult to access from outside, and terminates inquiry rather than enabling it. Standard professional field vocabulary does not check this criterion — the test is whether vocabulary operates as epistemological closure, not merely institutional naming.' },
   { id: 'C7',  name: 'Us-Versus-Them',               desc: 'More-enlightened-than-outsiders framing, defectors characterized as broken or corrupt, disagreement framed as bigotry or betrayal. Appropriate labor-management framing in unions and symmetrical partisan framing in political parties are distinguished from pathological enemy-construction.' },
-  { id: 'C8',  name: 'Exploitation of Labor',         desc: 'Sacrifice extracted as virtue, labor monetized through institutional control. Financial extraction coerced through doctrinal framing with salvific or mission stakes is labor extraction. The delivery mechanism — financial, physical, or psychological — does not moderate intensity scoring. Compensation engineered to create exit barriers rather than fairly reward labor also checks this criterion.' },
-  { id: 'C9',  name: 'High Exit Costs',               desc: 'Departure produces social, economic, or identity costs; exit is framed as betrayal. Spiritual absolutism — where departure means eternal damnation, complete family rupture, and total social network dissolution — scores at the same level as physical confinement. The absence of physical restraint does not moderate the score.' },
+  { id: 'C8',  name: 'Exploitation of Labor',         desc: 'Sacrifice extracted as virtue, labor monetized through institutional control. Financial extraction coerced through doctrinal framing with salvific or mission stakes is labor extraction. Systematic sexual harassment maintained through institutional cover-up and NDA architecture also checks this criterion. The delivery mechanism — financial, physical, sexual, or psychological — does not moderate intensity scoring. Compensation engineered to create exit barriers rather than fairly reward labor also checks this criterion.' },
+  { id: 'C9',  name: 'High Exit Costs',               desc: 'Departure produces social, economic, or identity costs; exit is framed as betrayal. Spiritual absolutism — where departure means eternal damnation, complete family rupture, and total social network dissolution — scores at the same level as physical confinement. Mechanism specificity: institutional enforcement of exit costs (asset forfeiture, career destruction, legal consequences) scores 7–10; reputational or social costs without enforcement infrastructure scores 3–6.' },
   { id: 'C10', name: 'Ends Justify the Means',        desc: 'Institutional harm tolerated in pursuit of mission, cover-ups occur, perpetrators are protected. Multi-generational non-correcting harm patterns score at the ceiling regardless of mechanism. The existence of internal dissenters who made the courageous choice within the same constraints establishes that compliant choices were genuine institutional choices, not forced outcomes.' },
 ];
 
@@ -39,6 +39,10 @@ export default function MethodologyPage() {
         <div className="container--narrow">
 
           <div className="section__label">The Source Framework</div>
+
+          <p>
+            <strong>Methodology Version: V5.0 (June 2026)</strong> — Evidence-based jury methodology with updated tier boundaries and mechanism specificity guidance.
+          </p>
 
           <p>
             Every criterion applied in this project is derived verbatim from
@@ -135,9 +139,9 @@ export default function MethodologyPage() {
 
           <div style={{margin: '1.5rem 0'}}>
             {[
-              { range: '0–40%',    tier: 'Not Culty',    color: '#2a6b4a' },
-              { range: '41–70%',   tier: 'Kinda Culty',  color: '#7a4a1a' },
-              { range: '71–100%',  tier: 'Super Culty',  color: '#6b1010' },
+              { range: '0–29%',    tier: 'Not Culty',    color: '#2a6b4a' },
+              { range: '30–59%',   tier: 'Kinda Culty',  color: '#7a4a1a' },
+              { range: '≥60%',     tier: 'Super Culty',  color: '#6b1010' },
             ].map((t, i) => (
               <div key={i} style={{
                 display: 'grid',
@@ -227,11 +231,30 @@ export default function MethodologyPage() {
 
           <hr className="rule" />
 
+          <div className="section__label">Evidence-Based Jury Methodology (V5.0)</div>
+
+          <p>
+            As of June 2026, all new AI-generated scores use an evidence-based jury protocol that eliminates calibration drift:
+          </p>
+
+          <ol style={{color: 'var(--muted)', fontSize: '0.9rem', lineHeight: 1.7}}>
+            <li style={{marginBottom: '0.75rem'}}>An evidence brief is compiled for each criterion — documented behaviors from court records, investigative journalism, academic scholarship, and institutional documentation.</li>
+            <li style={{marginBottom: '0.75rem'}}>The evidence brief is scored independently by three AI models (Claude, GPT-4o, Gemini) — no general knowledge, only the provided evidence.</li>
+            <li style={{marginBottom: '0.75rem'}}>The jury mean becomes the proposed score; a score spread greater than 5 points triggers additional review.</li>
+            <li style={{marginBottom: '0.75rem'}}>A three-model consensus at 0-point spread (perfect agreement) indicates high reliability.</li>
+          </ol>
+
+          <p style={{color: 'var(--muted)', fontSize: '0.9rem', marginTop: '1rem'}}>
+            This methodology corrected systematic upward bias that existed in previous anchor-calibrated versions, particularly for C5 (Isolation), C8 (Labor Exploitation), and C9 (Exit Costs) when applied to political and media organizations.
+          </p>
+
+          <hr className="rule" />
+
           <div className="section__label">The Human Review Gate</div>
 
           <p>
             AI-assisted scoring is used to generate proposed assessments at
-            scale. Every proposed score passes through human review before
+            scale. Every proposed score — jury mean or solo assessment — passes through human review before
             entering the dataset. The reviewer verifies that each score is
             consistent with the body text, that N/A designations have
             structural rationale, that cited sources support the claims made,
