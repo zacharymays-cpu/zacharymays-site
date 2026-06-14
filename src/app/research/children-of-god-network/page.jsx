@@ -15,6 +15,7 @@ export default function ChildrenOfGodResearch() {
   const map = useRef(null);
   const [geojsonData, setGeojsonData] = useState(null);
   const [cogData, setCogData] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
     confidence: { HIGH: true, MEDIUM: true, LOW: true },
     facilityType: {
@@ -52,9 +53,10 @@ export default function ChildrenOfGodResearch() {
   // Fetch org data from Supabase
   useEffect(() => {
     const fetchOrgData = async () => {
+      setLoading(true);
       try {
         const res = await fetch(
-          `${SUPABASE_URL}/rest/v1/organizations?select=id,name,slug,category,composite_score,composite_tier,youngs_score,founding_year,defunct_year,trajectory,summary_text,active,membership_count,membership_count_year,revenue_usd,revenue_year,size_tier,size_notes,political_scores(economic_axis,authority_axis,political_quadrant,scoring_notes),criterion_scores(criterion,score,confidence,body_text)&name=eq.Children of God / The Family`,
+          `${SUPABASE_URL}/rest/v1/organizations?select=id,name,slug,category,composite_score,composite_tier,youngs_score,founding_year,defunct_year,trajectory,summary_text,active,membership_count,membership_count_year,revenue_usd,revenue_year,size_tier,size_notes,political_scores(economic_axis,authority_axis,political_quadrant,scoring_notes),criterion_scores(criterion,score,confidence,body_text)&slug=eq.children-of-god-family-international`,
           {
             headers: {
               apikey: ANON_KEY,
@@ -75,6 +77,8 @@ export default function ChildrenOfGodResearch() {
         }
       } catch (error) {
         console.error('Error fetching org data:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -250,6 +254,17 @@ export default function ChildrenOfGodResearch() {
   // Render appropriate view based on active tab
   if (activeTab === 'movements') {
     return <SurvivorMovements />;
+  }
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className={styles.page} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
+        <div style={{ textAlign: 'center', color: 'var(--muted)' }}>
+          <p style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>Loading research data...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -648,6 +663,15 @@ export default function ChildrenOfGodResearch() {
         </main>
       </div>
       </>
+      )}
+      {!cogData && !loading && (
+        <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '2rem' }}>
+          <div style={{ background: 'rgba(220, 50, 47, 0.1)', border: '1px solid rgba(220, 50, 47, 0.3)', padding: '2rem', borderRadius: '4px', textAlign: 'center' }}>
+            <p style={{ color: 'var(--accent)', fontSize: '1.1rem', margin: '0' }}>
+              Unable to load organization data. Please check back later or contact support.
+            </p>
+          </div>
+        </div>
       )}
     </div>
   );
