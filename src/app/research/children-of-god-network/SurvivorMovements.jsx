@@ -5,8 +5,12 @@ import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import styles from './page.module.css';
 
-const SUPABASE_URL = 'https://shgdrkrqjnwtlyxcdayp.supabase.co';
-const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNoZ2Rya3JxanR3dGx5eGNkYXlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDk3NTczODMsImV4cCI6MTcyNzUzMzM4M30.kbJq8sxP6pZNqpd9Z2Y0i_HHvRLgKF7sDIV46DKEqbQ';
+const MAPTILER_KEY = process.env.NEXT_PUBLIC_MAPTILER_KEY;
+const USING_MAPTILER = Boolean(MAPTILER_KEY);
+const CARTO_FALLBACK = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json';
+const styleUrl = (id) => (USING_MAPTILER
+  ? `https://api.maptiler.com/maps/${id}/style.json?key=${MAPTILER_KEY}`
+  : CARTO_FALLBACK);
 
 const MOVEMENT_PATTERNS = [
   { id: 'japan-phil', name: 'Japan → Philippines', color: '#dc322f', survivors: 5 },
@@ -16,11 +20,13 @@ const MOVEMENT_PATTERNS = [
   { id: 'hq-macau', name: 'Huntington Beach → Macau', color: '#2aa198', survivors: 3 },
 ];
 
-export default function SurvivorMovements() {
+// `compounds` and `journeys` are fetched server-side in page.jsx and passed in
+// as props — same single source of truth (Supabase) as the Compound Network map.
+export default function SurvivorMovements({ compounds = [], journeys = [] }) {
   const mapContainer = useRef(null);
   const map = useRef(null);
-  const [movementData, setMovementData] = useState(null);
-  const [compounds, setCompounds] = useState(null);
+  const movementData = journeys;
+  const [hoveredRoute, setHoveredRoute] = useState(null);
   const [filters, setFilters] = useState({
     minSurvivors: 1,
     yearRange: [1968, 2024],
@@ -32,70 +38,16 @@ export default function SurvivorMovements() {
       'hq-macau': true,
     },
   });
-  const [hoveredRoute, setHoveredRoute] = useState(null);
-
-  // Fetch survivor journey data with compound coordinates
-  useEffect(() => {
-    const fetchCompounds = async () => {
-      try {
-        // Try Supabase first
-        const res = await fetch(
-          `${SUPABASE_URL}/rest/v1/cog_compounds?select=id,compound_name,latitude,longitude,country,city,facility_type,opened_year,closed_year`,
-          {
-            headers: {
-              apikey: ANON_KEY,
-              Authorization: `Bearer ${ANON_KEY}`,
-            },
-          }
-        );
-        if (res.ok) {
-          const data = await res.json();
-          const validData = data.filter(c => c.latitude && c.longitude);
-          if (validData.length > 0) {
-            setCompounds(validData);
-            return;
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching from Supabase:', error);
-      }
-
-      // Fallback to static GeoJSON
-      try {
-        const geoRes = await fetch('/cog_locations.geojson');
-        const geoData = await geoRes.json();
-        const converted = geoData.features.map((f, idx) => ({
-          id: f.properties.id || `fallback_${idx}`,
-          compound_name: f.properties.name,
-          latitude: f.geometry.coordinates[1],
-          longitude: f.geometry.coordinates[0],
-          country: f.properties.country,
-          city: f.properties.city,
-          facility_type: f.properties.facility_type,
-        }));
-        setCompounds(converted);
-      } catch (error) {
-        console.error('Error loading fallback GeoJSON:', error);
-      }
-    };
-
-    fetchCompounds();
-  }, []);
 
   // Initialize map and draw movement flows
   useEffect(() => {
-    if (!mapContainer.current || !compounds) return;
+    if (!mapContainer.current || !compounds || compounds.length === 0) return;
 
     const initMap = async () => {
       try {
-        const mapTilerKey = process.env.NEXT_PUBLIC_MAPTILER_KEY;
-        const mapStyle = mapTilerKey
-          ? `https://api.maptiler.com/maps/streets/style.json?key=${mapTilerKey}`
-          : 'https://demotiles.maplibre.org/style.json';
-
         map.current = new maplibregl.Map({
           container: mapContainer.current,
-          style: mapStyle,
+          style: styleUrl('hybrid'),
           center: [0, 20],
           zoom: 2,
           maxZoom: 19,
@@ -118,7 +70,7 @@ export default function SurvivorMovements() {
         map.current = null;
       }
     };
-  }, [compounds]);
+  }, [compounds, journeys]);
 
   // Add compound location dots
   const addCompoundsLayer = () => {
