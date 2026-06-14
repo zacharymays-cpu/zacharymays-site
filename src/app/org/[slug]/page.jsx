@@ -33,7 +33,8 @@ async function getOrg(slug) {
       methodology_version, updated_at, active,
       political_scores ( economic_axis, authority_axis, political_quadrant, scoring_notes ),
       criterion_scores ( criterion, score, confidence, na_rationale, body_text,
-        evidence_sources ( source_type, title, author, publication, year, url, doi, factual_tier ) )
+        evidence_sources ( source_type, title, author, publication, year, url, doi, factual_tier ) ),
+      organization_research_narratives ( id, narrative_type, title, content, summary, confidence_level, sources, created_at )
     `)
     .eq('slug', slug)
     .single()
@@ -431,6 +432,46 @@ export default async function OrgPage({ params }) {
                   </div>
                   <p style={{ fontSize: '1.05rem', color: '#e8e4dc', lineHeight: 1.8, margin: 0 }}>{org.summary_text}</p>
                 </div>
+              )}
+
+              {/* Research Narratives (Movement Patterns, etc.) */}
+              {org.organization_research_narratives && org.organization_research_narratives.length > 0 && (
+                <>
+                  {org.organization_research_narratives.map((narrative) => (
+                    <div key={narrative.id} style={{ marginBottom: '3rem' }}>
+                      <div style={{ fontFamily: 'var(--mono)', fontSize: '0.62rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                        {narrative.title}
+                        <span style={{ flex: 1, height: 1, background: 'rgba(212,206,196,0.15)' }} />
+                      </div>
+                      {narrative.summary && (
+                        <p style={{ fontSize: '0.95rem', color: '#d4cec4', lineHeight: 1.8, marginBottom: '1rem' }}>
+                          {narrative.summary}
+                        </p>
+                      )}
+                      <div style={{ fontSize: '0.92rem', color: '#d4cec4', lineHeight: 1.85, whiteSpace: 'pre-wrap', wordBreak: 'break-word', marginBottom: '1.5rem' }}>
+                        {narrative.content.split('\n\n').map((para, i) => (
+                          <p key={i} style={{ marginBottom: '1rem', margin: 0 }}>
+                            {para}
+                          </p>
+                        ))}
+                      </div>
+                      {narrative.sources && narrative.sources.length > 0 && (
+                        <div style={{ fontSize: '0.82rem', color: 'var(--muted)', marginTop: '1.5rem', padding: '1rem', background: 'rgba(244,240,232,0.02)', border: '1px solid rgba(212,206,196,0.08)', borderRadius: '3px' }}>
+                          <div style={{ fontFamily: 'var(--mono)', fontSize: '0.6rem', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '0.75rem', color: 'var(--gold)' }}>
+                            Sources
+                          </div>
+                          <ul style={{ margin: 0, paddingLeft: '1.25rem' }}>
+                            {narrative.sources.map((source, i) => (
+                              <li key={i} style={{ marginBottom: '0.5rem', lineHeight: 1.6 }}>
+                                {source.source} {source.confidence && <span style={{ color: 'rgba(212,206,196,0.6)' }}>· {source.confidence}</span>}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </>
               )}
 
               {/* Ten Criteria */}
