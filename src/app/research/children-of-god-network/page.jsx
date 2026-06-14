@@ -18,9 +18,16 @@ export default async function ChildrenOfGodPage() {
         `&slug=eq.children-of-god-the-family`,
       opts
     ),
+    // NOTE: cog_compounds also contains 15 Twelve Tribes communes (loaded by a
+    // mistaken Phase-4 integration) identifiable by their snake_case
+    // facility_type vocab. Exclude them so only genuine Children of God
+    // locations appear here. Until the data is properly partitioned by org,
+    // this filter is the guard.
     fetch(
       `${SUPABASE_URL}/rest/v1/cog_compounds` +
         `?select=id,compound_name,city,country,facility_type,opened_year,closed_year,status,confidence,latitude,longitude,sources,notes` +
+        `&facility_type=not.in.(communal_residence,communal_residence_business,communal_farm)` +
+        `&compound_name=not.ilike.Test*` +
         `&order=opened_year.asc`,
       opts
     ),
