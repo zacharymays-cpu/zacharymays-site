@@ -1,0 +1,140 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-77.3667, 34.7167]
+      },
+      "properties": {
+        "name": "Marine Raider Regiment (MRR)",
+        "facility_type": "Headquarters",
+        "location": "Camp Lejeune, Stone Bay, NC",
+        "confidence": "HIGH",
+        "opened_year": 2006,
+        "description": "Headquarters of MARSOC Marine Raider Regiment"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-77.3667, 34.7167]
+      },
+      "properties": {
+        "name": "1st Marine Raider Battalion",
+        "facility_type": "Battalion",
+        "location": "Camp Lejeune, Stone Bay, NC",
+        "confidence": "HIGH",
+        "opened_year": 2006,
+        "description": "1st Battalion, Marine Raider Regiment"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-77.3667, 34.7167]
+      },
+      "properties": {
+        "name": "2d Marine Raider Battalion",
+        "facility_type": "Battalion",
+        "location": "Camp Lejeune, Stone Bay, NC",
+        "confidence": "HIGH",
+        "opened_year": 2006,
+        "description": "2d Battalion, Marine Raider Regiment"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-77.3667, 34.7167]
+      },
+      "properties": {
+        "name": "3d Marine Raider Battalion",
+        "facility_type": "Battalion",
+        "location": "Camp Lejeune, Stone Bay, NC",
+        "confidence": "HIGH",
+        "opened_year": 2006,
+        "description": "3d Battalion, Marine Raider Regiment"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-77.3667, 34.7167]
+      },
+      "properties": {
+        "name": "Marine Raider Support Group (MRSG)",
+        "facility_type": "Support Group",
+        "location": "Camp Lejeune, Stone Bay, NC",
+        "confidence": "HIGH",
+        "opened_year": 2006,
+        "description": "Support command for Marine Raider operations"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-77.3667, 34.7167]
+      },
+      "properties": {
+        "name": "1st Marine Raider Support Battalion",
+        "facility_type": "Support Battalion",
+        "location": "Camp Lejeune, Stone Bay, NC",
+        "confidence": "HIGH",
+        "opened_year": 2006,
+        "description": "1st Support Battalion, Marine Raider Support Group"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-77.3667, 34.7167]
+      },
+      "properties": {
+        "name": "2d Marine Raider Support Battalion",
+        "facility_type": "Support Battalion",
+        "location": "Camp Lejeune, Stone Bay, NC",
+        "confidence": "HIGH",
+        "opened_year": 2006,
+        "description": "2d Support Battalion, Marine Raider Support Group"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-77.3667, 34.7167]
+      },
+      "properties": {
+        "name": "3d Marine Raider Support Battalion",
+        "facility_type": "Support Battalion",
+        "location": "Camp Lejeune, Stone Bay, NC",
+        "confidence": "HIGH",
+        "opened_year": 2006,
+        "description": "3d Support Battalion, Marine Raider Support Group"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-77.3667, 34.7167]
+      },
+      "properties": {
+        "name": "Marine Raider Training Center (MRTC)",
+        "facility_type": "Training Center",
+        "location": "Camp Lejeune, Stone Bay, NC",
+        "confidence": "HIGH",
+        "opened_year": 2006,
+        "description": "Training facility for Marine Raider Assessment & Selection and Individual Training Course"
+      }
+    }
+  ]
+}
