@@ -306,6 +306,10 @@ a:hover { color: var(--paper); }
   color: var(--accent-text);
 }
 
+.hero__title--compact {
+  font-size: clamp(2rem, 4vw, 2.8rem);
+}
+
 .hero__subtitle {
   font-size: clamp(1rem, 2vw, 1.2rem);
   color: var(--muted);
@@ -313,6 +317,12 @@ a:hover { color: var(--paper); }
   max-width: 600px;
   line-height: 1.6;
   margin-bottom: 0;
+}
+
+.hero__subtitle--compact {
+  font-size: 1rem;
+  color: #a39d95;
+  margin-top: 0.5rem;
 }
 
 /* ── Section ─────────────────────────────────────────────── */
@@ -374,6 +384,38 @@ a:hover { color: var(--paper); }
   top: 0; left: 0;
   width: 3px; height: 100%;
   background: var(--accent);
+}
+
+/* ── Component card (for research-system pages) ───────────── */
+.component-card {
+  padding: 1.5rem;
+  border: 1px solid rgba(212, 206, 196, 0.15);
+  border-left: 3px solid var(--accent);
+  background: rgba(244, 240, 232, 0.02);
+}
+
+.component-card__title {
+  font-family: var(--serif);
+  font-size: 1.1rem;
+  margin-bottom: 0.25rem;
+  color: var(--paper);
+  font-weight: 700;
+}
+
+.component-card__label {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.75rem;
+}
+
+.component-card__text {
+  font-size: 0.9rem;
+  color: #a39d95;
+  line-height: 1.6;
+  margin: 0;
 }
 
 /* ── Subject grid ────────────────────────────────────────── */
