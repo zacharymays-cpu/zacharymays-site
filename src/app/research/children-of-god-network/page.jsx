@@ -6,8 +6,7 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import styles from './page.module.css';
 import SurvivorMovements from './SurvivorMovements';
 
-const SUPABASE_URL = 'https://shgdrkrqjnwtlyxcdayp.supabase.co';
-const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNoZ2Rya3JxanR3dGx5eGNkYXlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDk3NTczODMsImV4cCI6MTcyNzUzMzM4M30.kbJq8sxP6pZNqpd9Z2Y0i_HHvRLgKF7sDIV46DKEqbQ';
+import { SUPABASE_URL, ANON_KEY } from '../../../lib/supabase/config';
 
 export default function ChildrenOfGodResearch() {
   const [activeTab, setActiveTab] = useState('compounds');
@@ -56,7 +55,7 @@ export default function ChildrenOfGodResearch() {
       setLoading(true);
       try {
         const res = await fetch(
-          `${SUPABASE_URL}/rest/v1/organizations?select=id,name,slug,category,composite_score,composite_tier,youngs_score,founding_year,defunct_year,trajectory,summary_text,active,membership_count,membership_count_year,revenue_usd,revenue_year,size_tier,size_notes,political_scores(economic_axis,authority_axis,political_quadrant,scoring_notes),criterion_scores(criterion,score,confidence,body_text)&name=eq.Children of God / The Family`,
+          `${SUPABASE_URL}/rest/v1/organizations?select=id,name,slug,category,composite_score,composite_tier,youngs_score,founding_year,defunct_year,trajectory,summary_text,active,membership_count,membership_count_year,revenue_usd,revenue_year,size_tier,size_notes,political_scores(economic_axis,authority_axis,political_quadrant,scoring_notes),criterion_scores(criterion,score,confidence,body_text)&slug=eq.children-of-god-the-family`,
           {
             headers: {
               apikey: ANON_KEY,
