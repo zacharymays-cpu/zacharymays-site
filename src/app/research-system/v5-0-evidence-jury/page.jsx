@@ -77,7 +77,7 @@ export default function V50Page() {
             <rect x="50" y="295" width="600" height="90" className="box" rx="4" />
             <text x="350" y="325" className="label" textAnchor="middle">Consensus Logic</text>
             <text x="350" y="350" className="small-label" textAnchor="middle">jury_mean • jury_median • jury_spread • consensus_strong</text>
-            <text x="350" y="370" style={{ fontSize: '11px', fill: '#6b6560', textAnchor: 'middle' }}>Spread Thresholds: 0-5pt strong | 6-10pt accept with notes | 11-20pt review | >20pt revise</text>
+            <text x="350" y="370" style={{ fontSize: '11px', fill: '#6b6560', textAnchor: 'middle' }}>Spread Thresholds: 0-5pt strong | 6-10pt accept with notes | 11-20pt review | &gt;20pt revise</text>
 
             <path d="M 350 385 L 350 415" className="arrow" />
 

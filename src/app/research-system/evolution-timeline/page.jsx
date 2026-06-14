@@ -63,15 +63,15 @@ export default function EvolutionTimelinePage() {
 
           <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.4rem', marginBottom: '1rem', color: '#f4f0e8' }}>Core Principles</h3>
           <ul style={{ marginTop: '1rem', paddingLeft: '2rem', color: '#f4f0e8' }}>
-            <li><strong>Rigor > Speed:</strong> Each version prioritizes methodological validity over rapid deployment.</li>
-            <li><strong>Transparency > Elegance:</strong> Document decisions, rejections, and trade-offs openly. Governance is visible.</li>
-            <li><strong>Auditability > Automation:</strong> Human review gate is preserved even as jury complexity increases.</li>
-            <li><strong>Generalizability > Domain-Specificity:</strong> System architecture is reusable across research domains.</li>
+            <li><strong>Rigor &gt; Speed:</strong> Each version prioritizes methodological validity over rapid deployment.</li>
+            <li><strong>Transparency &gt; Elegance:</strong> Document decisions, rejections, and trade-offs openly. Governance is visible.</li>
+            <li><strong>Auditability &gt; Automation:</strong> Human review gate is preserved even as jury complexity increases.</li>
+            <li><strong>Generalizability &gt; Domain-Specificity:</strong> System architecture is reusable across research domains.</li>
           </ul>
 
           <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.4rem', marginTop: '2rem', marginBottom: '1rem', color: '#f4f0e8' }}>Key Decisions</h3>
           <ul style={{ marginTop: '1rem', paddingLeft: '2rem', color: '#f4f0e8' }}>
-            <li><strong>Multi-model > Single-model:</strong> Jury consensus reduces single-model bias. But diversity must improve metrics, not worsen them (V5.2 rejection).</li>
+            <li><strong>Multi-model &gt; Single-model:</strong> Jury consensus reduces single-model bias. But diversity must improve metrics, not worsen them (V5.2 rejection).</li>
             <li><strong>Evidence tiers are essential:</strong> Not all sources are equal. 8-tier hierarchy ensures methodological rigor.</li>
             <li><strong>Human review is non-negotiable:</strong> No fully automated scoring. Governance gates preserve accountability.</li>
             <li><strong>Formal metrics enable publication:</strong> Krippendorff's alpha, ICC, ECRA statements transform jury scoring into publishable research.</li>
