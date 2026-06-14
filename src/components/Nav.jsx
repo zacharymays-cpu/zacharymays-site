@@ -12,7 +12,7 @@ const NAV_ITEMS = [
     ],
   },
   {
-    label: 'Cultiness Spectrum',
+    label: 'Organizational Coercion Index',
     items: [
       { href: '/cultiness',               label: 'Overview' },
       { href: '/explore',                 label: 'Dataset Explorer' },
