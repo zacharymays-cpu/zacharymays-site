@@ -180,7 +180,7 @@ export default function ChildrenOfGodResearch() {
   const hasScaleData = cogData && Boolean(membershipCount || revenueUsd || sizeTier || cogData.size_notes);
 
   useEffect(() => {
-    if (activeTab !== 'compounds' || !cogData || !compounds || !mapContainer.current) return;
+    if (activeTab !== 'compounds' || !cogData || compounds === null || !mapContainer.current) return;
 
     const initMap = async () => {
       try {
