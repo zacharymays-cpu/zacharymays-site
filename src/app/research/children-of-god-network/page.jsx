@@ -502,7 +502,7 @@ export default function ChildrenOfGodResearch() {
             <input
               type="range"
               min="1968"
-              max="1994"
+              max="2000"
               value={filters.year}
               onChange={e => handleFilterChange('year', parseInt(e.target.value))}
               className={styles.slider}
