@@ -2,8 +2,8 @@ import Link from 'next/link';
 import OrgCount from '../../../components/OrgCount';
 
 export const metadata = {
-  title: 'AI-Enabled Scoring — The Cultiness Spectrum',
-  description: 'Full transparency on how AI is used in the Cultiness Spectrum scoring process — what it does, why, the benefits, and the tradeoffs.',
+  title: 'AI-Enabled Scoring — The Organizational Coercion Index',
+  description: 'Full transparency on how AI is used in the Organizational Coercion Index scoring process — what it does, why, the benefits, and the tradeoffs.',
 };
 
 export default function AiMethodologyPage() {
@@ -12,7 +12,7 @@ export default function AiMethodologyPage() {
       <section className="hero">
         <div className="container--narrow">
           <span className="hero__eyebrow animate-up">
-            <Link href="/cultiness" style={{color: 'var(--gold)'}}>The Cultiness Spectrum</Link>
+            <Link href="/cultiness" style={{color: 'var(--gold)'}}>The Organizational Coercion Index</Link>
             {' '}—{' '}
             <Link href="/cultiness/methodology" style={{color: 'var(--gold)'}}>Methodology</Link>
           </span>

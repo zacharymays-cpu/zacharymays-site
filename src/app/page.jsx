@@ -3,7 +3,7 @@ import OrgCount from '../components/OrgCount';
 
 export const metadata = {
   title: 'Zachary S. Mays — Author',
-  description: 'Author of How We Got Here and Assholes in History. Home of the Cultiness Spectrum dataset.',
+  description: 'Author of How We Got Here and Assholes in History. Home of the Organizational Coercion Index dataset.',
 };
 
 export default function HomePage() {
@@ -69,7 +69,7 @@ export default function HomePage() {
           <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'4rem',alignItems:'center'}}>
             <div>
               <span style={{fontFamily:'var(--mono)',fontSize:'0.68rem',letterSpacing:'0.2em',textTransform:'uppercase',color:'var(--gold)',display:'block',marginBottom:'1.25rem'}}>
-                The Cultiness Spectrum
+                The Organizational Coercion Index
               </span>
               <h2 style={{fontFamily:'var(--serif)',fontSize:'clamp(1.8rem,3vw,2.8rem)',lineHeight:1.15,letterSpacing:'-0.02em',color:'var(--paper)',marginBottom:'1.25rem'}}>
                 <OrgCount /> American organizations.<br />One framework.

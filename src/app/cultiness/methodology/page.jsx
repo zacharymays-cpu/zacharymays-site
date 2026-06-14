@@ -1,8 +1,8 @@
 import Link from 'next/link';
 
 export const metadata = {
-  title: 'Methodology — The Cultiness Spectrum',
-  description: 'How the Cultiness Spectrum scoring system works: the ten criteria, the dual-metric system, N/A discipline, evidence-based jury methodology, and the evenhandedness standard. Current version: V5.0 (June 2026).',
+  title: 'Methodology — The Organizational Coercion Index',
+  description: 'How the Organizational Coercion Index scoring system works: the ten criteria, the dual-metric system, N/A discipline, evidence-based jury methodology, and the evenhandedness standard. Current version: V5.0 (June 2026).',
 };
 
 const CRITERIA = [
@@ -24,7 +24,7 @@ export default function MethodologyPage() {
       <section className="hero">
         <div className="container--narrow">
           <span className="hero__eyebrow animate-up">
-            <Link href="/cultiness" style={{color: 'var(--gold)'}}>The Cultiness Spectrum</Link>
+            <Link href="/cultiness" style={{color: 'var(--gold)'}}>The Organizational Coercion Index</Link>
             {' '}— Methodology
           </span>
           <h1 className="hero__title animate-up-2">How the<br />Scoring Works</h1>

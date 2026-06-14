@@ -3,7 +3,7 @@ import OrgCount from '../../components/OrgCount';
 import Correlation from '../../components/Correlation';
 
 export const metadata = {
-  title: 'The Cultiness Spectrum',
+  title: 'The Organizational Coercion Index',
   description: 'An independent public research project applying the Young-Reed framework systematically across hundreds of American institutions, openly documented and ongoing.',
 };
 
@@ -23,7 +23,7 @@ export default function CultinessPage() {
             An independent public research project
           </span>
           <h1 className="hero__title animate-up-2">
-            The Cultiness<br />Spectrum
+            The Organizational<br />Coercion Index
           </h1>
           <p className="hero__subtitle animate-up-3">
             A systematic, evenhanded application of the Young-Reed
@@ -39,7 +39,7 @@ export default function CultinessPage() {
           <div className="section__label">What This Is</div>
 
           <p>
-            The Cultiness Spectrum is an independent educational research
+            The Organizational Coercion Index is an independent educational research
             project. Its purpose is straightforward: to apply the framework
             developed by Daniella Mestyanek Young and Amy Reed in{' '}
             <a href="https://uncultureyourself.com" target="_blank" rel="noopener noreferrer">
