@@ -12,398 +12,249 @@ const styleUrl = (id) => (USING_MAPTILER
   ? `https://api.maptiler.com/maps/${id}/style.json?key=${MAPTILER_KEY}`
   : CARTO_FALLBACK);
 
-const MOVEMENT_PATTERNS = [
-  { id: 'japan-phil', name: 'Japan → Philippines', color: '#dc322f', survivors: 5 },
-  { id: 'macau-japan', name: 'Macau → Japan', color: '#cb4b16', survivors: 4 },
-  { id: 'macau-london', name: 'Macau → London', color: '#b58900', survivors: 3 },
-  { id: 'toronto-london', name: 'Toronto → London', color: '#859900', survivors: 2 },
-  { id: 'hq-macau', name: 'Huntington Beach → Macau', color: '#2aa198', survivors: 3 },
-];
+const summarize = (wp) => wp.map((w) => w.city || w.name).join(' → ');
+const yearSpan = (wp) => {
+  const ys = wp.flatMap((w) => [w.year_from, w.year_to]).filter((y) => y != null);
+  if (!ys.length) return '';
+  const lo = Math.min(...ys), hi = Math.max(...ys);
+  return lo === hi ? `${lo}` : `${lo}–${hi}`;
+};
 
-// `compounds` and `journeys` are fetched server-side in page.jsx and passed in
-// as props — same single source of truth (Supabase) as the Compound Network map.
-export default function SurvivorMovements({ compounds = [], journeys = [] }) {
+// `compounds` (location dots) and `personPaths` (each survivor's reconstructed
+// chronological location chain) are fetched + built server-side in page.jsx.
+export default function SurvivorMovements({ compounds = [], personPaths = [] }) {
   const mapContainer = useRef(null);
   const map = useRef(null);
-  const movementData = journeys;
-  const [hoveredRoute, setHoveredRoute] = useState(null);
-  const [filters, setFilters] = useState({
-    minSurvivors: 1,
-    yearRange: [1968, 2024],
-    showPattern: {
-      'japan-phil': true,
-      'macau-japan': true,
-      'macau-london': true,
-      'toronto-london': true,
-      'hq-macau': true,
-    },
-  });
+  const featureIdByPerson = useRef({});
+  const [selected, setSelected] = useState(null); // person_id or null
 
-  // Initialize map and draw movement flows
   useEffect(() => {
-    if (!mapContainer.current || !compounds || compounds.length === 0) return;
+    if (!mapContainer.current) return;
 
-    const initMap = async () => {
-      try {
-        map.current = new maplibregl.Map({
-          container: mapContainer.current,
-          style: styleUrl('hybrid'),
-          center: [0, 20],
-          zoom: 2,
-          maxZoom: 19,
-        });
+    map.current = new maplibregl.Map({
+      container: mapContainer.current,
+      style: styleUrl('hybrid'),
+      center: [0, 20],
+      zoom: 2,
+      maxZoom: 19,
+    });
 
-        map.current.on('load', () => {
-          addCompoundsLayer();
-          addMovementFlows();
-        });
-      } catch (error) {
-        console.error('Error initializing map:', error);
-      }
-    };
-
-    initMap();
+    map.current.on('load', () => {
+      addCompoundDots();
+      addPersonPaths();
+    });
 
     return () => {
-      if (map.current) {
-        map.current.remove();
-        map.current = null;
-      }
+      if (map.current) { map.current.remove(); map.current = null; }
     };
-  }, [compounds, journeys]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [compounds, personPaths]);
 
-  // Add compound location dots
-  const addCompoundsLayer = () => {
-    if (!map.current || !compounds) return;
-
-    const features = compounds.map(c => ({
-      type: 'Feature',
-      properties: {
-        name: c.compound_name,
-        country: c.country,
-        city: c.city,
-        type: c.facility_type,
-      },
-      geometry: {
-        type: 'Point',
-        coordinates: [c.longitude, c.latitude],
-      },
-    }));
-
+  const addCompoundDots = () => {
+    if (!map.current || !compounds.length) return;
     map.current.addSource('compounds', {
       type: 'geojson',
       data: {
         type: 'FeatureCollection',
-        features,
+        features: compounds
+          .filter((c) => c.latitude != null && c.longitude != null)
+          .map((c) => ({
+            type: 'Feature',
+            properties: { name: c.compound_name, city: c.city, country: c.country, type: c.facility_type },
+            geometry: { type: 'Point', coordinates: [Number(c.longitude), Number(c.latitude)] },
+          })),
       },
     });
-
     map.current.addLayer({
       id: 'compounds-layer',
       type: 'circle',
       source: 'compounds',
       paint: {
-        'circle-radius': 6,
+        'circle-radius': 4,
         'circle-color': '#d4af37',
-        'circle-opacity': 0.8,
-        'circle-stroke-width': 2,
+        'circle-opacity': 0.55,
+        'circle-stroke-width': 1,
         'circle-stroke-color': '#fff',
-        'circle-stroke-opacity': 0.6,
+        'circle-stroke-opacity': 0.4,
       },
     });
-
-    // Add popup on click
     map.current.on('click', 'compounds-layer', (e) => {
-      const props = e.features[0].properties;
-      const popupHTML = `
-        <div style="font-family: system-ui; font-size: 12px;">
-          <strong>${props.name}</strong><br/>
-          ${props.city}, ${props.country}<br/>
-          <span style="color: #999;">${props.type}</span>
-        </div>
-      `;
+      const p = e.features[0].properties;
       new maplibregl.Popup()
         .setLngLat(e.lngLat)
-        .setHTML(popupHTML)
+        .setHTML(`<div style="font-family:system-ui;font-size:12px;"><strong>${p.name}</strong><br/>${p.city}, ${p.country}<br/><span style="color:#999;">${p.type || ''}</span></div>`)
         .addTo(map.current);
-    });
-
-    map.current.on('mouseenter', 'compounds-layer', () => {
-      map.current.getCanvas().style.cursor = 'pointer';
-    });
-    map.current.on('mouseleave', 'compounds-layer', () => {
-      map.current.getCanvas().style.cursor = '';
     });
   };
 
-  // Add movement flow lines between compounds
-  const addMovementFlows = () => {
-    if (!map.current || !compounds || !movementData) return;
+  const addPersonPaths = () => {
+    if (!map.current || !personPaths.length) return;
 
-    // Create a lookup map for compound coordinates
-    const compoundCoords = {};
-    compounds.forEach(c => {
-      compoundCoords[c.id] = [c.longitude, c.latitude];
-    });
-
-    // Group journeys by route (from_compound → to_compound)
-    const routes = {};
-    movementData.forEach(journey => {
-      if (!journey.from_compound_id || !journey.to_compound_id) return;
-
-      const key = `${journey.from_compound_id}-${journey.to_compound_id}`;
-      if (!routes[key]) {
-        routes[key] = {
-          from_id: journey.from_compound_id,
-          to_id: journey.to_compound_id,
-          survivors: [],
-          years: { min: journey.year_from, max: journey.year_to },
-        };
-      }
-      routes[key].survivors.push(journey.person_name);
-      routes[key].years.min = Math.min(routes[key].years.min, journey.year_from);
-      routes[key].years.max = Math.max(routes[key].years.max, journey.year_to);
-    });
-
-    // Create GeoJSON for flow lines
-    const flowFeatures = Object.entries(routes).map(([key, route]) => {
-      const fromCoords = compoundCoords[route.from_id];
-      const toCoords = compoundCoords[route.to_id];
-
-      if (!fromCoords || !toCoords) return null;
-
+    featureIdByPerson.current = {};
+    const lineFeatures = personPaths.map((p, i) => {
+      featureIdByPerson.current[p.person_id] = i;
       return {
         type: 'Feature',
-        properties: {
-          survivors: route.survivors.length,
-          survivorNames: route.survivors.join(', '),
-          years: `${route.years.min}–${route.years.max}`,
-          key,
-        },
-        geometry: {
-          type: 'LineString',
-          coordinates: [fromCoords, toCoords],
-        },
+        id: i,
+        properties: { person_id: p.person_id, person_name: p.person_name, color: p.color, summary: summarize(p.waypoints) },
+        geometry: { type: 'LineString', coordinates: p.waypoints.map((w) => [w.lng, w.lat]) },
       };
-    }).filter(Boolean);
+    });
 
-    if (flowFeatures.length === 0) return;
-
-    map.current.addSource('movement-flows', {
+    map.current.addSource('person-paths', {
       type: 'geojson',
-      data: {
-        type: 'FeatureCollection',
-        features: flowFeatures,
-      },
+      data: { type: 'FeatureCollection', features: lineFeatures },
     });
 
-    // Add line layer with thickness based on survivor count
+    const activeOpacity = ['case', ['boolean', ['feature-state', 'active'], true], 0.85, 0.1];
+
     map.current.addLayer({
-      id: 'movement-lines',
+      id: 'person-lines',
       type: 'line',
-      source: 'movement-flows',
-      paint: {
-        'line-color': '#b58900',
-        'line-width': [
-          'interpolate',
-          ['linear'],
-          ['get', 'survivors'],
-          1, 2,
-          5, 8,
-        ],
-        'line-opacity': [
-          'case',
-          ['boolean', ['feature-state', 'hover'], false],
-          0.9,
-          0.4,
-        ],
-      },
+      source: 'person-paths',
+      layout: { 'line-cap': 'round', 'line-join': 'round' },
+      paint: { 'line-color': ['get', 'color'], 'line-width': 2.5, 'line-opacity': activeOpacity },
     });
 
-    // Add hover effect
-    map.current.on('mousemove', 'movement-lines', (e) => {
-      map.current.getCanvas().style.cursor = 'pointer';
-      const feature = e.features[0];
-      map.current.setFeatureState(
-        { source: 'movement-flows', id: feature.id },
-        { hover: true }
-      );
+    // Arrowheads along each line to show direction of travel.
+    map.current.addLayer({
+      id: 'person-arrows',
+      type: 'symbol',
+      source: 'person-paths',
+      layout: {
+        'symbol-placement': 'line',
+        'symbol-spacing': 90,
+        'text-field': '▶',
+        'text-size': 12,
+        'text-keep-upright': false,
+        'text-allow-overlap': true,
+      },
+      paint: { 'text-color': ['get', 'color'], 'text-opacity': activeOpacity },
+    });
 
-      const popupHTML = `
-        <div style="font-family: system-ui; font-size: 11px; max-width: 200px;">
-          <strong>${feature.properties.survivors} survivors</strong><br/>
-          <span style="color: #999;">${feature.properties.years}</span><br/>
-          <div style="margin-top: 6px; max-height: 100px; overflow-y: auto; font-size: 10px; color: #d4cec4;">
-            ${feature.properties.survivorNames.split(', ').map(s => `• ${s}`).join('<br/>')}
-          </div>
-        </div>
-      `;
+    // Waypoint dots (person-colored) so non-compound stops are still visible.
+    const wpFeatures = personPaths.flatMap((p) =>
+      p.waypoints.map((w, idx) => ({
+        type: 'Feature',
+        properties: { person_id: p.person_id, color: p.color, label: `${w.name}${w.year_from ? ` (${w.year_from})` : ''}`, step: idx + 1 },
+        geometry: { type: 'Point', coordinates: [w.lng, w.lat] },
+      }))
+    );
+    map.current.addSource('person-waypoints', { type: 'geojson', data: { type: 'FeatureCollection', features: wpFeatures } });
+    map.current.addLayer({
+      id: 'person-waypoints-layer',
+      type: 'circle',
+      source: 'person-waypoints',
+      paint: { 'circle-radius': 4, 'circle-color': ['get', 'color'], 'circle-stroke-width': 1.5, 'circle-stroke-color': '#fff', 'circle-stroke-opacity': 0.8 },
+    });
+
+    map.current.on('click', 'person-lines', (e) => {
+      const f = e.features[0];
       new maplibregl.Popup()
         .setLngLat(e.lngLat)
-        .setHTML(popupHTML)
+        .setHTML(`<div style="font-family:system-ui;font-size:12px;max-width:240px;"><strong>${f.properties.person_name}</strong><br/><span style="color:#666;">${f.properties.summary}</span></div>`)
         .addTo(map.current);
+      selectPerson(f.properties.person_id);
     });
+    map.current.on('mouseenter', 'person-lines', () => { map.current.getCanvas().style.cursor = 'pointer'; });
+    map.current.on('mouseleave', 'person-lines', () => { map.current.getCanvas().style.cursor = ''; });
+  };
 
-    map.current.on('mouseleave', 'movement-lines', () => {
-      map.current.getCanvas().style.cursor = '';
-      map.current.setFeatureState(
-        { source: 'movement-flows' },
-        { hover: false }
-      );
+  // Highlight one person's path (or clear with null) by toggling feature-state.
+  const selectPerson = (personId) => {
+    const next = selected === personId ? null : personId;
+    setSelected(next);
+    if (!map.current || !map.current.getSource('person-paths')) return;
+
+    personPaths.forEach((p) => {
+      const fid = featureIdByPerson.current[p.person_id];
+      const active = next === null || p.person_id === next;
+      map.current.setFeatureState({ source: 'person-paths', id: fid }, { active });
     });
+    // Waypoints dim too (they have no feature ids, so re-filter the layer)
+    map.current.setPaintProperty('person-waypoints-layer', 'circle-opacity',
+      next === null ? 0.9 : ['case', ['==', ['get', 'person_id'], next], 0.95, 0.12]);
+
+    if (next) {
+      const wp = personPaths.find((p) => p.person_id === next)?.waypoints || [];
+      if (wp.length) {
+        const b = new maplibregl.LngLatBounds();
+        wp.forEach((w) => b.extend([w.lng, w.lat]));
+        map.current.fitBounds(b, { padding: 80, maxZoom: 6, duration: 600 });
+      }
+    }
   };
 
   return (
     <div className={styles.page}>
-      {/* Hero Section */}
       <section style={{ padding: '2.5rem 0 2rem', borderTop: '3px solid #b58900', borderBottom: '1px solid rgba(212,206,196,0.1)' }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 2rem' }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.6rem', flexWrap: 'wrap', marginBottom: '0.75rem' }}>
-            <span style={{ fontFamily: 'var(--mono)', fontSize: '0.6rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--gold)' }}>
-              Survivor Journey Analysis
-            </span>
-          </div>
-          <h1 style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(1.8rem,4vw,3rem)', fontWeight: 700, color: 'var(--paper)', marginBottom: '1rem', lineHeight: 1.15 }}>
-            Geographic Movement Flows
+          <span style={{ fontFamily: 'var(--mono)', fontSize: '0.6rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--gold)' }}>
+            Survivor Journey Analysis
+          </span>
+          <h1 style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(1.8rem,4vw,3rem)', fontWeight: 700, color: 'var(--paper)', margin: '0.75rem 0 1rem', lineHeight: 1.15 }}>
+            Individual Movement Paths
           </h1>
           <p style={{ fontSize: '1.05rem', color: '#e8e4dc', lineHeight: 1.8, maxWidth: 800 }}>
-            Visualization of 49 documented survivors' movements across 48 compounds spanning 1968–2024. Line thickness indicates frequency; explore individual routes to see survivor names and timelines.
+            Each colored line traces one survivor's documented path through the network over time, reconstructed in chronological order. Click a name or a line to isolate that person's journey. {personPaths.length} survivors with multi-site paths are shown.
           </p>
         </div>
       </section>
 
-      {/* Main Layout */}
       <div className={styles.layout}>
-        {/* Sidebar with filters */}
         <aside className={styles.sidebar}>
           <div className={styles.filterGroup}>
-            <h3 className={styles.filterTitle}>Top Movement Routes</h3>
-            <div className={styles.checkboxGroup}>
-              {MOVEMENT_PATTERNS.map(pattern => (
-                <label key={pattern.id} className={styles.checkbox} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <input
-                    type="checkbox"
-                    checked={filters.showPattern[pattern.id]}
-                    onChange={(e) => {
-                      setFilters(prev => ({
-                        ...prev,
-                        showPattern: { ...prev.showPattern, [pattern.id]: e.target.checked }
-                      }));
+            <h3 className={styles.filterTitle} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span>Survivors ({personPaths.length})</span>
+              {selected && (
+                <button onClick={() => selectPerson(selected)} style={{ fontSize: '0.7rem', color: 'var(--gold)', background: 'none', border: '1px solid rgba(200,168,75,0.3)', borderRadius: 3, padding: '0.15rem 0.4rem', cursor: 'pointer' }}>
+                  Show all
+                </button>
+              )}
+            </h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', maxHeight: 520, overflowY: 'auto' }}>
+              {personPaths.map((p) => {
+                const isSel = selected === p.person_id;
+                return (
+                  <button
+                    key={p.person_id}
+                    onClick={() => selectPerson(p.person_id)}
+                    style={{
+                      display: 'flex', flexDirection: 'column', gap: '0.2rem', textAlign: 'left',
+                      padding: '0.5rem 0.6rem', borderRadius: 4, cursor: 'pointer',
+                      background: isSel ? 'rgba(200,168,75,0.12)' : 'rgba(244,240,232,0.025)',
+                      border: isSel ? '1px solid var(--gold)' : '1px solid rgba(212,206,196,0.1)',
                     }}
-                  />
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: 1 }}>
-                    <span style={{ width: 12, height: 2, background: pattern.color, borderRadius: 1 }} />
-                    <span>{pattern.name}</span>
-                    <span style={{ fontSize: '0.8rem', color: 'var(--muted)', marginLeft: 'auto' }}>({pattern.survivors})</span>
-                  </span>
-                </label>
-              ))}
+                  >
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <span style={{ width: 14, height: 3, background: p.color, borderRadius: 2, flexShrink: 0 }} />
+                      <span style={{ fontFamily: 'var(--serif)', fontSize: '0.9rem', color: 'var(--paper)', fontWeight: isSel ? 700 : 500 }}>{p.person_name}</span>
+                      <span style={{ marginLeft: 'auto', fontSize: '0.7rem', color: 'var(--muted)' }}>{yearSpan(p.waypoints)}</span>
+                    </span>
+                    <span style={{ fontSize: '0.72rem', color: 'rgba(212,206,196,0.65)', lineHeight: 1.4, paddingLeft: '1.4rem' }}>
+                      {summarize(p.waypoints)}
+                    </span>
+                  </button>
+                );
+              })}
+              {personPaths.length === 0 && (
+                <p style={{ fontSize: '0.85rem', color: 'var(--muted)' }}>No multi-site survivor paths recorded yet.</p>
+              )}
             </div>
           </div>
 
-          <div className={styles.filterGroup}>
-            <h3 className={styles.filterTitle}>Minimum Survivors</h3>
-            <input
-              type="range"
-              min="1"
-              max="5"
-              value={filters.minSurvivors}
-              onChange={(e) => setFilters({ ...filters, minSurvivors: parseInt(e.target.value) })}
-              className={styles.slider}
-            />
-            <p className={styles.yearDisplay}>{filters.minSurvivors}+ survivor route</p>
-          </div>
-
-          <div className={styles.filterGroup}>
-            <h3 className={styles.filterTitle}>Timeline Range</h3>
-            <p style={{ fontSize: '0.85rem', color: 'var(--muted)', margin: '0.5rem 0' }}>
-              {filters.yearRange[0]}–{filters.yearRange[1]}
-            </p>
-          </div>
-
-          {/* Route Summary Stats */}
-          <div className={styles.filterGroup} style={{ background: 'rgba(200,168,75,0.08)', borderRadius: '4px', padding: '1rem' }}>
+          <div className={styles.filterGroup} style={{ background: 'rgba(200,168,75,0.08)', borderRadius: 4, padding: '1rem' }}>
             <h3 className={styles.filterTitle} style={{ marginTop: 0 }}>Summary</h3>
             <div style={{ fontSize: '0.85rem', color: 'var(--muted)', lineHeight: 1.8 }}>
-              <div>📍 <strong>48</strong> compounds</div>
-              <div>👥 <strong>49</strong> survivors</div>
-              <div>🛤️ <strong>78+</strong> journeys</div>
-              <div>📊 <strong>5</strong> major routes</div>
+              <div>📍 <strong>{compounds.length}</strong> locations</div>
+              <div>🧑 <strong>{personPaths.length}</strong> survivors with paths</div>
+              <div>🛤️ <strong>{personPaths.reduce((n, p) => n + p.waypoints.length - 1, 0)}</strong> documented moves</div>
             </div>
           </div>
         </aside>
 
-        {/* Main Map */}
         <main className={styles.main}>
           <div ref={mapContainer} className={styles.map}></div>
-
-          <section className={styles.content}>
-            <h2 style={{ fontFamily: 'var(--serif)', fontSize: '1.5rem', fontWeight: 700, margin: '2rem 0 1rem', color: 'var(--paper)' }}>
-              Major Movement Patterns
-            </h2>
-
-            {MOVEMENT_PATTERNS.map(pattern => (
-              <div
-                key={pattern.id}
-                style={{
-                  marginBottom: '1.5rem',
-                  padding: '1rem',
-                  background: 'rgba(244,240,232,0.025)',
-                  border: `1px solid ${pattern.color}33`,
-                  borderLeft: `3px solid ${pattern.color}`,
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                }}
-                onMouseEnter={() => setHoveredRoute(pattern.id)}
-                onMouseLeave={() => setHoveredRoute(null)}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                  <h3 style={{ margin: 0, fontFamily: 'var(--serif)', fontSize: '1rem', color: 'var(--paper)' }}>
-                    {pattern.name}
-                  </h3>
-                  <span style={{ fontFamily: 'var(--mono)', fontSize: '0.8rem', color: 'var(--muted)', background: `${pattern.color}22`, padding: '0.25rem 0.5rem', borderRadius: '3px' }}>
-                    {pattern.survivors} survivors
-                  </span>
-                </div>
-                <p style={{ margin: 0, fontSize: '0.9rem', color: 'rgba(212,206,196,0.7)', lineHeight: 1.6 }}>
-                  {pattern.id === 'japan-phil' && 'Discipline and punishment pipeline: survivors transferred from Japan training facilities to Philippines reprogramming centers'}
-                  {pattern.id === 'macau-japan' && 'World Service dispersal: members moved from Macau regional hub to Japan for specialized training and organizational roles'}
-                  {pattern.id === 'macau-london' && 'Leadership coordination: flow from Asian operations to European leadership centers for administrative functions'}
-                  {pattern.id === 'toronto-london' && 'North American entry point: Canadian members relocated to London headquarters for leadership training'}
-                  {pattern.id === 'hq-macau' && 'Global dispersal: headquarters members distributed to Macau as World Service operational center'}
-                </p>
-              </div>
-            ))}
-
-            <h2 style={{ fontFamily: 'var(--serif)', fontSize: '1.5rem', fontWeight: 700, margin: '2rem 0 1rem', color: 'var(--paper)' }}>
-              Geographic Hubs Analysis
-            </h2>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
-              {[
-                { name: 'Macau', arrivals: 8, role: 'Primary World Service Home', color: '#dc322f' },
-                { name: 'London', arrivals: 6, role: 'Leadership Coordination', color: '#cb4b16' },
-                { name: 'Japan', arrivals: 4, role: 'Training & Reprogramming', color: '#b58900' },
-                { name: 'Philippines', arrivals: 5, role: 'Discipline Center', color: '#859900' },
-              ].map(hub => (
-                <div key={hub.name} style={{ background: 'rgba(244,240,232,0.025)', border: `1px solid ${hub.color}33`, borderLeft: `3px solid ${hub.color}`, padding: '1rem', borderRadius: '4px' }}>
-                  <div style={{ fontFamily: 'var(--serif)', fontSize: '1.1rem', fontWeight: 700, color: 'var(--paper)', marginBottom: '0.25rem' }}>
-                    {hub.name}
-                  </div>
-                  <div style={{ fontSize: '0.85rem', color: 'var(--muted)', marginBottom: '0.5rem' }}>
-                    {hub.arrivals}+ arrivals documented
-                  </div>
-                  <div style={{ fontSize: '0.8rem', color: 'rgba(212,206,196,0.6)' }}>
-                    <strong>Role:</strong> {hub.role}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <p style={{ background: 'rgba(139,32,32,0.1)', border: '3px solid var(--accent)', padding: '1.5rem', marginTop: '2rem', color: 'var(--accent-text)', fontStyle: 'italic' }}>
-              This visualization documents survivor testimony from 15 published memoirs, 700+ oral history interviews, and archival research. Movement patterns reveal organizational control strategies through geographic dispersal, isolation, and hierarchical placement.
-            </p>
-          </section>
         </main>
       </div>
     </div>

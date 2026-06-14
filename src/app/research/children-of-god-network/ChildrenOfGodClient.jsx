@@ -49,7 +49,7 @@ const compoundsToGeoJSON = (compounds) => ({
     })),
 });
 
-export default function ChildrenOfGodClient({ cogData, compounds, journeys }) {
+export default function ChildrenOfGodClient({ cogData, compounds, personPaths }) {
   const [activeTab, setActiveTab] = useState('compounds');
   const mapContainer = useRef(null);
   const map = useRef(null);
@@ -275,7 +275,7 @@ export default function ChildrenOfGodClient({ cogData, compounds, journeys }) {
 
   // Render appropriate view based on active tab
   if (activeTab === 'movements') {
-    return <SurvivorMovements compounds={compounds} journeys={journeys} />;
+    return <SurvivorMovements compounds={compounds} personPaths={personPaths} />;
   }
 
   if (!cogData) {
