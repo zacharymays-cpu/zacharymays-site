@@ -4,11 +4,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import styles from './page.module.css';
+import SurvivorMovements from './SurvivorMovements';
 
 const SUPABASE_URL = 'https://shgdrkrqjnwtlyxcdayp.supabase.co';
 const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNoZ2Rya3JxanR3dGx5eGNkYXlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDk3NTczODMsImV4cCI6MTcyNzUzMzM4M30.kbJq8sxP6pZNqpd9Z2Y0i_HHvRLgKF7sDIV46DKEqbQ';
 
 export default function ChildrenOfGodResearch() {
+  const [activeTab, setActiveTab] = useState('compounds');
   const mapContainer = useRef(null);
   const map = useRef(null);
   const [geojsonData, setGeojsonData] = useState(null);
@@ -245,10 +247,55 @@ export default function ChildrenOfGodResearch() {
     }
   };
 
+  // Render appropriate view based on active tab
+  if (activeTab === 'movements') {
+    return <SurvivorMovements />;
+  }
+
   return (
     <div className={styles.page}>
       {cogData && (
       <>
+      {/* ── Tab Navigation ──────────────────────────────────── */}
+      <div style={{ background: 'rgba(200,168,75,0.04)', borderBottom: '1px solid rgba(212,206,196,0.1)' }}>
+        <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 2rem', display: 'flex', gap: '2rem' }}>
+          <button
+            onClick={() => setActiveTab('compounds')}
+            style={{
+              padding: '1rem 0',
+              border: 'none',
+              background: 'none',
+              cursor: 'pointer',
+              fontFamily: 'var(--serif)',
+              fontSize: '0.95rem',
+              fontWeight: activeTab === 'compounds' ? 700 : 400,
+              color: activeTab === 'compounds' ? 'var(--gold)' : 'var(--muted)',
+              borderBottom: activeTab === 'compounds' ? '2px solid var(--gold)' : 'none',
+              transition: 'all 0.2s ease',
+            }}
+          >
+            📍 Compound Network
+          </button>
+          <button
+            onClick={() => setActiveTab('movements')}
+            style={{
+              padding: '1rem 0',
+              border: 'none',
+              background: 'none',
+              cursor: 'pointer',
+              fontFamily: 'var(--serif)',
+              fontSize: '0.95rem',
+              fontWeight: activeTab === 'movements' ? 700 : 400,
+              color: activeTab === 'movements' ? 'var(--gold)' : 'var(--muted)',
+              borderBottom: activeTab === 'movements' ? '2px solid var(--gold)' : 'none',
+              transition: 'all 0.2s ease',
+            }}
+          >
+            🛤️ Survivor Movements
+          </button>
+        </div>
+      </div>
+
       {/* ── Org-detail hero header ──────────────────────────────────── */}
       <section style={{ padding: '2.5rem 0 2rem', borderTop: `3px solid ${tierTextColor}`, borderBottom: '1px solid rgba(212,206,196,0.1)' }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 2rem' }}>
