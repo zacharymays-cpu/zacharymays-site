@@ -3,7 +3,7 @@ import { getFindingsStats, TIER_ORDER } from '../../../lib/getFindingsStats';
 import CultsOverTimeChart from '../../../components/CultsOverTimeChart';
 
 export const metadata = {
-  title: 'Findings — The Cultiness Spectrum',
+  title: 'Findings — The Organizational Coercion Index',
   description: 'What systematic application of the Young-Reed framework across hundreds of American organizations reveals about institutional formation and cult-adjacent dynamics.',
 };
 
@@ -53,7 +53,7 @@ export default async function FindingsPage() {
       <section className="hero">
         <div className="container--narrow">
           <span className="hero__eyebrow animate-up">
-            <Link href="/cultiness" style={{color: 'var(--gold)'}}>The Cultiness Spectrum</Link>
+            <Link href="/cultiness" style={{color: 'var(--gold)'}}>The Organizational Coercion Index</Link>
             {' '}— Findings
           </span>
           <h1 className="hero__title animate-up-2">What the<br />Data Shows</h1>

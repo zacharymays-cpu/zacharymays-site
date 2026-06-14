@@ -2,8 +2,8 @@ import Link from 'next/link';
 import OrgCount from '../../../components/OrgCount';
 
 export const metadata = {
-  title: 'The Dataset — The Cultiness Spectrum',
-  description: 'What the Cultiness Spectrum Dataset contains, how it is structured, and how to access it.',
+  title: 'The Dataset — The Organizational Coercion Index',
+  description: 'What the Organizational Coercion Index Dataset contains, how it is structured, and how to access it.',
 };
 
 const CATEGORIES = [
@@ -24,7 +24,7 @@ export default function DatasetPage() {
       <section className="hero">
         <div className="container--narrow">
           <span className="hero__eyebrow animate-up">
-            <Link href="/cultiness" style={{color: 'var(--gold)'}}>The Cultiness Spectrum</Link>
+            <Link href="/cultiness" style={{color: 'var(--gold)'}}>The Organizational Coercion Index</Link>
             {' '}— The Dataset
           </span>
           <h1 className="hero__title animate-up-2">What Was<br />Assessed</h1>
