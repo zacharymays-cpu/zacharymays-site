@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export const metadata = {
   title: 'Methodology — The Organizational Coercion Index',
-  description: 'How the Organizational Coercion Index scoring system works: the ten criteria, the dual-metric system, N/A discipline, evidence-based jury methodology, and the evenhandedness standard. Current version: V5.0 (June 2026).',
+  description: 'How the Organizational Coercion Index scoring system works: Young\'s ten behavioral criteria, Lifton\'s psychological totalism (C11), dual-track scoring, evidence framework, jury methodology, and the human review gate. Current version: V6.0 (June 2026).',
 };
 
 const CRITERIA = [
@@ -16,6 +16,7 @@ const CRITERIA = [
   { id: 'C8',  name: 'Exploitation of Labor',         desc: 'Sacrifice extracted as virtue, labor monetized through institutional control. Financial extraction coerced through doctrinal framing with salvific or mission stakes is labor extraction. Systematic sexual harassment maintained through institutional cover-up and NDA architecture also checks this criterion. The delivery mechanism — financial, physical, sexual, or psychological — does not moderate intensity scoring. Compensation engineered to create exit barriers rather than fairly reward labor also checks this criterion.' },
   { id: 'C9',  name: 'High Exit Costs',               desc: 'Departure produces social, economic, or identity costs; exit is framed as betrayal. Spiritual absolutism — where departure means eternal damnation, complete family rupture, and total social network dissolution — scores at the same level as physical confinement. Mechanism specificity: institutional enforcement of exit costs (asset forfeiture, career destruction, legal consequences) scores 7–10; reputational or social costs without enforcement infrastructure scores 3–6.' },
   { id: 'C10', name: 'Ends Justify the Means',        desc: 'Institutional harm tolerated in pursuit of mission, cover-ups occur, perpetrators are protected. Multi-generational non-correcting harm patterns score at the ceiling regardless of mechanism. The existence of internal dissenters who made the courageous choice within the same constraints establishes that compliant choices were genuine institutional choices, not forced outcomes.' },
+  { id: 'C11', name: 'Psychological Totalism',        desc: 'Robert Jay Lifton\'s framework describes a system where ideology becomes totalizing: it extends into every domain of life (totality), is self-sealing against critique (closed system), demands intellectual conformity, uses thought-terminating clichés, enforces emotional regulation, splits reality into absolute categories, uses sacred science claims to override evidence, maintains control through identity fusion with the organization, creates dependency on the system for meaning and morality, and is intended to be permanent/irreversible. The degree to which an organization instantiates these characteristics measures the degree of psychological totalism — not ideology per se, but the structural mechanisms that prevent exit from thought itself.' },
 ];
 
 export default function MethodologyPage() {
@@ -41,28 +42,27 @@ export default function MethodologyPage() {
           <div className="section__label">The Source Framework</div>
 
           <p>
-            <strong>Methodology Version: V5.0 (June 2026)</strong> — Evidence-based jury methodology with updated tier boundaries and mechanism specificity guidance.
+            <strong>Methodology Version: V6.0 (June 2026)</strong> — Dual-track scoring combining Young-Reed behavioral analysis (C1-C10) with Lifton's psychological totalism framework (C11). Evidence-based jury methodology with formal validation metrics.
           </p>
 
           <p>
-            Every criterion applied in this project is derived verbatim from
-            Daniella Mestyanek Young and Amy Reed's{' '}
+            Criteria C1–C10 are derived verbatim from Daniella Mestyanek Young and Amy Reed's{' '}
             <a href="https://uncultureyourself.com" target="_blank" rel="noopener noreferrer">
               <em>The Culting of America: What Makes a Cult and Why We Love Them</em>
             </a>{' '}
-            (Otterpine, 2026). Young and Reed define a cult as a group that
-            meets these ten conditions. The composite scoring system was
-            developed independently to extend analytical range for
-            dataset-scale application — but the criteria themselves are
-            Young and Reed's.
+            (Otterpine, 2026). Young and Reed define a cult as a group that meets these ten behavioral conditions. The composite scoring system was developed independently to extend analytical range for dataset-scale application — but the criteria themselves are Young and Reed's.
+          </p>
+
+          <p>
+            Criterion C11 (Psychological Totalism) is derived from Robert Jay Lifton's clinical and historical research on ideological systems. Lifton's framework examines the structural mechanisms that create totalizing control over thought, emotion, and identity — independent of the specific ideology. Young's framework measures behavioral patterns; Lifton's measures system-level psychological architecture. Both are provided for each organization.
           </p>
 
           <hr className="rule" />
 
-          <div className="section__label">The Ten Criteria</div>
+          <div className="section__label">The Eleven Criteria</div>
 
           <p style={{color: 'var(--muted)', marginBottom: '2rem'}}>
-            A cult is a group that:
+            Young and Reed define a cult as a group that exhibits these ten behavioral patterns. Lifton's eleventh criterion examines the system-level psychological totalism that enables and sustains those patterns.
           </p>
 
           <div style={{display: 'flex', flexDirection: 'column', gap: '0'}}>
@@ -103,16 +103,13 @@ export default function MethodologyPage() {
 
           <hr className="rule" />
 
-          <div className="section__label">Two Independent Instruments</div>
+          <div className="section__label">Three Parallel Score Outputs</div>
 
           <p>
-            Every organization receives two scores that are derived
-            independently and never converted between each other.
-            Their divergence is analytically meaningful, not a problem
-            to resolve.
+            Every organization receives three independent scores generated in parallel by the jury system. They use different measurement models and capture different dimensions of institutional coercion. All three are provided; none is derived from the others.
           </p>
 
-          <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1px', background: 'rgba(212,206,196,0.1)', margin: '2rem 0'}}>
+          <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1px', background: 'rgba(212,206,196,0.1)', margin: '2rem 0'}}>
             {[
               {
                 label: "Young's Original Score",
@@ -122,7 +119,12 @@ export default function MethodologyPage() {
               {
                 label: 'Composite Cultiness Score',
                 sub: 'Formula-based 0–100%',
-                body: 'Formula: (Breadth ÷ 10) × (Mean Intensity ÷ 10) × 100. Breadth = criteria with non-N/A scores. Mean Intensity = average of those scores. Adds two dimensions the binary instrument cannot capture: intensity variance and breadth-intensity interaction. Produces three tiers from Not Culty through Super Culty.',
+                body: 'Formula: (Breadth ÷ 10) × (Mean Intensity ÷ 10) × 100 (C1-C10 only). Breadth = criteria with non-N/A scores. Mean Intensity = average of those scores. Adds two dimensions the binary instrument cannot capture: intensity variance and breadth-intensity interaction. Produces three tiers from Not Culty (0–29%) through Super Culty (≥60%).',
+              },
+              {
+                label: "Lifton's Totalism Score",
+                sub: '0–10 intensity scale',
+                body: 'Scores C11 (Psychological Totalism) on a 1–10 intensity scale, measuring the degree to which the organization exhibits system-level mechanisms that create totalizing control over thought and identity. Independent of C1-C10 scores. A behavioral cult (high C1-C10) may have low totalism (temporary structures); a totalizing system (high C11) may lack some behavioral hallmarks.',
               },
             ].map((item, i) => (
               <div key={i} style={{background: 'var(--ink)', padding: '2rem'}}>
@@ -132,6 +134,10 @@ export default function MethodologyPage() {
               </div>
             ))}
           </div>
+
+          <p style={{marginTop: '1.5rem', color: 'var(--muted)', fontSize: '0.9rem'}}>
+            These three outputs are independent variables, not conversions of each other. Divergence between them is analytically meaningful. For example, a military institution might score high on C1-C10 (charismatic command, obedience structures) but lower on C11 (totalism) if it maintains explicit time-limits and member exit pathways. A new religious movement might score moderate on C1-C10 but extreme on C11 if it structures every domain of life and uses identity fusion.
+          </p>
 
           <hr className="rule" />
 
@@ -231,21 +237,24 @@ export default function MethodologyPage() {
 
           <hr className="rule" />
 
-          <div className="section__label">Evidence-Based Jury Methodology (V5.0)</div>
+          <div className="section__label">Evidence-Based Jury Methodology (V6.0)</div>
 
           <p>
-            As of June 2026, all new AI-generated scores use an evidence-based jury protocol that eliminates calibration drift:
+            All scores — across all three output tracks (Young's, Composite, and Lifton's) — are generated by an evidence-based jury protocol that eliminates calibration drift:
           </p>
 
           <ol style={{color: 'var(--muted)', fontSize: '0.9rem', lineHeight: 1.7}}>
             <li style={{marginBottom: '0.75rem'}}>An evidence brief is compiled for each criterion — documented behaviors from court records, investigative journalism, academic scholarship, and institutional documentation.</li>
-            <li style={{marginBottom: '0.75rem'}}>The evidence brief is scored independently by three AI models (Claude, GPT-4o, Gemini) — no general knowledge, only the provided evidence.</li>
-            <li style={{marginBottom: '0.75rem'}}>The jury mean becomes the proposed score; a score spread greater than 5 points triggers additional review.</li>
-            <li style={{marginBottom: '0.75rem'}}>A three-model consensus at 0-point spread (perfect agreement) indicates high reliability.</li>
+            <li style={{marginBottom: '0.75rem'}}>The evidence brief is scored independently by four AI models (Claude, GPT-4o, Gemini, Llama) — no general knowledge, only the provided evidence. Models never see each other's scores.</li>
+            <li style={{marginBottom: '0.75rem'}}>The jury mean becomes the proposed score; a score spread greater than 5 points triggers additional review and evidence re-evaluation.</li>
+            <li style={{marginBottom: '0.75rem'}}>For Young's Original Score: the binary checklist is derived from the jury intensity scores (≥5 = checks; &lt;5 = does not check) for consistency and auditability.</li>
+            <li style={{marginBottom: '0.75rem'}}>For Composite: formula applied to the jury-derived intensity scores, using the four-model consensus as the basis.</li>
+            <li style={{marginBottom: '0.75rem'}}>For Lifton's Totalism (C11): jury intensity scores for psychological totalism mechanisms, independent of C1-C10.</li>
+            <li style={{marginBottom: '0.75rem'}}>A four-model consensus at 0–2 point spread indicates high reliability. Results include Krippendorff's alpha and pairwise agreement metrics.</li>
           </ol>
 
           <p style={{color: 'var(--muted)', fontSize: '0.9rem', marginTop: '1rem'}}>
-            This methodology corrected systematic upward bias that existed in previous anchor-calibrated versions, particularly for C5 (Isolation), C8 (Labor Exploitation), and C9 (Exit Costs) when applied to political and media organizations.
+            This dual-track methodology corrected systematic upward bias that existed in previous anchor-calibrated versions, particularly for C5 (Isolation), C8 (Labor Exploitation), and C9 (Exit Costs) when applied to political and media organizations. The addition of Lifton's C11 adds system-level totalism measurement orthogonal to behavioral indicators.
           </p>
 
           <hr className="rule" />
