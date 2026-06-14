@@ -56,7 +56,7 @@ export default function ChildrenOfGodResearch() {
       setLoading(true);
       try {
         const res = await fetch(
-          `${SUPABASE_URL}/rest/v1/organizations?select=id,name,slug,category,composite_score,composite_tier,youngs_score,founding_year,defunct_year,trajectory,summary_text,active,membership_count,membership_count_year,revenue_usd,revenue_year,size_tier,size_notes,political_scores(economic_axis,authority_axis,political_quadrant,scoring_notes),criterion_scores(criterion,score,confidence,body_text)&slug=eq.children-of-god-family-international`,
+          `${SUPABASE_URL}/rest/v1/organizations?select=id,name,slug,category,composite_score,composite_tier,youngs_score,founding_year,defunct_year,trajectory,summary_text,active,membership_count,membership_count_year,revenue_usd,revenue_year,size_tier,size_notes,political_scores(economic_axis,authority_axis,political_quadrant,scoring_notes),criterion_scores(criterion,score,confidence,body_text)&name=eq.Children of God / The Family`,
           {
             headers: {
               apikey: ANON_KEY,
