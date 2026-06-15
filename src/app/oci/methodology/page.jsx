@@ -124,7 +124,7 @@ export default function MethodologyPage() {
               {
                 label: "Lifton's Totalism Score",
                 sub: '0–10 intensity scale',
-                body: 'Scores C11 (Psychological Totalism) on a 1–10 intensity scale, measuring the degree to which the organization exhibits system-level mechanisms that create totalizing control over thought and identity. Independent of C1-C10 scores. A behavioral cult (high C1-C10) may have low totalism (temporary structures); a totalizing system (high C11) may lack some behavioral hallmarks.',
+                body: 'Scores C11 (Psychological Totalism) on a 0–10 intensity scale, measuring the degree to which the organization exhibits system-level mechanisms that create totalizing control over thought and identity. Produces three classifications: Non-Totalizing (0–2.9), Moderately Totalizing (3–5.9), Psychologically Totalizing (6–10). Independent of C1-C10 scores. A behavioral cult (high C1-C10) may have low totalism (temporary structures); a totalizing system (high C11) may lack some behavioral hallmarks.',
               },
             ].map((item, i) => (
               <div key={i} style={{background: 'var(--ink)', padding: '2rem'}}>
