@@ -87,13 +87,22 @@ export default function V60Page() {
           <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.4rem', marginTop: '2rem', marginBottom: '1rem', color: '#f4f0e8' }}>Scoring Outputs (Generated in Parallel)</h3>
           <p>V6.0 generates three scoring outputs simultaneously for each organization:</p>
           <ul style={{ marginTop: '1rem', paddingLeft: '2rem', color: '#f4f0e8' }}>
-            <li><strong>Young's Original Score:</strong> 0-10 binary checklist from C1-C10 jury track</li>
+            <li><strong>Young's Original Score:</strong> 0-10 binary checklist from C1-C10 jury track (Not Culty, Kinda Culty, Super Culty)</li>
             <li><strong>Composite Score:</strong> 0-100% formula-based from C1-C10 jury track</li>
-            <li><strong>Lifton's Totalism Score:</strong> 0-10 from C11 jury track (ideological totalism framework)</li>
+            <li><strong>Lifton's Totalism Score:</strong> 0-10 from C11 jury track (Non-Totalizing, Moderately Totalizing, Psychologically Totalizing)</li>
           </ul>
           <p style={{ marginTop: '1rem' }}>
             All three scores are generated from the same evidence package via parallel jury processing. Users receive all three perspectives on each organization—Young's behavior-based analysis, Composite evidence-weighted prevalence, and Lifton's system-level totalism assessment.
           </p>
+
+          <div style={{ background: 'rgba(200, 168, 75, 0.08)', padding: '1.5rem', marginTop: '1.5rem', borderLeft: '3px solid #c8a84b' }}>
+            <h4 style={{ fontFamily: 'DM Mono, monospace', fontSize: '0.85rem', color: '#c8a84b', textTransform: 'uppercase', margin: '0 0 1rem 0' }}>Lifton Classification Tiers</h4>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', fontSize: '0.9rem', color: '#f4f0e8' }}>
+              <div><strong>0–2.9:</strong> Non-Totalizing</div>
+              <div><strong>3.0–5.9:</strong> Moderately Totalizing</div>
+              <div style={{ gridColumn: '1 / -1' }}><strong>6.0–10:</strong> Psychologically Totalizing</div>
+            </div>
+          </div>
 
           <hr className="rule" />
         </div>
