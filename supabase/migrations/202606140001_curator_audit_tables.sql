@@ -1,4 +1,4 @@
--- 0010_curator_audit_tables.sql
+-- 202606140001_curator_audit_tables.sql
 -- Curator decision audit trail + researcher follow-up requests for the Phase I
 -- curator dashboard. curator_decisions is append-only (one row per decision).
 
@@ -14,6 +14,7 @@ create table if not exists curator_decisions (
 create index if not exists idx_curator_decisions_org on curator_decisions(org_id);
 create index if not exists idx_curator_decisions_reviewed on curator_decisions(reviewed_at desc);
 
+-- evidence_requests: Phase II scaffolding (no UI writer yet); see actions.js requestEvidence.
 create table if not exists evidence_requests (
   id uuid primary key default gen_random_uuid(),
   org_id uuid not null references organizations(id) on delete cascade,

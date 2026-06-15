@@ -1,6 +1,11 @@
 // src/lib/curatorSignals.js
 // Pure curator review signals. No I/O — unit-tested with node --test.
 // A "signal" is a reason an org needs human eyes, with a 0–1 severity.
+// NOTE: This module is intentionally CommonJS (module.exports), unlike the ESM
+// lib files around it. It is the only lib file with a unit test, and it must load
+// BOTH under Next/webpack (which interops CJS named imports — see curatorQueue.js)
+// AND under bare `node --test` (the repo has no "type":"module", so zero-config
+// testing needs CJS). Do not convert to ESM without also solving the test runner.
 
 const EVIDENCE_COMPLETENESS_LOW = 0.4; // <40% of criteria with 3+ sources
 const CONFIDENCE_LOW = 0.6;            // overall HC confidence floor

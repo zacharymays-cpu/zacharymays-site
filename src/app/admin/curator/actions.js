@@ -54,6 +54,11 @@ export async function applyCuratorDecision(formData) {
   return { ok: true };
 }
 
+// PHASE II SCAFFOLDING — not yet wired to the UI. The curator dropdown's
+// "request_evidence" choice currently logs a curator_decisions row via
+// applyCuratorDecision; the dedicated evidence_requests workflow (a criteria
+// picker that calls this action) lands in a later phase. Kept here so the
+// table contract and the action are ready. Safe to leave unused.
 export async function requestEvidence(formData) {
   const user = await requireAdmin();
   const orgId = String(formData.get('orgId') || '');
