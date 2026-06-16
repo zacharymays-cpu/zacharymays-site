@@ -258,12 +258,14 @@ export default function CuratorClient({ items, mode = 'worklist', search = '', f
     if ((next.q ?? q)) params.set('q', next.q ?? q);
     if ((next.rating ?? filters.rating)) params.set('rating', next.rating ?? filters.rating);
     if ((next.reviewed ?? filters.reviewed)) params.set('reviewed', next.reviewed ?? filters.reviewed);
+    if ((next.category ?? filters.category)) params.set('category', next.category ?? filters.category);
     if (next.page != null) params.set('page', String(next.page));
     router.push(`/admin/curator?${params.toString()}`);
   }
 
+  // Switching modes clears all filters/search so stale params don't leak across tabs.
   const tab = (key, label) => (
-    <button key={key} onClick={() => go({ mode: key, page: 0 })}
+    <button key={key} onClick={() => go({ mode: key, page: 0, q: '', rating: '', reviewed: '', category: '' })}
       style={{ padding: '6px 12px', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer',
         border: `1px solid ${mode === key ? C.gold : C.border}`,
         background: mode === key ? C.gold : 'transparent', color: mode === key ? '#1f1c19' : C.muted }}>

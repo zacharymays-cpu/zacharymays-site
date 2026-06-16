@@ -231,10 +231,11 @@ export async function getCuratorOrgs({ mode = 'browse', search = '', filters = {
 
   // Pending mode: flag likely duplicates against the live (ACCEPTED) set by normalized name.
   if (mode === 'pending' && items.length) {
-    const { data: accepted } = await sb
+    const { data: accepted, error: dupErr } = await sb
       .from('organizations')
       .select('id, name, slug')
       .eq('scoring_status', 'ACCEPTED');
+    if (dupErr) console.error('curator dup-check failed:', dupErr.message);
     const byKey = new Map();
     for (const a of accepted || []) {
       const k = normalizeName(a.name);
