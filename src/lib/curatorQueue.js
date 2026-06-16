@@ -31,6 +31,7 @@ export async function getCuratorQueue({ limit = 40 } = {}) {
     .from('organizations')
     .select('id, name, category, summary_text, hc_rating, hc_control_index_score, hc_leadership_authority_score, hc_member_dependency_index, hc_exit_cost_assessment, hc_composite_risk_level, hc_confidence_overall, reviewed_at')
     .eq('is_calibration', false)
+    .eq('scoring_status', 'ACCEPTED') // only live orgs — keeps ARCHIVED dupes + PENDING stubs out of the console
     .not('hc_rating', 'is', null);
   if (orgErr) throw orgErr;
 
