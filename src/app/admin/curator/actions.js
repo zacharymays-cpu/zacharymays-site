@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { createSupabaseServerClient } from '../../../lib/supabase/server';
 import { createSupabaseAdminClient } from '../../../lib/supabase/admin';
+import { nextStatusFor } from '../../../lib/curatorLifecycle';
 
 function adminEmails() {
   return (process.env.ADMIN_EMAILS || '')
@@ -35,23 +36,33 @@ export async function applyCuratorDecision(formData) {
   if (!DECISIONS.has(decision)) return { ok: false, error: 'Invalid decision.' };
 
   const admin = createSupabaseAdminClient();
-  const { error } = await admin.from('curator_decisions').insert({
+
+  // Read current status so we apply the correct lifecycle transition.
+  const { data: org, error: readErr } = await admin
+    .from('organizations').select('scoring_status').eq('id', orgId).single();
+  if (readErr) return { ok: false, error: readErr.message };
+
+  const { error: logErr } = await admin.from('curator_decisions').insert({
     org_id: orgId,
     curator_email: (user.email || '').toLowerCase(),
     decision,
     notes: notes || null,
     reviewed_at: new Date().toISOString(),
   });
-  if (error) return { ok: false, error: error.message };
+  if (logErr) return { ok: false, error: logErr.message };
 
-  if (decision === 'approve') {
-    await admin.from('organizations')
-      .update({ reviewed_by: user.id, reviewed_at: new Date().toISOString() })
-      .eq('id', orgId);
+  const newStatus = nextStatusFor(decision, org.scoring_status);
+  const patch = {};
+  if (newStatus) patch.scoring_status = newStatus;
+  if (decision === 'approve') { patch.reviewed_by = user.id; patch.reviewed_at = new Date().toISOString(); }
+  if (Object.keys(patch).length) {
+    patch.updated_at = new Date().toISOString();
+    const { error: updErr } = await admin.from('organizations').update(patch).eq('id', orgId);
+    if (updErr) return { ok: false, error: updErr.message };
   }
 
   revalidatePath('/admin/curator');
-  return { ok: true };
+  return { ok: true, newStatus: newStatus || org.scoring_status };
 }
 
 const EDITABLE_CRITERIA = new Set(['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'C10']);

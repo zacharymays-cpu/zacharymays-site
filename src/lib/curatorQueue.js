@@ -10,6 +10,7 @@
 // the headline scores.)
 import { createSupabaseAdminClient } from './supabase/admin';
 import { computeSignals, priorityScore } from './curatorSignals';
+import { normalizeName } from './curatorLifecycle';
 
 // C1–C10 are the Young & Reed criteria; C11 is Lifton ideological totalism.
 const CRITERIA = ['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'C10', 'C11'];
@@ -161,4 +162,90 @@ async function attachCriteria(sb, items) {
       // Drop criteria with nothing to show (no score, no explanation, no jury data).
       .filter((c) => c.score != null || (c.body && c.body.length > 0) || c.juryMean != null);
   }
+}
+
+const PENDING_STATUSES = ['PENDING', 'SOURCES_INSUFFICIENT'];
+
+// Build a single org row in the same shape as getCuratorQueue items, minus the
+// heavy per-criterion join (worklist mode keeps that via getCuratorQueue).
+function baseRow(o) {
+  const cis = numOrNull(o.hc_control_index_score);
+  const cla = numOrNull(o.hc_leadership_authority_score);
+  const signals = computeSignals({
+    hcRating: o.hc_rating,
+    confidenceOverall: numOrNull(o.hc_confidence_overall),
+    brief: null,
+  });
+  return {
+    orgId: o.id, name: o.name, slug: o.slug || null, category: o.category,
+    summary: o.summary_text || '', status: o.scoring_status,
+    reviewedAt: o.reviewed_at || null,
+    hc: {
+      rating: o.hc_rating, controlIndex: cis, leadershipAuthority: cla,
+      memberDependency: numOrNull(o.hc_member_dependency_index),
+      exitCost: numOrNull(o.hc_exit_cost_assessment),
+      compositeRisk: numOrNull(o.hc_composite_risk_level),
+      confidenceOverall: numOrNull(o.hc_confidence_overall),
+    },
+    dualTrack: { youngReed: cis, liftonC11: cla == null ? null : cla / 10 },
+    signals, priorityScore: priorityScore(signals),
+    dupCandidates: [],
+    criteria: [],
+  };
+}
+
+// Unified org fetch for the curator console.
+//   mode: 'worklist' (delegates to getCuratorQueue), 'browse' (ACCEPTED, searchable+filterable),
+//         'pending' (PENDING + SOURCES_INSUFFICIENT, with dedup warnings)
+//   search: case-insensitive name substring
+//   filters: { rating?, reviewed?: 'yes'|'no', category? }
+//   page (0-based), pageSize. Returns { items, total, page, pageSize }.
+export async function getCuratorOrgs({ mode = 'browse', search = '', filters = {}, page = 0, pageSize = 25 } = {}) {
+  if (mode === 'worklist') {
+    const items = await getCuratorQueue({ limit: 40 });
+    return { items, total: items.length, page: 0, pageSize: items.length };
+  }
+
+  const sb = createSupabaseAdminClient();
+  const cols = 'id, name, slug, category, summary_text, scoring_status, reviewed_at, hc_rating, hc_control_index_score, hc_leadership_authority_score, hc_member_dependency_index, hc_exit_cost_assessment, hc_composite_risk_level, hc_confidence_overall';
+
+  let q = sb.from('organizations').select(cols, { count: 'exact' }).eq('is_calibration', false);
+
+  if (mode === 'pending') {
+    q = q.in('scoring_status', PENDING_STATUSES);
+  } else {
+    q = q.eq('scoring_status', 'ACCEPTED');
+    if (filters.rating) q = q.eq('hc_rating', filters.rating);
+    if (filters.category) q = q.eq('category', filters.category);
+    if (filters.reviewed === 'yes') q = q.not('reviewed_at', 'is', null);
+    if (filters.reviewed === 'no') q = q.is('reviewed_at', null);
+  }
+  if (search && search.trim()) q = q.ilike('name', `%${search.trim()}%`);
+
+  q = q.order('name', { ascending: true }).range(page * pageSize, page * pageSize + pageSize - 1);
+
+  const { data, error, count } = await q;
+  if (error) throw error;
+
+  const items = (data || []).map((o) => baseRow(o));
+
+  // Pending mode: flag likely duplicates against the live (ACCEPTED) set by normalized name.
+  if (mode === 'pending' && items.length) {
+    const { data: accepted, error: dupErr } = await sb
+      .from('organizations')
+      .select('id, name, slug')
+      .eq('scoring_status', 'ACCEPTED');
+    if (dupErr) console.error('curator dup-check failed:', dupErr.message);
+    const byKey = new Map();
+    for (const a of accepted || []) {
+      const k = normalizeName(a.name);
+      if (!byKey.has(k)) byKey.set(k, []);
+      byKey.get(k).push({ name: a.name, slug: a.slug || null });
+    }
+    for (const it of items) {
+      it.dupCandidates = byKey.get(normalizeName(it.name)) || [];
+    }
+  }
+
+  return { items, total: count ?? items.length, page, pageSize };
 }
