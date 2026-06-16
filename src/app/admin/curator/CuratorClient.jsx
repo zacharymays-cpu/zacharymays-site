@@ -70,6 +70,63 @@ function DecisionForm({ orgId, onSaved }) {
   );
 }
 
+// One criterion: code + name, published score, the jury's AI mean + model-split
+// flag, and the written explanation — the actual basis for a judgement.
+function CriterionRow({ c }) {
+  const split = c.jurySpread != null && c.jurySpread >= 3;
+  return (
+    <div style={{ borderTop: `1px solid ${C.border}`, padding: '10px 0' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
+        <div style={{ fontWeight: 700, fontSize: 13, color: C.paper }}>
+          {c.code} <span style={{ color: C.muted, fontWeight: 400 }}>· {c.name}</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 12 }}>
+          {split && (
+            <span style={{ color: C.gold, border: `1px solid ${C.gold}`, borderRadius: 999, padding: '1px 7px', fontWeight: 700 }}>
+              models split · {c.jurySpread}
+            </span>
+          )}
+          {c.juryMean != null && (
+            <span style={{ color: C.muted }}>AI <strong style={{ color: C.paper }}>{c.juryMean}</strong></span>
+          )}
+          <span style={{ color: C.paper, fontWeight: 700 }}>{c.score == null ? 'N/A' : `${c.score}/10`}</span>
+        </div>
+      </div>
+      {c.body ? (
+        <p style={{ margin: '6px 0 0', fontSize: 13, lineHeight: 1.55, color: C.paper, whiteSpace: 'pre-wrap', maxHeight: 150, overflow: 'auto', borderLeft: `2px solid ${C.border}`, paddingLeft: 10 }}>
+          {c.body}
+        </p>
+      ) : (
+        <p style={{ margin: '6px 0 0', fontSize: 12, color: C.faint, fontStyle: 'italic' }}>No explanation on file.</p>
+      )}
+    </div>
+  );
+}
+
+// Collapsible list of all scored criteria with their explanations — the evidence
+// a curator reads to judge whether the scores are well-founded.
+function CriteriaCard({ criteria }) {
+  const [open, setOpen] = useState(true);
+  if (!criteria || !criteria.length) {
+    return (
+      <div style={{ border: `1px solid ${C.border}`, borderRadius: 8, padding: '12px 14px', marginBottom: 12, background: C.panel2, opacity: 0.55 }}>
+        <h3 style={{ fontSize: 14, fontWeight: 700 }}>Criteria &amp; explanations</h3>
+        <p style={{ fontSize: 12, color: C.muted, marginTop: 6 }}>No per-criterion scores on file.</p>
+      </div>
+    );
+  }
+  return (
+    <div style={{ border: `1px solid ${C.border}`, borderRadius: 8, padding: '12px 14px', marginBottom: 12, background: C.panel2 }}>
+      <button onClick={() => setOpen((o) => !o)}
+        style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: C.paper }}>
+        <h3 style={{ fontSize: 14, fontWeight: 700 }}>Criteria &amp; explanations ({criteria.length})</h3>
+        <span style={{ color: C.muted, fontSize: 12 }}>{open ? '▴ hide' : '▾ show'}</span>
+      </button>
+      {open && criteria.map((c) => <CriterionRow key={c.code} c={c} />)}
+    </div>
+  );
+}
+
 function Detail({ item, onSaved }) {
   const hc = item.hc;
   return (
@@ -94,7 +151,7 @@ function Detail({ item, onSaved }) {
 
       <div style={{ border: `1px solid ${C.border}`, borderRadius: 8, padding: '12px 14px', marginBottom: 12, background: C.panel2, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
         <div>
-          <div style={{ color: C.muted, fontSize: 12, marginBottom: 2 }}>Young &amp; Reed (C1–C10)</div>
+          <div style={{ color: C.muted, fontSize: 12, marginBottom: 2 }}>Composite (C1–C10)</div>
           <div style={{ color: C.paper, fontWeight: 700, fontSize: 18 }}>{fmt(item.dualTrack.youngReed, '/100')}</div>
         </div>
         <div>
@@ -102,6 +159,8 @@ function Detail({ item, onSaved }) {
           <div style={{ color: C.paper, fontWeight: 700, fontSize: 18 }}>{item.dualTrack.liftonC11 == null ? '—' : `${item.dualTrack.liftonC11.toFixed(1)}/10`}</div>
         </div>
       </div>
+
+      <CriteriaCard criteria={item.criteria} />
 
       <div style={{ border: `1px solid ${C.border}`, borderRadius: 8, padding: '12px 14px', marginBottom: 12, background: C.panel2, opacity: item.brief ? 1 : 0.55 }}>
         <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 6 }}>Research brief</h3>
