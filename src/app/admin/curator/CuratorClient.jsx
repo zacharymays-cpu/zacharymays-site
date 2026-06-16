@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState, useTransition } from 'react';
-import { applyCuratorDecision } from './actions';
+import { applyCuratorDecision, modifyCriterionScore } from './actions';
 
 const C = {
   paper: '#f4f0e8', muted: 'rgba(244,240,232,0.62)', faint: 'rgba(244,240,232,0.40)',
@@ -70,10 +70,33 @@ function DecisionForm({ orgId, onSaved }) {
   );
 }
 
+// C1–C10 are the editable Young & Reed criteria; C11 (Lifton) is read-only here.
+const EDITABLE = new Set(['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'C10']);
+
 // One criterion: code + name, published score, the jury's AI mean + model-split
-// flag, and the written explanation — the actual basis for a judgement.
-function CriterionRow({ c }) {
+// flag, the written explanation, and — for C1–C10 — an inline audited edit.
+function CriterionRow({ orgId, c }) {
   const split = c.jurySpread != null && c.jurySpread >= 3;
+  const editable = EDITABLE.has(c.code);
+  const [score, setScore] = useState(c.score == null ? 'NA' : String(c.score));
+  const [rationale, setRationale] = useState('');
+  const [msg, setMsg] = useState(null);
+  const [pending, start] = useTransition();
+
+  function save() {
+    setMsg(null);
+    const fd = new FormData();
+    fd.set('orgId', orgId); fd.set('criterion', c.code);
+    fd.set('score', score); fd.set('rationale', rationale);
+    start(async () => {
+      const res = await modifyCriterionScore(fd);
+      setMsg(res.ok ? { ok: true, t: 'Saved ✓ (composite recomputed)' } : { ok: false, t: res.error });
+      if (res.ok) setRationale('');
+    });
+  }
+
+  const input = { background: C.inputBg, color: C.paper, border: `1px solid ${C.borderStrong}`, borderRadius: 6, padding: '5px 8px', fontSize: 13 };
+
   return (
     <div style={{ borderTop: `1px solid ${C.border}`, padding: '10px 0' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
@@ -93,11 +116,28 @@ function CriterionRow({ c }) {
         </div>
       </div>
       {c.body ? (
-        <p style={{ margin: '6px 0 0', fontSize: 13, lineHeight: 1.55, color: C.paper, whiteSpace: 'pre-wrap', maxHeight: 150, overflow: 'auto', borderLeft: `2px solid ${C.border}`, paddingLeft: 10 }}>
+        <p style={{ margin: '6px 0 8px', fontSize: 13, lineHeight: 1.55, color: C.paper, whiteSpace: 'pre-wrap', maxHeight: 150, overflow: 'auto', borderLeft: `2px solid ${C.border}`, paddingLeft: 10 }}>
           {c.body}
         </p>
       ) : (
-        <p style={{ margin: '6px 0 0', fontSize: 12, color: C.faint, fontStyle: 'italic' }}>No explanation on file.</p>
+        <p style={{ margin: '6px 0 8px', fontSize: 12, color: C.faint, fontStyle: 'italic' }}>No explanation on file.</p>
+      )}
+      {editable ? (
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+          <label style={{ fontSize: 11, color: C.muted }}>new</label>
+          <input value={score} onChange={(e) => setScore(e.target.value)}
+            style={{ ...input, width: 52, textAlign: 'center' }} aria-label={`New score for ${c.code}`} />
+          <input value={rationale} onChange={(e) => setRationale(e.target.value)}
+            placeholder="rationale (required to save)"
+            style={{ ...input, flex: 1, minWidth: 200 }} />
+          <button onClick={save} disabled={pending || !rationale.trim()}
+            style={{ background: C.gold, color: '#1f1c19', border: 'none', borderRadius: 6, padding: '5px 12px', fontWeight: 700, cursor: pending || !rationale.trim() ? 'not-allowed' : 'pointer', opacity: pending || !rationale.trim() ? 0.5 : 1 }}>
+            {pending ? '…' : 'Save'}
+          </button>
+          {msg && <span style={{ fontSize: 12, color: msg.ok ? C.ok : C.err }}>{msg.t}</span>}
+        </div>
+      ) : (
+        <p style={{ fontSize: 11, color: C.faint, fontStyle: 'italic' }}>Lifton track — read-only here.</p>
       )}
     </div>
   );
@@ -105,7 +145,7 @@ function CriterionRow({ c }) {
 
 // Collapsible list of all scored criteria with their explanations — the evidence
 // a curator reads to judge whether the scores are well-founded.
-function CriteriaCard({ criteria }) {
+function CriteriaCard({ orgId, criteria }) {
   const [open, setOpen] = useState(true);
   if (!criteria || !criteria.length) {
     return (
@@ -122,7 +162,7 @@ function CriteriaCard({ criteria }) {
         <h3 style={{ fontSize: 14, fontWeight: 700 }}>Criteria &amp; explanations ({criteria.length})</h3>
         <span style={{ color: C.muted, fontSize: 12 }}>{open ? '▴ hide' : '▾ show'}</span>
       </button>
-      {open && criteria.map((c) => <CriterionRow key={c.code} c={c} />)}
+      {open && criteria.map((c) => <CriterionRow key={c.code} orgId={orgId} c={c} />)}
     </div>
   );
 }
@@ -160,7 +200,7 @@ function Detail({ item, onSaved }) {
         </div>
       </div>
 
-      <CriteriaCard criteria={item.criteria} />
+      <CriteriaCard orgId={item.orgId} criteria={item.criteria} />
 
       <div style={{ border: `1px solid ${C.border}`, borderRadius: 8, padding: '12px 14px', marginBottom: 12, background: C.panel2, opacity: item.brief ? 1 : 0.55 }}>
         <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 6 }}>Research brief</h3>
