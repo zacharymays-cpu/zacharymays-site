@@ -1,6 +1,7 @@
 'use client';
 
-import { useMemo, useState, useTransition } from 'react';
+import { useState, useTransition } from 'react';
+import { useRouter } from 'next/navigation';
 import { applyCuratorDecision, modifyCriterionScore } from './actions';
 
 const C = {
@@ -53,10 +54,10 @@ function DecisionForm({ orgId, onSaved }) {
     <div style={{ border: `1px solid ${C.borderStrong}`, borderRadius: 8, padding: '12px 14px', background: C.panel }}>
       <label style={{ display: 'block', fontSize: 12, fontWeight: 700, marginBottom: 6 }}>Decision</label>
       <select value={decision} onChange={(e) => setDecision(e.target.value)} style={{ ...input, width: '100%', marginBottom: 10 }}>
-        <option value="approve">Approve</option>
+        <option value="approve">Approve (publish if pending)</option>
+        <option value="reject">Reject (archive)</option>
         <option value="request_evidence">Request additional evidence</option>
         <option value="modify">Modify score</option>
-        <option value="reject">Flag for review</option>
       </select>
       <label style={{ display: 'block', fontSize: 12, fontWeight: 700, marginBottom: 6 }}>Notes</label>
       <textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Rationale (optional)"
@@ -174,6 +175,20 @@ function Detail({ item, onSaved }) {
       <h2 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: 4 }}>{item.name}</h2>
       <p style={{ fontSize: 12, color: C.muted, marginBottom: 14 }}>{item.category || 'Uncategorized'}</p>
 
+      {item.status && item.status !== 'ACCEPTED' && (
+        <div style={{ marginBottom: 8 }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: C.paper, background: C.panel2, border: `1px solid ${C.borderStrong}`, borderRadius: 999, padding: '2px 8px' }}>
+            status: {item.status}
+          </span>
+        </div>
+      )}
+      {item.dupCandidates && item.dupCandidates.length > 0 && (
+        <div style={{ marginBottom: 10, border: `1px solid ${C.err}`, borderRadius: 8, padding: '8px 10px', background: C.panel2 }}>
+          <strong style={{ color: C.err, fontSize: 12 }}>⚠ Possible duplicate of:</strong>
+          <span style={{ color: C.muted, fontSize: 12 }}> {item.dupCandidates.map((d) => d.name).join(', ')}</span>
+        </div>
+      )}
+
       <div style={{ border: `1px solid ${C.border}`, borderRadius: 8, padding: '12px 14px', marginBottom: 12, background: C.panel2 }}>
         <span style={{ display: 'inline-block', background: HC_COLOR[hc.rating] || C.panel, color: C.paper, padding: '4px 10px', borderRadius: 4, fontSize: 12, fontWeight: 700, textTransform: 'capitalize', marginBottom: 12 }}>
           {hc.rating || 'unrated'}
@@ -232,62 +247,99 @@ function Detail({ item, onSaved }) {
   );
 }
 
-export default function CuratorClient({ items }) {
-  const [filter, setFilter] = useState('all');
+export default function CuratorClient({ items, mode = 'worklist', search = '', filters = {}, page = 0, pageSize = 25, total = 0 }) {
+  const router = useRouter();
   const [selectedId, setSelectedId] = useState(items[0]?.orgId || null);
-  const [done, setDone] = useState(() => new Set());
+  const [q, setQ] = useState(search);
 
-  const filtered = useMemo(() => {
-    if (filter === 'all') return items;
-    return items.filter((it) => it.signals.some((s) => s.type === filter));
-  }, [items, filter]);
+  function go(next) {
+    const params = new URLSearchParams();
+    params.set('mode', next.mode ?? mode);
+    if ((next.q ?? q)) params.set('q', next.q ?? q);
+    if ((next.rating ?? filters.rating)) params.set('rating', next.rating ?? filters.rating);
+    if ((next.reviewed ?? filters.reviewed)) params.set('reviewed', next.reviewed ?? filters.reviewed);
+    if (next.page != null) params.set('page', String(next.page));
+    router.push(`/admin/curator?${params.toString()}`);
+  }
 
-  const selected = filtered.find((it) => it.orgId === selectedId) || filtered[0] || null;
-
-  const filterBtn = (key, label) => (
-    <button key={key} onClick={() => setFilter(key)}
-      style={{ padding: '4px 10px', borderRadius: 999, fontSize: 12, fontWeight: 700, cursor: 'pointer',
-        border: `1px solid ${filter === key ? C.gold : C.border}`,
-        background: filter === key ? C.gold : 'transparent', color: filter === key ? '#1f1c19' : C.muted }}>
+  const tab = (key, label) => (
+    <button key={key} onClick={() => go({ mode: key, page: 0 })}
+      style={{ padding: '6px 12px', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer',
+        border: `1px solid ${mode === key ? C.gold : C.border}`,
+        background: mode === key ? C.gold : 'transparent', color: mode === key ? '#1f1c19' : C.muted }}>
       {label}
     </button>
   );
 
-  if (!items.length) return <p style={{ color: C.muted }}>No organizations to review.</p>;
+  const selected = items.find((it) => it.orgId === selectedId) || items[0] || null;
+  const lastPage = Math.max(0, Math.ceil(total / pageSize) - 1);
 
   return (
     <div>
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
-        {filterBtn('all', `All (${items.length})`)}
-        {filterBtn('low_evidence', 'Low evidence')}
-        {filterBtn('boundary', 'Severe rating')}
-        {filterBtn('confidence', 'Low confidence')}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+        {tab('worklist', 'Worklist (top 40)')}
+        {tab('browse', 'Browse all')}
+        {tab('pending', 'Pending intake')}
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: 16, alignItems: 'start' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: '70vh', overflowY: 'auto' }}>
-          {filtered.map((it) => {
-            const isSel = selected && it.orgId === selected.orgId;
-            return (
-              <button key={it.orgId} onClick={() => setSelectedId(it.orgId)}
-                style={{ textAlign: 'left', padding: '10px 12px', borderRadius: 8, cursor: 'pointer',
-                  border: `1px solid ${isSel ? C.gold : C.border}`, background: isSel ? C.panel : C.panel2,
-                  color: C.paper, opacity: done.has(it.orgId) ? 0.5 : 1 }}>
-                <div style={{ fontWeight: 700, fontSize: 13 }}>{it.name}</div>
-                <div style={{ fontSize: 11, color: C.muted, marginTop: 2 }}>
-                  <span style={{ textTransform: 'capitalize' }}>{it.hc.rating || 'unrated'}</span>
-                  {it.signals.length ? ` · ${it.signals.length} signal${it.signals.length > 1 ? 's' : ''}` : ''}
-                  {done.has(it.orgId) ? ' · reviewed ✓' : ''}
-                </div>
-              </button>
-            );
-          })}
+
+      {mode !== 'worklist' && (
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12, alignItems: 'center' }}>
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="search name…"
+            onKeyDown={(e) => { if (e.key === 'Enter') go({ page: 0 }); }}
+            style={{ background: C.inputBg, color: C.paper, border: `1px solid ${C.borderStrong}`, borderRadius: 6, padding: '6px 10px', fontSize: 14, minWidth: 220 }} />
+          {mode === 'browse' && (
+            <>
+              <select value={filters.rating || ''} onChange={(e) => go({ rating: e.target.value, page: 0 })}
+                style={{ background: C.inputBg, color: C.paper, border: `1px solid ${C.borderStrong}`, borderRadius: 6, padding: '6px 8px' }}>
+                <option value="">any rating</option><option value="low">low</option><option value="moderate">moderate</option><option value="high">high</option><option value="severe">severe</option>
+              </select>
+              <select value={filters.reviewed || ''} onChange={(e) => go({ reviewed: e.target.value, page: 0 })}
+                style={{ background: C.inputBg, color: C.paper, border: `1px solid ${C.borderStrong}`, borderRadius: 6, padding: '6px 8px' }}>
+                <option value="">reviewed: any</option><option value="no">unreviewed</option><option value="yes">reviewed</option>
+              </select>
+            </>
+          )}
+          <button onClick={() => go({ page: 0 })}
+            style={{ background: C.gold, color: '#1f1c19', border: 'none', borderRadius: 6, padding: '6px 12px', fontWeight: 700, cursor: 'pointer' }}>Search</button>
+          <span style={{ color: C.muted, fontSize: 12 }}>{total} orgs</span>
         </div>
-        {selected ? (
-          <Detail item={selected} onSaved={() => setDone((d) => new Set(d).add(selected.orgId))} />
-        ) : (
-          <p style={{ color: C.muted }}>No items match this filter.</p>
-        )}
-      </div>
+      )}
+
+      {!items.length ? (
+        <p style={{ color: C.muted }}>No organizations match.</p>
+      ) : (
+        <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: 16, alignItems: 'start' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: '70vh', overflowY: 'auto' }}>
+            {items.map((it) => {
+              const isSel = selected && it.orgId === selected.orgId;
+              return (
+                <button key={it.orgId} onClick={() => setSelectedId(it.orgId)}
+                  style={{ textAlign: 'left', padding: '10px 12px', borderRadius: 8, cursor: 'pointer',
+                    border: `1px solid ${isSel ? C.gold : C.border}`, background: isSel ? C.panel : C.panel2, color: C.paper }}>
+                  <div style={{ fontWeight: 700, fontSize: 13 }}>{it.name}</div>
+                  <div style={{ fontSize: 11, color: C.muted, marginTop: 2 }}>
+                    <span style={{ textTransform: 'capitalize' }}>{it.hc.rating || 'unrated'}</span>
+                    {it.status && it.status !== 'ACCEPTED' ? ` · ${it.status}` : ''}
+                    {it.reviewedAt ? ' · reviewed ✓' : ''}
+                    {it.dupCandidates && it.dupCandidates.length ? ' · ⚠ possible dup' : ''}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+          {selected ? <Detail item={selected} onSaved={() => router.refresh()} /> : <p style={{ color: C.muted }}>Select an org.</p>}
+        </div>
+      )}
+
+      {mode !== 'worklist' && total > pageSize && (
+        <div style={{ display: 'flex', gap: 10, justifyContent: 'center', marginTop: 16 }}>
+          <button disabled={page <= 0} onClick={() => go({ page: page - 1 })}
+            style={{ padding: '6px 12px', borderRadius: 6, border: 'none', fontWeight: 700, cursor: page <= 0 ? 'not-allowed' : 'pointer', background: page <= 0 ? C.panel : C.gold, color: page <= 0 ? C.muted : '#1f1c19' }}>← Prev</button>
+          <span style={{ color: C.muted, fontSize: 13, alignSelf: 'center' }}>page {page + 1} / {lastPage + 1}</span>
+          <button disabled={page >= lastPage} onClick={() => go({ page: page + 1 })}
+            style={{ padding: '6px 12px', borderRadius: 6, border: 'none', fontWeight: 700, cursor: page >= lastPage ? 'not-allowed' : 'pointer', background: page >= lastPage ? C.panel : C.gold, color: page >= lastPage ? C.muted : '#1f1c19' }}>Next →</button>
+        </div>
+      )}
     </div>
   );
 }
