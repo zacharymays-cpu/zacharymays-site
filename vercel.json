@@ -5,6 +5,10 @@
     {
       "path": "/api/cron/sync-usaspending",
       "schedule": "0 2 * * *"
+    },
+    {
+      "path": "/api/cron/run-intake",
+      "schedule": "0 3 * * *"
     }
   ]
 }
