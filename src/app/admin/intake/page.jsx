@@ -1,7 +1,7 @@
 // Restricted intake console. Same gate as /admin/curator: session + ADMIN_EMAILS + verified TOTP/AAL2.
 import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '../../../lib/supabase/server';
-import { getIntakeProposals } from '../../../lib/intakeProposals';
+import { getIntakeProposals, getCategories } from '../../../lib/intakeProposals';
 import IntakeClient from './IntakeClient';
 
 export const dynamic = 'force-dynamic';
@@ -32,8 +32,12 @@ export default async function AdminIntakePage() {
   if (!hasVerifiedTotp || aal?.currentLevel !== 'aal2') redirect('/admin/mfa');
 
   let proposals = [];
+  let categories = [];
   let loadError = null;
-  try { proposals = await getIntakeProposals({ limit: 100 }); } catch (e) { loadError = e.message; }
+  try {
+    proposals = await getIntakeProposals({ limit: 100 });
+    categories = await getCategories();
+  } catch (e) { loadError = e.message; }
 
   return (
     <main style={{ padding: '2rem', maxWidth: 1000, margin: '0 auto' }}>
@@ -44,7 +48,7 @@ export default async function AdminIntakePage() {
           and approve/reject pending proposals. Signed in as {email}.
         </p>
       </header>
-      {loadError ? <p style={{ color: '#b00' }}>Failed to load: {loadError}</p> : <IntakeClient proposals={proposals} />}
+      {loadError ? <p style={{ color: '#b00' }}>Failed to load: {loadError}</p> : <IntakeClient proposals={proposals} categories={categories} />}
     </main>
   );
 }

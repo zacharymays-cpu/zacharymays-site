@@ -25,9 +25,10 @@ function DupWarning({ duplicates }) {
   );
 }
 
-function ProposalForm() {
+function ProposalForm({ categories = [] }) {
   const router = useRouter();
   const [f, setF] = useState({ name: '', category: '', justification: '', category_fit: '', public_interest: '', source_pre_assessment: '' });
+  const [newCat, setNewCat] = useState(false); // true when entering a brand-new category
   const [dups, setDups] = useState(null);
   const [needsConfirm, setNeedsConfirm] = useState(false);
   const [msg, setMsg] = useState(null);
@@ -42,7 +43,7 @@ function ProposalForm() {
     start(async () => {
       const res = await submitProposal(fd);
       if (res.needsConfirm) { setDups(res.duplicates); setNeedsConfirm(true); setMsg({ ok: false, t: 'Possible duplicate — confirm to submit anyway.' }); return; }
-      if (res.ok) { setMsg({ ok: true, t: 'Proposal submitted ✓' }); setF({ name: '', category: '', justification: '', category_fit: '', public_interest: '', source_pre_assessment: '' }); setDups(null); setNeedsConfirm(false); router.refresh(); }
+      if (res.ok) { setMsg({ ok: true, t: 'Proposal submitted ✓' }); setF({ name: '', category: '', justification: '', category_fit: '', public_interest: '', source_pre_assessment: '' }); setNewCat(false); setDups(null); setNeedsConfirm(false); router.refresh(); }
       else setMsg({ ok: false, t: res.error });
     });
   }
@@ -52,7 +53,23 @@ function ProposalForm() {
       <h2 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: 12 }}>Propose an organization</h2>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
         <div><label style={{ fontSize: 12, color: C.muted }}>Name *</label><input style={input} value={f.name} onChange={set('name')} /></div>
-        <div><label style={{ fontSize: 12, color: C.muted }}>Category *</label><input style={input} value={f.category} onChange={set('category')} /></div>
+        <div>
+          <label style={{ fontSize: 12, color: C.muted }}>Category *</label>
+          {newCat ? (
+            <div style={{ display: 'flex', gap: 6 }}>
+              <input style={input} placeholder="New category name" value={f.category} onChange={set('category')} autoFocus />
+              <button type="button" title="Back to list" onClick={() => { setNewCat(false); setF({ ...f, category: '' }); }}
+                style={{ background: 'transparent', color: C.muted, border: `1px solid ${C.borderStrong}`, borderRadius: 6, padding: '0 10px', cursor: 'pointer' }}>↩</button>
+            </div>
+          ) : (
+            <select style={input} value={f.category}
+              onChange={(e) => { if (e.target.value === '__new__') { setNewCat(true); setF({ ...f, category: '' }); } else setF({ ...f, category: e.target.value }); }}>
+              <option value="">Select a category…</option>
+              {categories.map((c) => <option key={c} value={c}>{c}</option>)}
+              <option value="__new__">+ New category…</option>
+            </select>
+          )}
+        </div>
       </div>
       {[['justification', 'Justification'], ['category_fit', 'Category fit'], ['public_interest', 'Public interest'], ['source_pre_assessment', 'Source pre-assessment']].map(([k, label]) => (
         <div key={k} style={{ marginTop: 10 }}>
@@ -119,10 +136,10 @@ function ProposalRow({ p }) {
   );
 }
 
-export default function IntakeClient({ proposals }) {
+export default function IntakeClient({ proposals, categories = [] }) {
   return (
     <div>
-      <ProposalForm />
+      <ProposalForm categories={categories} />
       <h2 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: 10 }}>Proposals ({proposals.length})</h2>
       {proposals.length ? proposals.map((p) => <ProposalRow key={p.id} p={p} />) : <p style={{ color: C.muted }}>No proposals yet.</p>}
     </div>
