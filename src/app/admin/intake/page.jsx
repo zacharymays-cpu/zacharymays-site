@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '../../../lib/supabase/server';
 import { getIntakeProposals, getCategories } from '../../../lib/intakeProposals';
 import IntakeClient from './IntakeClient';
+import AdminNav from '../AdminNav';
 
 export const dynamic = 'force-dynamic';
 
@@ -41,6 +42,7 @@ export default async function AdminIntakePage() {
 
   return (
     <main style={{ padding: '2rem', maxWidth: 1000, margin: '0 auto' }}>
+      <AdminNav active="/admin/intake" />
       <header style={{ marginBottom: '1.5rem' }}>
         <h1 style={{ fontSize: '1.6rem', fontWeight: 700 }}>Org intake</h1>
         <p style={{ opacity: 0.7, marginTop: '0.4rem' }}>

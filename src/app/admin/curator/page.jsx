@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '../../../lib/supabase/server';
 import { getCuratorOrgs } from '../../../lib/curatorQueue';
 import CuratorClient from './CuratorClient';
+import AdminNav from '../AdminNav';
 
 export const dynamic = 'force-dynamic';
 
@@ -57,6 +58,7 @@ export default async function AdminCuratorPage({ searchParams }) {
 
   return (
     <main style={{ padding: '2rem', maxWidth: 1100, margin: '0 auto' }}>
+      <AdminNav active="/admin/curator" />
       <header style={{ marginBottom: '1.5rem' }}>
         <h1 style={{ fontSize: '1.6rem', fontWeight: 700 }}>Curator console</h1>
         <p style={{ opacity: 0.7, marginTop: '0.4rem' }}>
