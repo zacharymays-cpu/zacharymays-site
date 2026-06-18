@@ -22,6 +22,22 @@ export async function getIntakeProposals({ limit = 100 } = {}) {
   }));
 }
 
+// Distinct org categories currently in use (for the intake form dropdown), sorted.
+export async function getCategories() {
+  const sb = createSupabaseAdminClient();
+  const { data, error } = await sb
+    .from('organizations')
+    .select('category')
+    .not('category', 'is', null);
+  if (error) return [];
+  const set = new Set();
+  for (const r of data || []) {
+    const c = (r.category || '').trim();
+    if (c) set.add(c);
+  }
+  return [...set].sort((a, b) => a.localeCompare(b));
+}
+
 // Returns { orgs: [...ranked], proposals: [...ranked] } likely duplicates for `name`.
 export async function findIntakeDuplicates(name) {
   const sb = createSupabaseAdminClient();
