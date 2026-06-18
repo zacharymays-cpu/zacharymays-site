@@ -67,7 +67,8 @@ function buildPersonPaths(journeyRows, personMap, locMap) {
 }
 
 export default async function ChildrenOfGodPage() {
-  const [orgRes, compoundsRes, journeysRes] = await Promise.all([
+  // Fetch org and CoG locations first (journeys depend on location IDs).
+  const [orgRes, compoundsRes] = await Promise.all([
     fetch(
       `${SUPABASE_URL}/rest/v1/organizations` +
         `?select=id,name,slug,category,composite_score,composite_tier,youngs_score,founding_year,defunct_year,trajectory,summary_text,active,membership_count,membership_count_year,revenue_usd,revenue_year,size_tier,size_notes,political_scores(economic_axis,authority_axis,political_quadrant,scoring_notes),criterion_scores(criterion,score,confidence,body_text),organization_research_narratives(id,narrative_type,title,content,summary,confidence_level,sources)` +
@@ -86,16 +87,28 @@ export default async function ChildrenOfGodPage() {
         `&order=opened_year.asc`,
       opts
     ),
-    fetch(
-      `${SUPABASE_URL}/rest/v1/survivor_journeys` +
-        `?select=person_id,journey_sequence,from_location_id,to_location_id,year_from,year_to,confidence`,
-      opts
-    ),
   ]);
 
   const orgRows = await orgRes.json().catch(() => []);
   const compounds = await compoundsRes.json().catch(() => []);
-  const journeyRows = await journeysRes.json().catch(() => []);
+
+  // Scope survivor journeys to CoG locations only. survivor_journeys is a shared
+  // table spanning every org's locations, so an unscoped fetch leaks other orgs'
+  // movement legs (e.g. Twelve Tribes) onto this map.
+  const cogLocIds = (Array.isArray(compounds) ? compounds : [])
+    .map((c) => c.id)
+    .filter(Boolean);
+
+  let journeyRows = [];
+  if (cogLocIds.length > 0) {
+    const journeysRes = await fetch(
+      `${SUPABASE_URL}/rest/v1/survivor_journeys` +
+        `?select=person_id,journey_sequence,from_location_id,to_location_id,year_from,year_to,confidence` +
+        `&or=(from_location_id.in.(${cogLocIds.join(',')}),to_location_id.in.(${cogLocIds.join(',')}))`,
+      opts
+    );
+    journeyRows = await journeysRes.json().catch(() => []);
+  }
 
   // The persons table (10k+ rows) is RLS-locked from anon, so survivor names
   // come from a security-definer RPC that exposes ONLY journey-referenced
