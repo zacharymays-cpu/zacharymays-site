@@ -26,8 +26,9 @@ const NAV_ITEMS = [
       { href: '/explore/sankey',          label: 'Category Flow' },
       { href: '/explore/sunburst',        label: 'Sunburst' },
       { href: '/explore/compare',         label: 'Head-to-Head' },
-      { href: '/research/children-of-god-network', label: 'Children of God Network' },
-      { href: '/research/marine-raiders-network', label: 'Marine Raiders (MARSOC)' },
+      { heading: 'Case Studies' },
+      { href: '/research/children-of-god-network', label: 'Children of God' },
+      { href: '/research/twelve-tribes-network',   label: 'Twelve Tribes' },
     ],
   },
   {
@@ -84,17 +85,30 @@ function Dropdown({ item, path, onNavigate }) {
       </button>
       {open && (
         <ul className="nav__dropdown" role="menu">
-          {item.items.map(child => (
-            <li key={child.href} role="none">
-              <Link
-                href={child.href}
-                role="menuitem"
-                className={path === child.href || path.startsWith(child.href + '/') ? 'active' : ''}
-                onClick={() => { setOpen(false); onNavigate?.(); }}>
-                {child.label}
-              </Link>
-            </li>
-          ))}
+          {item.items.map((child, idx) =>
+            child.heading ? (
+              <li key={`heading-${idx}`} role="presentation"
+                style={{
+                  margin: '0.35rem 0 0.1rem', padding: '0.35rem 1rem 0.15rem',
+                  borderTop: '1px solid rgba(212,206,196,0.12)',
+                  fontFamily: 'var(--mono, monospace)', fontSize: '0.6rem',
+                  letterSpacing: '0.12em', textTransform: 'uppercase',
+                  color: 'var(--gold, #c8a84b)', opacity: 0.85, pointerEvents: 'none',
+                }}>
+                {child.heading}
+              </li>
+            ) : (
+              <li key={child.href} role="none">
+                <Link
+                  href={child.href}
+                  role="menuitem"
+                  className={path === child.href || path.startsWith(child.href + '/') ? 'active' : ''}
+                  onClick={() => { setOpen(false); onNavigate?.(); }}>
+                  {child.label}
+                </Link>
+              </li>
+            )
+          )}
         </ul>
       )}
     </li>
