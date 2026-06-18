@@ -6,6 +6,7 @@ import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '../../../lib/supabase/server';
 import { getReviewQueue } from '../../../lib/reviewQueue';
 import ReviewClient from './ReviewClient';
+import AdminNav from '../AdminNav';
 
 export const dynamic = 'force-dynamic'; // always live; never cache the console
 
@@ -58,6 +59,7 @@ export default async function AdminReviewPage() {
 
   return (
     <main style={{ padding: '2rem', maxWidth: 1100, margin: '0 auto' }}>
+      <AdminNav active="/admin/review" />
       <header style={{ marginBottom: '1.5rem' }}>
         <h1 style={{ fontSize: '1.6rem', fontWeight: 700 }}>Score review console</h1>
         <p style={{ opacity: 0.7, marginTop: '0.4rem' }}>
