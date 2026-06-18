@@ -152,7 +152,7 @@ export default function SurvivorMovements({ compounds = [], personPaths = [] }) 
       const f = e.features[0];
       new maplibregl.Popup()
         .setLngLat(e.lngLat)
-        .setHTML(`<div style="font-family:system-ui;font-size:12px;max-width:240px;"><strong>${f.properties.person_name}</strong><br/><span style="color:#666;">${f.properties.summary}</span></div>`)
+        .setHTML(`<div style="font-family:system-ui;font-size:14px;max-width:240px;background-color:rgba(0,0,0,0.85);padding:6px 8px;border-radius:3px;"><strong style="color:#e8e4dc;">${f.properties.person_name}</strong><br/><span style="color:#d4c5b9;font-size:13px;">${f.properties.summary}</span></div>`)
         .addTo(map.current);
       selectPerson(f.properties.person_id);
     });
@@ -160,18 +160,21 @@ export default function SurvivorMovements({ compounds = [], personPaths = [] }) 
     map.current.on('mouseleave', 'person-lines', () => { map.current.getCanvas().style.cursor = ''; });
   };
 
-  // Highlight one person's path (or clear with null) by toggling feature-state.
+  // Highlight one person's path (or clear with null) by toggling opacity on all related layers.
   const selectPerson = (personId) => {
     const next = selected === personId ? null : personId;
     setSelected(next);
     if (!map.current || !map.current.getSource('person-paths')) return;
 
-    personPaths.forEach((p) => {
-      const fid = featureIdByPerson.current[p.person_id];
-      const active = next === null || p.person_id === next;
-      map.current.setFeatureState({ source: 'person-paths', id: fid }, { active });
-    });
-    // Waypoints dim too (they have no feature ids, so re-filter the layer)
+    // Update line opacity: selected person is 0.85, others dim to 0.1
+    map.current.setPaintProperty('person-lines', 'line-opacity',
+      next === null ? 0.85 : ['case', ['==', ['get', 'person_id'], next], 0.85, 0.1]);
+
+    // Update arrow opacity (same as lines)
+    map.current.setPaintProperty('person-arrows', 'text-opacity',
+      next === null ? 0.85 : ['case', ['==', ['get', 'person_id'], next], 0.85, 0.1]);
+
+    // Update waypoint opacity
     map.current.setPaintProperty('person-waypoints-layer', 'circle-opacity',
       next === null ? 0.9 : ['case', ['==', ['get', 'person_id'], next], 0.95, 0.12]);
 
