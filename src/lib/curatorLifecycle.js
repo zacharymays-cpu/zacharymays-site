@@ -22,4 +22,18 @@ function nextStatusFor(decision, currentStatus) {
   return null;
 }
 
-module.exports = { normalizeName, nextStatusFor };
+// Worklist eligibility. An org belongs on the curator priority worklist only if
+// it is live (ACCEPTED), not a calibration anchor, has an HC rating to prioritize
+// on, and has NOT yet been curator-reviewed — approving an org stamps reviewed_at
+// (see applyCuratorDecision), which is what drops it off the worklist. This is the
+// pure mirror of the getCuratorQueue() query filters so the rule can be unit-tested
+// and applied as an in-memory guard against the DB query drifting.
+function isWorklistEligible(org) {
+  if (!org) return false;
+  return org.scoring_status === 'ACCEPTED'
+    && org.is_calibration === false
+    && org.hc_rating != null
+    && org.reviewed_at == null;
+}
+
+module.exports = { normalizeName, nextStatusFor, isWorklistEligible };

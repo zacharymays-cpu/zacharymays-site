@@ -4,13 +4,16 @@
 // (so the curator can actually judge, not just see aggregates), with computed
 // review signals, sorted by priority. Uses the service role because the hc_* and
 // jury tables are not anon-readable.
+// Only surfaces ACCEPTED orgs that have NOT yet been curator-reviewed
+// (reviewed_at IS NULL); approving an org stamps reviewed_at, so it drops off the
+// worklist. (Browse mode still lists every ACCEPTED org — see getCuratorOrgs.)
 // Dual-track is derived from the HC columns: CIS == young_reed composite (0–100),
 // and CLA == lifton C11 × 10, so liftonC11 = leadershipAuthority / 10. (The
 // ai_jury_verdicts lifton rows have NULL jury_mean, so we do NOT read them for
 // the headline scores.)
 import { createSupabaseAdminClient } from './supabase/admin';
 import { computeSignals, priorityScore } from './curatorSignals';
-import { normalizeName } from './curatorLifecycle';
+import { normalizeName, isWorklistEligible } from './curatorLifecycle';
 
 // C1–C10 are the Young & Reed criteria; C11 is Lifton ideological totalism.
 const CRITERIA = ['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'C10', 'C11'];
@@ -30,9 +33,10 @@ export async function getCuratorQueue({ limit = 40 } = {}) {
 
   const { data: orgs, error: orgErr } = await sb
     .from('organizations')
-    .select('id, name, category, summary_text, hc_rating, hc_control_index_score, hc_leadership_authority_score, hc_member_dependency_index, hc_exit_cost_assessment, hc_composite_risk_level, hc_confidence_overall, reviewed_at')
+    .select('id, name, category, summary_text, is_calibration, scoring_status, hc_rating, hc_control_index_score, hc_leadership_authority_score, hc_member_dependency_index, hc_exit_cost_assessment, hc_composite_risk_level, hc_confidence_overall, reviewed_at')
     .eq('is_calibration', false)
     .eq('scoring_status', 'ACCEPTED') // only live orgs — keeps ARCHIVED dupes + PENDING stubs out of the console
+    .is('reviewed_at', null)          // drop curator-approved orgs — once reviewed they no longer need human eyes
     .not('hc_rating', 'is', null);
   if (orgErr) throw orgErr;
 
@@ -48,7 +52,9 @@ export async function getCuratorQueue({ limit = 40 } = {}) {
     // research_briefs not present (or unreadable) — briefs stay empty; UI shows "no brief".
   }
 
-  const rows = (orgs || []).map((o) => {
+  // In-memory guard mirroring the query filters above — keeps the worklist correct
+  // even if the DB-side filters drift (single source of truth: isWorklistEligible).
+  const rows = (orgs || []).filter(isWorklistEligible).map((o) => {
     const brief = briefByOrg.get(o.id) || null;
     const cis = numOrNull(o.hc_control_index_score);
     const cla = numOrNull(o.hc_leadership_authority_score);
