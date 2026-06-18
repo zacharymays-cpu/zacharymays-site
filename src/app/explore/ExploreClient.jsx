@@ -19,6 +19,25 @@ const TIERS = ['Super Culty','Kinda Culty','Not Culty'];
 const TIER_LABELS = { 'Super Culty':'High-Control','Kinda Culty':'Moderate-Control','Not Culty':'Low-Control' };
 const lbl = (t) => TIER_LABELS[t] || t;
 const TRAJECTORIES = ['Stable','Escalating','Declining','Defunct'];
+
+// ── Lifton psychological-totalism tier (C11) ────────────────────────────────
+// Derived client-side from the 0–10 C11 score using the methodology cut-lines.
+// Cool/violet palette deliberately distinct from the warm behavioral TIER_COLORS
+// so the two tier systems never visually collide.
+const LIFTON_TIERS = ['Psychologically Totalizing','Moderately Totalizing','Non-Totalizing'];
+const LIFTON_TIER_COLORS = {
+  'Psychologically Totalizing':'#a06cd5','Moderately Totalizing':'#6d83b5','Non-Totalizing':'#5f8f86',
+};
+const LIFTON_TIER_SHORT = {
+  'Psychologically Totalizing':'Totalizing','Moderately Totalizing':'Moderate','Non-Totalizing':'Non-Totalizing',
+};
+const liftonTier = (score) => {
+  const v = parseFloat(score);
+  if (Number.isNaN(v)) return null;
+  if (v >= 6) return 'Psychologically Totalizing';
+  if (v >= 3) return 'Moderately Totalizing';
+  return 'Non-Totalizing';
+};
 const CRITERIA = ['C1','C2','C3','C4','C5','C6','C7','C8','C9','C10'];
 const CRITERIA_DETAIL = {
   C1:{name:'Charismatic Leadership',desc:'Has a defined, charismatic leader — or a central authoritative idea — treated as extraordinary, directives taken as truth, dissenters discredited.'},
@@ -423,6 +442,7 @@ export default function ExploreClient({ initialOrgs=[] }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [search, setSearch] = useState('');
   const [tierFilter, setTierFilter] = useState([]);
+  const [liftonTierFilter, setLiftonTierFilter] = useState([]);
   const [trajFilter, setTrajFilter] = useState([]);
   const [categoryFilter, setCategoryFilter] = useState([]);
   const [sortBy, setSortBy] = useState('composite_score');
@@ -444,13 +464,14 @@ export default function ExploreClient({ initialOrgs=[] }) {
   const toggle = (val,state,setter) =>
     setter(state.includes(val)?state.filter(v=>v!==val):[...state,val]);
 
-  const hasFilters = search||tierFilter.length||trajFilter.length||categoryFilter.length||scoreMin>0||scoreMax<100;
+  const hasFilters = search||tierFilter.length||liftonTierFilter.length||trajFilter.length||categoryFilter.length||scoreMin>0||scoreMax<100;
 
   const filtered = useMemo(()=>{
     let result = orgs.filter(o=>{
       if(search&&!o.name.toLowerCase().includes(search.toLowerCase())&&
          !o.category.toLowerCase().includes(search.toLowerCase())) return false;
       if(tierFilter.length&&!tierFilter.includes(o.composite_tier)) return false;
+      if(liftonTierFilter.length&&!liftonTierFilter.includes(liftonTier(o.lifton_score))) return false;
       if(trajFilter.length&&!trajFilter.includes(o.trajectory)) return false;
       if(categoryFilter.length&&!categoryFilter.includes(o.category)) return false;
       const s=parseFloat(o.composite_score);
@@ -462,7 +483,7 @@ export default function ExploreClient({ initialOrgs=[] }) {
     });
     return [...result].sort((a,b)=>{
       let av=a[sortBy],bv=b[sortBy];
-      if(sortBy==='composite_score'||sortBy==='youngs_score'){
+      if(sortBy==='composite_score'||sortBy==='youngs_score'||sortBy==='lifton_score'){
         // Numeric sort; unscored (null/NaN) values sink to the bottom regardless of direction.
         av=parseFloat(av); bv=parseFloat(bv);
         const aNan=Number.isNaN(av), bNan=Number.isNaN(bv);
@@ -478,7 +499,7 @@ export default function ExploreClient({ initialOrgs=[] }) {
       if(av>bv) return sortDir==='asc'?1:-1;
       return 0;
     });
-  },[orgs,search,tierFilter,trajFilter,categoryFilter,sortBy,sortDir,scoreMin,scoreMax]);
+  },[orgs,search,tierFilter,liftonTierFilter,trajFilter,categoryFilter,sortBy,sortDir,scoreMin,scoreMax]);
 
   const handleSort=(col)=>{
     if(sortBy===col) setSortDir(d=>d==='asc'?'desc':'asc');
@@ -528,20 +549,36 @@ export default function ExploreClient({ initialOrgs=[] }) {
           <div className="explore-sidebar">
             <button className="explore-filter-toggle" onClick={()=>setSidebarOpen(o=>!o)}>
               <span className="filter-label">
-                Filters{hasFilters?` (${tierFilter.length+trajFilter.length+categoryFilter.length+(search?1:0)} active)`:''}
+                Filters{hasFilters?` (${tierFilter.length+liftonTierFilter.length+trajFilter.length+categoryFilter.length+(search?1:0)} active)`:''}
               </span>
               <span style={{fontSize:'0.8rem'}}>{sidebarOpen?'◀':'▶'}</span>
             </button>
 
             <div className="explore-sidebar-body">
-              {/* Tier */}
+              {/* Control Tier (behavioral, C1–C10) */}
               <div style={{marginBottom:'1.25rem'}}>
-                <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--muted)',marginBottom:'0.5rem'}}>Tier</div>
+                <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--muted)',marginBottom:'0.5rem'}}>
+                  Control Tier <span style={{textTransform:'none',letterSpacing:0,color:'rgba(212,206,196,0.3)'}}>· behavioral</span>
+                </div>
                 {TIERS.map(t=>(
                   <label key={t} style={{display:'flex',alignItems:'center',gap:'0.5rem',marginBottom:'0.3rem',cursor:'pointer'}}>
                     <input type="checkbox" checked={tierFilter.includes(t)} onChange={()=>toggle(t,tierFilter,setTierFilter)} style={{accentColor:TIER_COLORS[t]}}/>
                     <span style={{fontSize:'0.77rem',color:tierFilter.includes(t)?'var(--paper)':'var(--muted)',flex:1}}>{lbl(t)}</span>
                     <span style={{fontFamily:'var(--mono)',fontSize:'0.63rem',color:'var(--muted)'}}>{orgs.filter(o=>o.composite_tier===t).length}</span>
+                  </label>
+                ))}
+              </div>
+
+              {/* Psychological Tier (Lifton totalism, C11) */}
+              <div style={{marginBottom:'1.25rem'}}>
+                <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--muted)',marginBottom:'0.5rem'}}>
+                  Psychological Tier <span style={{textTransform:'none',letterSpacing:0,color:'rgba(212,206,196,0.3)'}}>· Lifton</span>
+                </div>
+                {LIFTON_TIERS.map(t=>(
+                  <label key={t} style={{display:'flex',alignItems:'center',gap:'0.5rem',marginBottom:'0.3rem',cursor:'pointer'}}>
+                    <input type="checkbox" checked={liftonTierFilter.includes(t)} onChange={()=>toggle(t,liftonTierFilter,setLiftonTierFilter)} style={{accentColor:LIFTON_TIER_COLORS[t]}}/>
+                    <span style={{fontSize:'0.77rem',color:liftonTierFilter.includes(t)?'var(--paper)':'var(--muted)',flex:1}}>{t}</span>
+                    <span style={{fontFamily:'var(--mono)',fontSize:'0.63rem',color:'var(--muted)'}}>{orgs.filter(o=>liftonTier(o.lifton_score)===t).length}</span>
                   </label>
                 ))}
               </div>
@@ -582,7 +619,7 @@ export default function ExploreClient({ initialOrgs=[] }) {
               </div>
 
               {hasFilters&&(
-                <button onClick={()=>{setSearch('');setTierFilter([]);setTrajFilter([]);setCategoryFilter([]);setScoreMin(0);setScoreMax(100);}}
+                <button onClick={()=>{setSearch('');setTierFilter([]);setLiftonTierFilter([]);setTrajFilter([]);setCategoryFilter([]);setScoreMin(0);setScoreMax(100);}}
                   style={{fontFamily:'var(--mono)',fontSize:'0.63rem',letterSpacing:'0.1em',textTransform:'uppercase',padding:'0.45rem 0.9rem',width:'100%',background:'transparent',border:'1px solid rgba(212,206,196,0.25)',color:'var(--muted)',cursor:'pointer'}}>
                   Clear All
                 </button>
@@ -603,14 +640,21 @@ export default function ExploreClient({ initialOrgs=[] }) {
               <table style={{width:'100%',borderCollapse:'collapse',minWidth:'500px'}}>
                 <thead style={{position:'sticky',top:0,background:'#1a1512',zIndex:1}}>
                   <tr style={{borderBottom:'1px solid rgba(212,206,196,0.2)'}}>
-                    {[['name','Organization'],['composite_score','Score'],['composite_tier','Tier'],['youngs_score',"Young's"],['category','Category'],['trajectory','Trajectory']].map(([col,label])=>(
+                    {[['name','Organization'],['composite_score','Score'],['composite_tier','Control Tier'],['youngs_score',"Young's"],['lifton_score','Lifton'],['__psych','Psych Tier'],['category','Category'],['trajectory','Trajectory']].map(([col,label])=>{
+                      const hideMobile = col==='category'||col==='trajectory'||col==='lifton_score'||col==='__psych';
+                      // Derived (non-sortable) columns use a sentinel key prefixed with '__'.
+                      if(col.startsWith('__')) return (
+                        <th key={col} className={hideMobile?'explore-table-hide-mobile':''} style={{fontFamily:'var(--mono)',fontSize:'0.65rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'rgba(212,206,196,0.72)',textAlign:'left',padding:'0.6rem 0.75rem',whiteSpace:'nowrap'}}>{label}</th>
+                      );
+                      return (
                       <th key={col} onClick={()=>handleSort(col)}
                         onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();handleSort(col);}}}
                         role="button" tabIndex={0} aria-label={`Sort by ${label}`}
-                        className={col==='category'||col==='trajectory'?'explore-table-hide-mobile':''} style={{fontFamily:'var(--mono)',fontSize:'0.65rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'rgba(212,206,196,0.72)',textAlign:'left',padding:'0.6rem 0.75rem',cursor:'pointer',userSelect:'none',whiteSpace:'nowrap'}}>
+                        className={hideMobile?'explore-table-hide-mobile':''} style={{fontFamily:'var(--mono)',fontSize:'0.65rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'rgba(212,206,196,0.72)',textAlign:'left',padding:'0.6rem 0.75rem',cursor:'pointer',userSelect:'none',whiteSpace:'nowrap'}}>
                         {label} <SortIcon col={col}/>
                       </th>
-                    ))}
+                      );
+                    })}
                     <th style={{fontFamily:'var(--mono)',fontSize:'0.6rem',color:'rgba(212,206,196,0.45)',padding:'0.6rem 0.75rem',textAlign:'right'}}>Detail</th>
                   </tr>
                 </thead>
@@ -637,13 +681,19 @@ export default function ExploreClient({ initialOrgs=[] }) {
                           : <span style={{fontFamily:'var(--mono)',fontSize:'0.62rem',fontStyle:'italic',color:'rgba(212,206,196,0.3)'}}>Pending</span>}
                       </td>
                       <td style={{padding:'0.65rem 0.75rem',fontFamily:'var(--mono)',fontSize:'0.82rem',color:'rgba(212,206,196,0.8)'}}>{org.youngs_score==null?'—':`${org.youngs_score}/10`}</td>
+                      <td className="explore-table-hide-mobile" style={{padding:'0.65rem 0.75rem',fontFamily:'var(--mono)',fontSize:'0.82rem',fontWeight:600,color:'var(--paper)',whiteSpace:'nowrap'}}>{org.lifton_score==null?<span style={{color:'rgba(212,206,196,0.35)',fontWeight:400}}>—</span>:`${parseFloat(org.lifton_score)}/10`}</td>
+                      <td className="explore-table-hide-mobile" style={{padding:'0.65rem 0.75rem',whiteSpace:'nowrap'}}>
+                        {(() => { const lt = liftonTier(org.lifton_score); return lt
+                          ? <span style={{display:'inline-flex',alignItems:'center',gap:'0.4rem',fontFamily:'var(--mono)',fontSize:'0.62rem',color:'rgba(212,206,196,0.8)'}}><span style={{width:8,height:8,borderRadius:'50%',background:LIFTON_TIER_COLORS[lt],flexShrink:0}}/>{LIFTON_TIER_SHORT[lt]}</span>
+                          : <span style={{fontFamily:'var(--mono)',fontSize:'0.62rem',color:'rgba(212,206,196,0.3)'}}>—</span>; })()}
+                      </td>
                       <td className="explore-table-hide-mobile" style={{padding:'0.65rem 0.75rem',color:'rgba(212,206,196,0.8)',fontSize:'0.75rem',fontFamily:'var(--mono)',whiteSpace:'nowrap'}}>{org.category}</td>
                       <td className="explore-table-hide-mobile" style={{padding:'0.65rem 0.75rem',fontFamily:'var(--mono)',fontSize:'0.72rem',color:'rgba(212,206,196,0.8)',whiteSpace:'nowrap'}}>{org.trajectory}</td>
                       <td style={{padding:'0.65rem 0.75rem',textAlign:'right',fontFamily:'var(--mono)',fontSize:'0.65rem',color:'rgba(200,168,75,0.6)'}}>→</td>
                     </tr>
                   ))}
                   {filtered.length===0&&(
-                    <tr><td colSpan={7} style={{padding:'3rem',textAlign:'center',color:'var(--muted)',fontFamily:'var(--mono)',fontSize:'0.8rem'}}>No organizations match current filters.</td></tr>
+                    <tr><td colSpan={9} style={{padding:'3rem',textAlign:'center',color:'var(--muted)',fontFamily:'var(--mono)',fontSize:'0.8rem'}}>No organizations match current filters.</td></tr>
                   )}
                 </tbody>
               </table>

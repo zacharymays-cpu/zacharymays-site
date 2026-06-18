@@ -256,8 +256,17 @@ export default async function OrgPage({ params }) {
   const org = await getOrg(slug)
   if (!org) notFound()
 
+  // C1–C10 are the behavioral "Ten Criteria"; C11 (Lifton psychological totalism)
+  // is a separate track surfaced as its own scoreboard card, not in the list.
   const criteria = [...(org.criterion_scores || [])]
+    .filter(c => c.criterion !== 'C11')
     .sort((a, b) => parseInt(a.criterion.replace('C','')) - parseInt(b.criterion.replace('C','')))
+  const liftonRow   = (org.criterion_scores || []).find(c => c.criterion === 'C11')
+  const liftonScore = liftonRow && liftonRow.score != null ? parseFloat(liftonRow.score) : null
+  const liftonTier  = liftonScore == null ? null
+    : liftonScore >= 6 ? 'Psychologically Totalizing'
+    : liftonScore >= 3 ? 'Moderately Totalizing'
+    : 'Non-Totalizing'
 
   // De-duplicate evidence sources across all criteria (each source is attached
   // per-criterion, so the same reference recurs). Best factual tier first, then newest.
@@ -354,6 +363,18 @@ export default async function OrgPage({ params }) {
                     {org.youngs_score}<span style={{ fontSize: '0.9rem', color: 'var(--muted)' }}>/10</span>
                   </span>
                   <span style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)' }}>Young's{org.youngs_band ? ` · ${org.youngs_band}` : ''}</span>
+                </div>
+              </>
+            )}
+
+            {liftonScore != null && (
+              <>
+                <div style={{ width: 1, background: 'rgba(212,206,196,0.15)' }} />
+                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '0.3rem' }}>
+                  <span style={{ fontFamily: 'var(--serif)', fontSize: '1.5rem', fontWeight: 700, color: '#a06cd5', lineHeight: 1 }}>
+                    {liftonScore}<span style={{ fontSize: '0.9rem', color: 'var(--muted)' }}>/10</span>
+                  </span>
+                  <span style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)' }}>Lifton{liftonTier ? ` · ${liftonTier}` : ''}</span>
                 </div>
               </>
             )}
