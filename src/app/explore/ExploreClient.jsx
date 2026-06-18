@@ -558,7 +558,7 @@ export default function ExploreClient({ initialOrgs=[] }) {
               {/* Control Tier (behavioral, C1–C10) */}
               <div style={{marginBottom:'1.25rem'}}>
                 <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--muted)',marginBottom:'0.5rem'}}>
-                  Control Tier <span style={{textTransform:'none',letterSpacing:0,color:'rgba(212,206,196,0.3)'}}>· behavioral</span>
+                  Composite Tier <span style={{textTransform:'none',letterSpacing:0,color:'rgba(212,206,196,0.3)'}}>· behavioral</span>
                 </div>
                 {TIERS.map(t=>(
                   <label key={t} style={{display:'flex',alignItems:'center',gap:'0.5rem',marginBottom:'0.3rem',cursor:'pointer'}}>
@@ -572,7 +572,7 @@ export default function ExploreClient({ initialOrgs=[] }) {
               {/* Psychological Tier (Lifton totalism, C11) */}
               <div style={{marginBottom:'1.25rem'}}>
                 <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--muted)',marginBottom:'0.5rem'}}>
-                  Psychological Tier <span style={{textTransform:'none',letterSpacing:0,color:'rgba(212,206,196,0.3)'}}>· Lifton</span>
+                  Totalism Tier <span style={{textTransform:'none',letterSpacing:0,color:'rgba(212,206,196,0.3)'}}>· Lifton</span>
                 </div>
                 {LIFTON_TIERS.map(t=>(
                   <label key={t} style={{display:'flex',alignItems:'center',gap:'0.5rem',marginBottom:'0.3rem',cursor:'pointer'}}>
