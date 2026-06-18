@@ -5,6 +5,9 @@ import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import styles from './page.module.css';
 import SurvivorMovements from './SurvivorMovements';
+import NetworkTabs from './NetworkTabs';
+import BasemapSwitcher from './BasemapSwitcher';
+import MapControls from './MapControls';
 
 const MAPTILER_KEY = process.env.NEXT_PUBLIC_MAPTILER_KEY;
 const USING_MAPTILER = Boolean(MAPTILER_KEY);
@@ -260,14 +263,13 @@ export default function ChildrenOfGodClient({ cogData, compounds, personPaths })
   };
 
   const handleStyleChange = (newStyle) => {
-    if (map.current && geojsonData && viewRef.current) {
-      viewRef.current = { center: map.current.getCenter(), zoom: map.current.getZoom() };
+    if (map.current && geojsonData) {
       map.current.setStyle(styleUrl(newStyle));
       setMapStyle(newStyle);
 
-      // Re-add the layer after style change
-      map.current.on('load', () => {
-        map.current.easeTo({ center: viewRef.current.center, zoom: viewRef.current.zoom, duration: 0 });
+      // Re-add the layer after style change — styledata fires once the new
+      // style has loaded its tiles/sprites; 'load' does NOT re-fire on setStyle.
+      map.current.once('styledata', () => {
         addDataToMap(geojsonData, filters);
       });
     }
@@ -275,7 +277,7 @@ export default function ChildrenOfGodClient({ cogData, compounds, personPaths })
 
   // Render appropriate view based on active tab
   if (activeTab === 'movements') {
-    return <SurvivorMovements compounds={compounds} personPaths={personPaths} />;
+    return <SurvivorMovements compounds={compounds} personPaths={personPaths} activeTab={activeTab} onTabChange={setActiveTab} />;
   }
 
   if (!cogData) {
@@ -295,40 +297,7 @@ export default function ChildrenOfGodClient({ cogData, compounds, personPaths })
       {/* ── Tab Navigation ──────────────────────────────────── */}
       <div style={{ background: 'rgba(200,168,75,0.04)', borderBottom: '1px solid rgba(212,206,196,0.1)' }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 2rem', display: 'flex', gap: '2rem' }}>
-          <button
-            onClick={() => setActiveTab('compounds')}
-            style={{
-              padding: '1rem 0',
-              border: 'none',
-              background: 'none',
-              cursor: 'pointer',
-              fontFamily: 'var(--serif)',
-              fontSize: '0.95rem',
-              fontWeight: activeTab === 'compounds' ? 700 : 400,
-              color: activeTab === 'compounds' ? 'var(--gold)' : 'var(--muted)',
-              borderBottom: activeTab === 'compounds' ? '2px solid var(--gold)' : 'none',
-              transition: 'all 0.2s ease',
-            }}
-          >
-            📍 Compound Network
-          </button>
-          <button
-            onClick={() => setActiveTab('movements')}
-            style={{
-              padding: '1rem 0',
-              border: 'none',
-              background: 'none',
-              cursor: 'pointer',
-              fontFamily: 'var(--serif)',
-              fontSize: '0.95rem',
-              fontWeight: activeTab === 'movements' ? 700 : 400,
-              color: activeTab === 'movements' ? 'var(--gold)' : 'var(--muted)',
-              borderBottom: activeTab === 'movements' ? '2px solid var(--gold)' : 'none',
-              transition: 'all 0.2s ease',
-            }}
-          >
-            🛤️ Survivor Movements
-          </button>
+          <NetworkTabs activeTab={activeTab} onChange={setActiveTab} />
         </div>
       </div>
 
@@ -500,30 +469,11 @@ export default function ChildrenOfGodClient({ cogData, compounds, personPaths })
         {/* Main content */}
         <main className={styles.main}>
           <div style={{ position: 'relative', marginBottom: '2rem' }}>
-            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
-              {STYLE_OPTIONS.map(style => (
-                <button
-                  key={style.id}
-                  onClick={() => handleStyleChange(style.id)}
-                  style={{
-                    padding: '0.5rem 1rem',
-                    borderRadius: '4px',
-                    border: mapStyle === style.id ? '2px solid var(--gold)' : '1px solid rgba(212,206,196,0.2)',
-                    background: mapStyle === style.id ? 'rgba(200,168,75,0.15)' : 'rgba(212,206,196,0.05)',
-                    color: mapStyle === style.id ? 'var(--gold)' : 'var(--muted)',
-                    cursor: 'pointer',
-                    fontSize: '0.9rem',
-                    fontWeight: mapStyle === style.id ? 600 : 400,
-                    transition: 'all 0.2s ease',
-                  }}
-                  onMouseEnter={e => e.target.style.borderColor = 'var(--gold)'}
-                  onMouseLeave={e => e.target.style.borderColor = mapStyle === style.id ? '2px solid var(--gold)' : '1px solid rgba(212,206,196,0.2)'}
-                >
-                  {style.label}
-                </button>
-              ))}
+            <BasemapSwitcher styles={STYLE_OPTIONS} current={mapStyle} onChange={handleStyleChange} />
+            <div style={{ position: 'relative' }}>
+              <div ref={mapContainer} className={styles.map}></div>
+              <MapControls mapRef={map} />
             </div>
-            <div ref={mapContainer} className={styles.map}></div>
           </div>
 
           <section className={styles.content}>
