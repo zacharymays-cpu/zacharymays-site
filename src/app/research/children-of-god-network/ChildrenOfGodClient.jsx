@@ -52,7 +52,10 @@ const compoundsToGeoJSON = (compounds) => ({
     })),
 });
 
-export default function ChildrenOfGodClient({ cogData, compounds, personPaths }) {
+const DEFAULT_ABOUT_TEXT =
+  "This dataset documents the global network of the Children of God (later known as The Family International), a high-control religious organization founded by David Brandt Berg in 1968. The cultiness scores reflect extensive survivor testimony, legal records, and academic documentation.";
+
+export default function ChildrenOfGodClient({ cogData, compounds, personPaths, aboutText = DEFAULT_ABOUT_TEXT, sources = null }) {
   const [activeTab, setActiveTab] = useState('compounds');
   const mapContainer = useRef(null);
   const map = useRef(null);
@@ -621,7 +624,7 @@ export default function ChildrenOfGodClient({ cogData, compounds, personPaths })
               Research Methodology
             </h2>
             <p style={{ fontSize: '1rem', lineHeight: 1.75, color: 'var(--muted)', marginBottom: '1.25em' }}>
-              This dataset documents the global network of the Children of God (later known as The Family International), a high-control religious organization founded by David Brandt Berg in 1968. The cultiness scores reflect extensive survivor testimony, legal records, and academic documentation.
+              {aboutText}
             </p>
 
             <h3 style={{ fontFamily: 'var(--serif)', fontSize: '1.2rem', fontWeight: 700, margin: '1.5rem 0 0.75rem', color: 'var(--cream)', lineHeight: 1.15 }}>
@@ -678,19 +681,29 @@ export default function ChildrenOfGodClient({ cogData, compounds, personPaths })
             <h3 style={{ fontFamily: 'var(--serif)', fontSize: '1.2rem', fontWeight: 700, margin: '1.5rem 0 0.75rem', color: 'var(--cream)', lineHeight: 1.15 }}>
               Full Sources
             </h3>
-            <h4 style={{ fontFamily: 'var(--serif)', fontSize: '1rem', fontWeight: 700, margin: '1rem 0 0.5rem', color: 'var(--paper)' }}>Books & Memoirs</h4>
-            <ul style={{ marginLeft: '1.5rem', marginBottom: '1.25em', color: 'var(--muted)' }}>
-              <li style={{ marginBottom: '0.75rem' }}>Jones, Faith (2021). "Sex Cult Nun: Breaking Away from the Children of God"</li>
-              <li style={{ marginBottom: '0.75rem' }}>Young, Daniella (2019). "Uncultured: A Memoir"</li>
-              <li style={{ marginBottom: '0.75rem' }}>The Family International. "The Story of Davidito" (organizational account)</li>
-            </ul>
+            {sources ? (
+              <ul style={{ marginLeft: '1.5rem', marginBottom: '1.25em', color: 'var(--muted)' }}>
+                {sources.map((s, i) => (
+                  <li key={i} style={{ marginBottom: '0.75rem' }}>{s}</li>
+                ))}
+              </ul>
+            ) : (
+              <>
+                <h4 style={{ fontFamily: 'var(--serif)', fontSize: '1rem', fontWeight: 700, margin: '1rem 0 0.5rem', color: 'var(--paper)' }}>Books & Memoirs</h4>
+                <ul style={{ marginLeft: '1.5rem', marginBottom: '1.25em', color: 'var(--muted)' }}>
+                  <li style={{ marginBottom: '0.75rem' }}>Jones, Faith (2021). "Sex Cult Nun: Breaking Away from the Children of God"</li>
+                  <li style={{ marginBottom: '0.75rem' }}>Young, Daniella (2019). "Uncultured: A Memoir"</li>
+                  <li style={{ marginBottom: '0.75rem' }}>The Family International. "The Story of Davidito" (organizational account)</li>
+                </ul>
 
-            <h4 style={{ fontFamily: 'var(--serif)', fontSize: '1rem', fontWeight: 700, margin: '1rem 0 0.5rem', color: 'var(--paper)' }}>Archives</h4>
-            <ul style={{ marginLeft: '1.5rem', marginBottom: '1.25em', color: 'var(--muted)' }}>
-              <li style={{ marginBottom: '0.75rem' }}>San Diego State University — Family International Records (1940-2009)</li>
-              <li style={{ marginBottom: '0.75rem' }}>Hamilton College Archives — Children of God Collection</li>
-              <li style={{ marginBottom: '0.75rem' }}>XFamily.org — Survivor testimony database</li>
-            </ul>
+                <h4 style={{ fontFamily: 'var(--serif)', fontSize: '1rem', fontWeight: 700, margin: '1rem 0 0.5rem', color: 'var(--paper)' }}>Archives</h4>
+                <ul style={{ marginLeft: '1.5rem', marginBottom: '1.25em', color: 'var(--muted)' }}>
+                  <li style={{ marginBottom: '0.75rem' }}>San Diego State University — Family International Records (1940-2009)</li>
+                  <li style={{ marginBottom: '0.75rem' }}>Hamilton College Archives — Children of God Collection</li>
+                  <li style={{ marginBottom: '0.75rem' }}>XFamily.org — Survivor testimony database</li>
+                </ul>
+              </>
+            )}
 
             <p style={{ background: 'rgba(139,32,32,0.1)', border: '3px solid var(--accent)', padding: '1.5rem', marginTop: '2rem', color: 'var(--accent-text)', fontStyle: 'italic' }}>
               This research is provided for educational purposes and to support survivor advocacy and academic study. All information is sourced from public records and published survivor testimony. Cultiness scores reflect the organization's systematic control mechanisms and documented harm to members.
