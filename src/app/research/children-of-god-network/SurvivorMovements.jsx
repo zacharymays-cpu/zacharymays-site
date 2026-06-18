@@ -4,6 +4,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import styles from './page.module.css';
+import NetworkTabs from './NetworkTabs';
+import BasemapSwitcher from './BasemapSwitcher';
+import MapControls from './MapControls';
 
 const MAPTILER_KEY = process.env.NEXT_PUBLIC_MAPTILER_KEY;
 const USING_MAPTILER = Boolean(MAPTILER_KEY);
@@ -11,6 +14,14 @@ const CARTO_FALLBACK = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/st
 const styleUrl = (id) => (USING_MAPTILER
   ? `https://api.maptiler.com/maps/${id}/style.json?key=${MAPTILER_KEY}`
   : CARTO_FALLBACK);
+
+const MAP_STYLES = [
+  { id: 'streets', label: 'Streets' },
+  { id: 'satellite', label: 'Satellite' },
+  { id: 'hybrid', label: 'Hybrid' },
+  { id: 'topo', label: 'Terrain' },
+  { id: 'dataviz-dark', label: 'Dark' },
+];
 
 const summarize = (wp) => wp.map((w) => w.city || w.name).join(' → ');
 const yearSpan = (wp) => {
@@ -22,11 +33,12 @@ const yearSpan = (wp) => {
 
 // `compounds` (location dots) and `personPaths` (each survivor's reconstructed
 // chronological location chain) are fetched + built server-side in page.jsx.
-export default function SurvivorMovements({ compounds = [], personPaths = [] }) {
+export default function SurvivorMovements({ compounds = [], personPaths = [], activeTab, onTabChange }) {
   const mapContainer = useRef(null);
   const map = useRef(null);
   const featureIdByPerson = useRef({});
   const [selected, setSelected] = useState(null); // person_id or null
+  const [mapStyle, setMapStyle] = useState('hybrid');
 
   useEffect(() => {
     if (!mapContainer.current) return;
@@ -188,7 +200,25 @@ export default function SurvivorMovements({ compounds = [], personPaths = [] }) 
     }
   };
 
+  const handleStyleChange = (newStyle) => {
+    if (!map.current) return;
+    map.current.setStyle(styleUrl(newStyle));
+    setMapStyle(newStyle);
+    map.current.once('styledata', () => {
+      addCompoundDots();
+      addPersonPaths();
+    });
+  };
+
   return (
+    <>
+      {onTabChange && (
+        <div style={{ background: 'rgba(200,168,75,0.04)', borderBottom: '1px solid rgba(212,206,196,0.1)' }}>
+          <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 2rem', display: 'flex', gap: '2rem' }}>
+            <NetworkTabs activeTab={activeTab} onChange={onTabChange} />
+          </div>
+        </div>
+      )}
     <div className={styles.page}>
       <section style={{ padding: '2.5rem 0 2rem', borderTop: '3px solid #b58900', borderBottom: '1px solid rgba(212,206,196,0.1)' }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 2rem' }}>
@@ -257,9 +287,14 @@ export default function SurvivorMovements({ compounds = [], personPaths = [] }) 
         </aside>
 
         <main className={styles.main}>
-          <div ref={mapContainer} className={styles.map}></div>
+          <BasemapSwitcher styles={MAP_STYLES} current={mapStyle} onChange={handleStyleChange} />
+          <div style={{ position: 'relative' }}>
+            <div ref={mapContainer} className={styles.map}></div>
+            <MapControls mapRef={map} />
+          </div>
         </main>
       </div>
     </div>
+    </>
   );
 }
