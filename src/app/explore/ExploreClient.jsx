@@ -640,7 +640,7 @@ export default function ExploreClient({ initialOrgs=[] }) {
               <table style={{width:'100%',borderCollapse:'collapse',minWidth:'500px'}}>
                 <thead style={{position:'sticky',top:0,background:'#1a1512',zIndex:1}}>
                   <tr style={{borderBottom:'1px solid rgba(212,206,196,0.2)'}}>
-                    {[['name','Organization'],['composite_score','Score'],['composite_tier','Control Tier'],['youngs_score',"Young's"],['lifton_score','Lifton'],['__psych','Psych Tier'],['category','Category'],['trajectory','Trajectory']].map(([col,label])=>{
+                    {[['name','Organization'],['composite_score','Composite Score'],['composite_tier','Control Tier'],['youngs_score',"Young's"],['lifton_score','Totalism Score'],['__psych','Psych Tier'],['category','Category'],['trajectory','Trajectory']].map(([col,label])=>{
                       const hideMobile = col==='category'||col==='trajectory'||col==='lifton_score'||col==='__psych';
                       // Derived (non-sortable) columns use a sentinel key prefixed with '__'.
                       if(col.startsWith('__')) return (
