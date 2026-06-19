@@ -99,10 +99,12 @@ const NODE_W = 204;
 const NODE_H = 68;
 const COL_GAP = 24;
 const ROW_GAP = 20;
-const GROUP_GAP = 72;
-const GROUP_HEADER = 32;
-const ITEMS_PER_COL = 7;
+const BAND_GAP = 60;   // vertical gap between category bands
+const BAND_HEADER = 32;
+const ITEMS_PER_ROW = 6;
 
+// Categories stack top-to-bottom; nodes within each band flow left-to-right.
+// This keeps the canvas narrow enough to be readable without heavy zoom-out.
 function computeLayout(nodes) {
   const groups = {};
   nodes.forEach(n => {
@@ -120,21 +122,21 @@ function computeLayout(nodes) {
   });
 
   const positions = {};
-  let gx = 0;
+  let gy = 0;
 
   sortedCats.forEach(cat => {
     const arr = groups[cat];
-    const numCols = Math.ceil(arr.length / ITEMS_PER_COL);
     arr.forEach((n, i) => {
-      const col = Math.floor(i / ITEMS_PER_COL);
-      const row = i % ITEMS_PER_COL;
+      const col = i % ITEMS_PER_ROW;
+      const row = Math.floor(i / ITEMS_PER_ROW);
       positions[n.slug] = {
-        x: gx + col * (NODE_W + COL_GAP),
-        y: GROUP_HEADER + row * (NODE_H + ROW_GAP),
+        x: col * (NODE_W + COL_GAP),
+        y: gy + BAND_HEADER + row * (NODE_H + ROW_GAP),
       };
     });
-    const groupW = numCols * (NODE_W + COL_GAP) - COL_GAP;
-    gx += groupW + GROUP_GAP;
+    const numRows = Math.ceil(arr.length / ITEMS_PER_ROW);
+    const bandH = BAND_HEADER + numRows * (NODE_H + ROW_GAP) - ROW_GAP;
+    gy += bandH + BAND_GAP;
   });
 
   return positions;
@@ -245,14 +247,11 @@ function useToggleSet(allItems) {
 export default function LineageGraphClient({ nodes = [], edges = [] }) {
   const router = useRouter();
 
-  const allChains = useMemo(() =>
-    [...new Set(edges.map(e => e.chain_name).filter(Boolean))].sort(), [edges]);
   const allCategories = useMemo(() =>
     [...new Set(nodes.map(n => n.category).filter(Boolean))].sort(), [nodes]);
   const allRels = useMemo(() =>
     [...new Set(edges.map(e => e.relationship_type).filter(Boolean))].sort(), [edges]);
 
-  const chains = useToggleSet(allChains);
   const categories = useToggleSet(allCategories);
   const rels = useToggleSet(allRels);
   const [search, setSearch] = useState('');
@@ -269,9 +268,8 @@ export default function LineageGraphClient({ nodes = [], edges = [] }) {
   const filteredEdges = useMemo(() => edges.filter(e =>
     slugSet.has(e.source_slug) &&
     slugSet.has(e.target_slug) &&
-    chains.isActive(e.chain_name) &&
     rels.isActive(e.relationship_type)
-  ), [edges, slugSet, chains, rels]);
+  ), [edges, slugSet, rels]);
 
   const rfNodes = useMemo(() => filteredNodes.map(n => ({
     id: n.slug,
@@ -297,11 +295,11 @@ export default function LineageGraphClient({ nodes = [], edges = [] }) {
     router.push(`/org/${node.id}`);
   }, [router]);
 
-  const anyFiltered = chains.active || categories.active || rels.active || search;
+  const anyFiltered = categories.active || rels.active || search;
 
   const resetAll = useCallback(() => {
-    chains.reset(); categories.reset(); rels.reset(); setSearch('');
-  }, [chains, categories, rels]);
+    categories.reset(); rels.reset(); setSearch('');
+  }, [categories, rels]);
 
   return (
     <div style={{ display: 'flex', height: 'calc(100vh - 110px)', background: '#0a0806' }}>
@@ -330,14 +328,6 @@ export default function LineageGraphClient({ nodes = [], edges = [] }) {
         />
 
         <Stat label={`${filteredNodes.length} orgs · ${filteredEdges.length} links`} />
-
-        <FilterSection label="Chain">
-          {allChains.map(c => (
-            <Chip key={c} active={chains.isActive(c)} color={chainColor(c)} onClick={() => chains.toggle(c)}>
-              {c}
-            </Chip>
-          ))}
-        </FilterSection>
 
         <FilterSection label="Category">
           {allCategories.map(c => (
