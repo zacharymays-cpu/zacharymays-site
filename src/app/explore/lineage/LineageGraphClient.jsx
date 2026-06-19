@@ -1,8 +1,9 @@
 'use client';
 import { useState, useMemo, useCallback } from 'react';
 import {
-  ReactFlow, Background, Controls, MiniMap,
+  ReactFlow, Background, MiniMap, Panel,
   Handle, Position, MarkerType, BaseEdge, getSmoothStepPath,
+  useReactFlow,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { useRouter } from 'next/navigation';
@@ -228,19 +229,20 @@ const edgeTypes = { labeled: LabeledEdge };
 
 // ── Filter helpers ────────────────────────────────────────────────────────
 function useToggleSet(allItems) {
-  const [active, setActive] = useState(null); // null = all active
-  const isActive = (item) => !active || active.has(item);
+  const [active, setActive] = useState(null); // null = all active; empty Set = none active
+  const isActive = (item) => active === null || active.has(item);
   const toggle = useCallback((item) => {
     setActive(prev => {
       const full = new Set(allItems);
       const cur = prev ?? full;
       const next = new Set(cur);
       if (next.has(item)) next.delete(item); else next.add(item);
-      return next.size === 0 ? new Set([item]) : next.size === allItems.length ? null : next;
+      return next.size === allItems.length ? null : next;
     });
   }, [allItems]);
-  const reset = useCallback(() => setActive(null), []);
-  return { active, isActive, toggle, reset };
+  const reset  = useCallback(() => setActive(null), []);
+  const clear  = useCallback(() => setActive(new Set()), []);
+  return { active, isActive, toggle, reset, clear };
 }
 
 // ── Main Component ────────────────────────────────────────────────────────
@@ -329,7 +331,7 @@ export default function LineageGraphClient({ nodes = [], edges = [] }) {
 
         <Stat label={`${filteredNodes.length} orgs · ${filteredEdges.length} links`} />
 
-        <FilterSection label="Category">
+        <FilterSection label="Category" onClear={categories.clear} onAll={categories.reset}>
           {allCategories.map(c => (
             <Chip key={c} active={categories.isActive(c)} color={catColor(c)} onClick={() => categories.toggle(c)}>
               {c}
@@ -337,7 +339,7 @@ export default function LineageGraphClient({ nodes = [], edges = [] }) {
           ))}
         </FilterSection>
 
-        <FilterSection label="Relationship">
+        <FilterSection label="Relationship" onClear={rels.clear} onAll={rels.reset}>
           {allRels.map(r => (
             <Chip key={r} active={rels.isActive(r)} color="rgba(212,206,196,0.55)" onClick={() => rels.toggle(r)}>
               {REL_LABELS[r] || r}
@@ -386,13 +388,7 @@ export default function LineageGraphClient({ nodes = [], edges = [] }) {
           style={{ background: '#0a0806' }}
         >
           <Background color="rgba(212,206,196,0.05)" gap={36} />
-          <Controls
-            style={{
-              background: 'rgba(14,10,6,0.92)',
-              border: '1px solid rgba(212,206,196,0.14)',
-              borderRadius: 4,
-            }}
-          />
+          <MapControls />
           <MiniMap
             style={{
               background: 'rgba(14,10,6,0.92)',
@@ -401,44 +397,75 @@ export default function LineageGraphClient({ nodes = [], edges = [] }) {
             nodeColor={n => catColor(n.data?.category)}
             maskColor="rgba(8,6,4,0.72)"
           />
-
-          {/* Category headers as SVG labels */}
-          <CategoryLabels nodes={nodes} layout={layout} visibleSlugs={slugSet} />
         </ReactFlow>
       </div>
     </div>
   );
 }
 
-// ── Category group header labels rendered as React Flow overlay nodes ─────
-import { useReactFlow } from '@xyflow/react';
+// ── Zoom + directional pad (must live inside ReactFlow context) ───────────
+const CTRL_BTN = {
+  width: 28, height: 28,
+  background: 'rgba(14,10,6,0.92)',
+  border: '1px solid rgba(212,206,196,0.14)',
+  color: 'rgba(212,206,196,0.72)',
+  cursor: 'pointer', borderRadius: 3,
+  display: 'flex', alignItems: 'center', justifyContent: 'center',
+  fontSize: 14, fontFamily: 'monospace', lineHeight: 1,
+  padding: 0,
+};
 
-function CategoryLabels({ nodes, layout, visibleSlugs }) {
-  // Group visible nodes by category, find leftmost X per group
-  const groups = useMemo(() => {
-    const g = {};
-    nodes.forEach(n => {
-      if (!visibleSlugs.has(n.slug)) return;
-      const pos = layout[n.slug];
-      if (!pos) return;
-      const cat = n.category || 'Other';
-      if (!g[cat] || pos.x < g[cat].x) g[cat] = { x: pos.x, cat };
-    });
-    return Object.values(g);
-  }, [nodes, layout, visibleSlugs]);
-
-  return null; // handled via CSS overlay below — not ReactFlow nodes
+function MapControls() {
+  const { zoomIn, zoomOut, fitView, panBy } = useReactFlow();
+  const PAN = 160;
+  const b = (label, action, title) => (
+    <button title={title} onClick={action} style={CTRL_BTN}>{label}</button>
+  );
+  return (
+    <Panel position="bottom-left" style={{ marginBottom: 8, marginLeft: 8, display: 'flex', flexDirection: 'column', gap: 4 }}>
+      {/* Zoom row */}
+      <div style={{ display: 'flex', gap: 2 }}>
+        {b('+', () => zoomIn({ duration: 200 }), 'Zoom in')}
+        {b('−', () => zoomOut({ duration: 200 }), 'Zoom out')}
+        {b('⊡', () => fitView({ padding: 0.12, duration: 300 }), 'Fit view')}
+      </div>
+      {/* Directional pad */}
+      <div style={{ display: 'grid', gridTemplateColumns: '28px 28px 28px', gap: 2 }}>
+        <span />{b('↑', () => panBy({ x: 0, y: PAN }), 'Pan up')}<span />
+        {b('←', () => panBy({ x: PAN, y: 0 }), 'Pan left')}
+        {b('↓', () => panBy({ x: 0, y: -PAN }), 'Pan down')}
+        {b('→', () => panBy({ x: -PAN, y: 0 }), 'Pan right')}
+      </div>
+    </Panel>
+  );
 }
 
 // ── Sub-components ────────────────────────────────────────────────────────
-function FilterSection({ label, children }) {
+function FilterSection({ label, children, onClear, onAll }) {
   return (
     <div style={{ marginBottom: '1rem' }}>
-      <div style={{
-        fontFamily: 'monospace', fontSize: 9, letterSpacing: '0.12em',
-        textTransform: 'uppercase', color: 'rgba(212,206,196,0.35)',
-        marginBottom: '0.4rem',
-      }}>{label}</div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+        <span style={{
+          fontFamily: 'monospace', fontSize: 9, letterSpacing: '0.12em',
+          textTransform: 'uppercase', color: 'rgba(212,206,196,0.35)',
+        }}>{label}</span>
+        {onClear && (
+          <div style={{ display: 'flex', gap: 6 }}>
+            <button onClick={onClear} style={{
+              background: 'none', border: 'none', padding: 0,
+              fontFamily: 'monospace', fontSize: 9, letterSpacing: '0.08em',
+              textTransform: 'uppercase', color: 'rgba(212,206,196,0.28)',
+              cursor: 'pointer',
+            }}>none</button>
+            <button onClick={onAll} style={{
+              background: 'none', border: 'none', padding: 0,
+              fontFamily: 'monospace', fontSize: 9, letterSpacing: '0.08em',
+              textTransform: 'uppercase', color: 'rgba(212,206,196,0.28)',
+              cursor: 'pointer',
+            }}>all</button>
+          </div>
+        )}
+      </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         {children}
       </div>
