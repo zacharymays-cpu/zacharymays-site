@@ -82,12 +82,29 @@ export default function CultinessPage() {
 
           <p>
             This project extends that diagnostic capacity to comparative,
-            dataset-scale analysis. A dual-metric scoring system was developed
+            dataset-scale analysis. A three-axis scoring system was developed
             specifically for this purpose: Young's original binary instrument
-            runs fully independently alongside a composite score that captures
-            both the breadth and intensity of cult-adjacent dynamics across
-            all ten criteria. The two instruments are never converted between
-            each other — their divergence is itself analytically meaningful.
+            (Cultiness Score, 0–10) runs fully independently alongside a
+            composite score (0–100%) that captures both the breadth and
+            intensity of cult-adjacent dynamics across all ten criteria. A
+            third axis — Lifton's Totalism Score — operates independently
+            of both. The three instruments are never converted between each
+            other; their divergence is itself analytically meaningful.
+          </p>
+
+          <p>
+            The Totalism Score is derived from Robert Jay Lifton's eight
+            criteria of ideological totalism, assessed as a single synthesized
+            criterion (C11). Where the Young-Reed framework measures behavioral
+            patterns in institutional conduct, Lifton's framework measures the
+            psychological architecture of the belief system — how thought,
+            language, confession, and doctrine function to close off independent
+            judgment. A high Totalism Score can appear in organizations with
+            moderate behavioral control scores; a high Composite Score can
+            appear without significant totalistic ideology. The three axes
+            measure distinct dimensions of coercive institutional dynamics,
+            and their relationships across the dataset are as informative as
+            their individual values.
           </p>
 
           <p>
@@ -196,18 +213,23 @@ export default function CultinessPage() {
               fontFamily: 'var(--mono)', fontSize: '0.7rem',
               letterSpacing: '0.15em', textTransform: 'uppercase',
               color: 'var(--gold)', marginBottom: '0.75rem'
-            }}>Framework Source</p>
-            <p style={{fontSize: '0.95rem', color: 'var(--muted)', margin: 0}}>
-              The ten criteria applied in this project are derived verbatim
+            }}>Framework Sources</p>
+            <p style={{fontSize: '0.95rem', color: 'var(--muted)', marginBottom: '0.75rem'}}>
+              The ten behavioral criteria applied in this project are derived verbatim
               from Daniella Mestyanek Young and Amy Reed,{' '}
               <a href="https://uncultureyourself.com" target="_blank" rel="noopener noreferrer">
                 <em>The Culting of America: What Makes a Cult and Why We Love Them</em>
               </a>{' '}
-              (Otterpine, 2026). The composite scoring system and dual-metric
-              architecture were developed independently as an extension for
-              dataset-scale application. Young's binary instrument runs fully
-              independently and is never mechanically converted from composite
-              scores.
+              (Otterpine, 2026).
+            </p>
+            <p style={{fontSize: '0.95rem', color: 'var(--muted)', margin: 0}}>
+              The Totalism Score (C11) is derived from Robert Jay Lifton,{' '}
+              <em>Thought Reform and the Psychology of Totalism</em>{' '}
+              (W. W. Norton, 1961), applying his eight criteria of ideological
+              totalism as an independent third axis. The composite scoring system
+              and three-axis architecture were developed independently as an
+              extension for dataset-scale application. No axis is mechanically
+              converted from another.
             </p>
           </div>
 
