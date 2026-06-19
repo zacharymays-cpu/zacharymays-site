@@ -533,7 +533,7 @@ export default function ExploreClient({ initialOrgs=[] }) {
                 {TIERS.map(t=>(
                   <label key={t} style={{display:'flex',alignItems:'center',gap:'0.5rem',marginBottom:'0.3rem',cursor:'pointer'}}>
                     <input type="checkbox" checked={youngsBandFilter.includes(t)} onChange={()=>toggle(t,youngsBandFilter,setYoungsBandFilter)} style={{accentColor:TIER_COLORS[t]}}/>
-                    <span style={{fontSize:'0.77rem',color:youngsBandFilter.includes(t)?'var(--paper)':'var(--muted)',flex:1}}>{lbl(t)}</span>
+                    <span style={{fontSize:'0.77rem',color:youngsBandFilter.includes(t)?'var(--paper)':'var(--muted)',flex:1}}>{t}</span>
                     <span style={{fontFamily:'var(--mono)',fontSize:'0.63rem',color:'var(--muted)'}}>{orgs.filter(o=>o.youngs_band===t).length}</span>
                   </label>
                 ))}
@@ -651,7 +651,7 @@ export default function ExploreClient({ initialOrgs=[] }) {
                       <td style={{padding:'0.65rem 0.75rem',fontFamily:'var(--mono)',fontSize:'0.82rem',color:'rgba(212,206,196,0.8)'}}>{org.youngs_score==null?'—':`${org.youngs_score}/10`}</td>
                       <td className="explore-table-hide-mobile" style={{padding:'0.65rem 0.75rem',whiteSpace:'nowrap'}}>
                         {org.youngs_band
-                          ? <span style={{display:'inline-flex',alignItems:'center',gap:'0.4rem',fontFamily:'var(--mono)',fontSize:'0.62rem',color:'rgba(212,206,196,0.8)'}}><span style={{width:8,height:8,borderRadius:'50%',background:TIER_COLORS[org.youngs_band],flexShrink:0}}/>{lbl(org.youngs_band)}</span>
+                          ? <span style={{display:'inline-flex',alignItems:'center',gap:'0.4rem',fontFamily:'var(--mono)',fontSize:'0.62rem',color:'rgba(212,206,196,0.8)'}}><span style={{width:8,height:8,borderRadius:'50%',background:TIER_COLORS[org.youngs_band],flexShrink:0}}/>{org.youngs_band}</span>
                           : <span style={{fontFamily:'var(--mono)',fontSize:'0.62rem',color:'rgba(212,206,196,0.3)'}}>—</span>}
                       </td>
                       <td className="explore-table-hide-mobile" style={{padding:'0.65rem 0.75rem',fontFamily:'var(--mono)',fontSize:'0.82rem',fontWeight:600,color:'var(--paper)',whiteSpace:'nowrap'}}>{org.lifton_score==null?<span style={{color:'rgba(212,206,196,0.35)',fontWeight:400}}>—</span>:`${parseFloat(org.lifton_score)}/10`}</td>
