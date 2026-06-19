@@ -514,7 +514,7 @@ export default function ExploreClient({ initialOrgs=[] }) {
               {/* Control Tier (composite_tier, C1–C10 behavioral) */}
               <div style={{marginBottom:'1.25rem'}}>
                 <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--muted)',marginBottom:'0.5rem'}}>
-                  Control Tier <span style={{textTransform:'none',letterSpacing:0,color:'rgba(212,206,196,0.3)'}}>· behavioral</span>
+                  Composite Tier <span style={{textTransform:'none',letterSpacing:0,color:'rgba(212,206,196,0.3)'}}>· behavioral</span>
                 </div>
                 {TIERS.map(t=>(
                   <label key={t} style={{display:'flex',alignItems:'center',gap:'0.5rem',marginBottom:'0.3rem',cursor:'pointer'}}>
@@ -609,7 +609,7 @@ export default function ExploreClient({ initialOrgs=[] }) {
               <table style={{width:'100%',borderCollapse:'collapse',minWidth:'500px'}}>
                 <thead style={{position:'sticky',top:0,background:'#1a1512',zIndex:1}}>
                   <tr style={{borderBottom:'1px solid rgba(212,206,196,0.2)'}}>
-                    {[['name','Organization'],['composite_score','Composite Score'],['composite_tier','Control Tier'],['youngs_score','Cultiness Score'],['youngs_band','Cultiness Tier'],['lifton_score','Totalism Score'],['__psych','Totalism Tier'],['category','Category'],['trajectory','Trajectory']].map(([col,label])=>{
+                    {[['name','Organization'],['composite_score','Composite Score'],['composite_tier','Composite Tier'],['youngs_score','Cultiness Score'],['youngs_band','Cultiness Tier'],['lifton_score','Totalism Score'],['__psych','Totalism Tier'],['category','Category'],['trajectory','Trajectory']].map(([col,label])=>{
                       const hideMobile = col==='category'||col==='trajectory'||col==='lifton_score'||col==='__psych'||col==='youngs_band';
                       if(col.startsWith('__')) return (
                         <th key={col} className={hideMobile?'explore-table-hide-mobile':''} style={{fontFamily:'var(--mono)',fontSize:'0.65rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'rgba(212,206,196,0.72)',textAlign:'left',padding:'0.6rem 0.75rem',whiteSpace:'nowrap'}}>{label}</th>
