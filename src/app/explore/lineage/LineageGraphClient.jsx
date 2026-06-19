@@ -6,6 +6,7 @@ import {
   useReactFlow,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
+import dagre from '@dagrejs/dagre';
 import { useRouter } from 'next/navigation';
 
 // ── Palettes ─────────────────────────────────────────────────────────────
@@ -77,69 +78,31 @@ const REL_LABELS = {
 };
 
 // ── Layout ───────────────────────────────────────────────────────────────
-const CATEGORY_ORDER = [
-  'Therapeutic',
-  'Recovery / self-help',
-  'Professional formation',
-  'Religious',
-  'Conservative pipeline',
-  'Political',
-  'Criminal',
-  'Think tank / media',
-  'Government',
-  'Military',
-  'Intelligence',
-  'Law enforcement',
-  'MLM',
-  'Academic',
-  'Corporate',
-  'Digital / online',
-];
-
 const NODE_W = 204;
 const NODE_H = 68;
-const COL_GAP = 24;
-const ROW_GAP = 20;
-const BAND_GAP = 60;   // vertical gap between category bands
-const BAND_HEADER = 32;
-const ITEMS_PER_ROW = 6;
 
-// Categories stack top-to-bottom; nodes within each band flow left-to-right.
-// This keeps the canvas narrow enough to be readable without heavy zoom-out.
-function computeLayout(nodes) {
-  const groups = {};
-  nodes.forEach(n => {
-    const cat = n.category || 'Other';
-    (groups[cat] = groups[cat] || []).push(n);
+// Dagre computes a proper Sugiyama-style layered DAG layout:
+// ancestors at the top, descendants below, edge crossings minimized.
+// Accepts the currently-visible nodes+edges so layout reflects the active filter.
+function computeLayout(nodes, edges) {
+  const g = new dagre.graphlib.Graph();
+  g.setDefaultEdgeLabel(() => ({}));
+  g.setGraph({ rankdir: 'TB', ranksep: 80, nodesep: 28, marginx: 32, marginy: 32 });
+
+  const slugSet = new Set(nodes.map(n => n.slug));
+  nodes.forEach(n => g.setNode(n.slug, { width: NODE_W, height: NODE_H }));
+  edges.forEach(e => {
+    if (slugSet.has(e.source_slug) && slugSet.has(e.target_slug))
+      g.setEdge(e.source_slug, e.target_slug);
   });
 
-  const sortedCats = Object.keys(groups).sort((a, b) => {
-    const ai = CATEGORY_ORDER.indexOf(a);
-    const bi = CATEGORY_ORDER.indexOf(b);
-    if (ai >= 0 && bi >= 0) return ai - bi;
-    if (ai >= 0) return -1;
-    if (bi >= 0) return 1;
-    return groups[b].length - groups[a].length;
-  });
+  dagre.layout(g);
 
   const positions = {};
-  let gy = 0;
-
-  sortedCats.forEach(cat => {
-    const arr = groups[cat];
-    arr.forEach((n, i) => {
-      const col = i % ITEMS_PER_ROW;
-      const row = Math.floor(i / ITEMS_PER_ROW);
-      positions[n.slug] = {
-        x: col * (NODE_W + COL_GAP),
-        y: gy + BAND_HEADER + row * (NODE_H + ROW_GAP),
-      };
-    });
-    const numRows = Math.ceil(arr.length / ITEMS_PER_ROW);
-    const bandH = BAND_HEADER + numRows * (NODE_H + ROW_GAP) - ROW_GAP;
-    gy += bandH + BAND_GAP;
+  nodes.forEach(n => {
+    const nd = g.node(n.slug);
+    if (nd) positions[n.slug] = { x: nd.x - NODE_W / 2, y: nd.y - NODE_H / 2 };
   });
-
   return positions;
 }
 
@@ -258,8 +221,6 @@ export default function LineageGraphClient({ nodes = [], edges = [] }) {
   const rels = useToggleSet(allRels);
   const [search, setSearch] = useState('');
 
-  const layout = useMemo(() => computeLayout(nodes), [nodes]);
-
   const filteredNodes = useMemo(() => nodes.filter(n =>
     categories.isActive(n.category) &&
     (!search || n.name.toLowerCase().includes(search.toLowerCase()))
@@ -272,6 +233,9 @@ export default function LineageGraphClient({ nodes = [], edges = [] }) {
     slugSet.has(e.target_slug) &&
     rels.isActive(e.relationship_type)
   ), [edges, slugSet, rels]);
+
+  // Recompute dagre layout whenever the visible subgraph changes
+  const layout = useMemo(() => computeLayout(filteredNodes, filteredEdges), [filteredNodes, filteredEdges]);
 
   const rfNodes = useMemo(() => filteredNodes.map(n => ({
     id: n.slug,
