@@ -1,75 +1,116 @@
-# `/admin/review` — analyst score-review console
+# Admin consoles — setup and authentication
 
-A restricted page for human review of the AI-jury scores ("engine recommends, a
-human disposes"). It shows a prioritized worklist (high model-disagreement +
-tier-boundary orgs), and applies accepted changes through the audited
-`record_criterion_change` RPC so every edit lands in the immutable
-`score_history` trail with the analyst as the actor.
+Four restricted consoles live under `/admin`:
+
+| Path | Purpose |
+|---|---|
+| `/admin/review` | Human review of AI-jury scores (prioritized worklist) |
+| `/admin/curator` | Data curation — HC + dual-track scores |
+| `/admin/intake` | Propose and approve/reject org intake |
+| `/admin/photos` | Upload, tag, and validate photos linked to organizations |
+
+All four share the same auth gate and navigation bar.
+
+---
 
 ## Architecture
-- **Auth:** Supabase Auth (cookie sessions via `@supabase/ssr`) with a choice of
-  OAuth providers — **Google, GitHub, Microsoft (Azure), Apple** (buttons in
-  `src/app/admin/login/page.jsx`; enable whichever you configure, delete the rest).
-- **2FA (required):** TOTP. `src/app/admin/mfa/page.jsx` enrolls an authenticator
-  app (Google Authenticator / Authy / 1Password) and steps the session up to
-  **AAL2**. `/admin/review` and the write action both require AAL2.
-- **Gates:** `src/middleware.js` requires a session on `/admin/*`; the review page
-  requires the email in `ADMIN_EMAILS` **and** an AAL2 (2FA) session; the write
-  action re-checks both.
-- **Reads:** `src/lib/reviewQueue.js` (service role — the AI-jury tables are not
-  anon-readable).
-- **Writes:** `src/app/admin/review/actions.js` Server Action → service-role →
-  `record_criterion_change(...)` (defined in
-  `cultiness-spectrum/db/migrations/0004`). The action records `auth.users.id` as
-  `changed_by` (this is what finally gives the audit trail a real actor).
+
+### Auth stack
+- **Session:** Supabase Auth with cookie-based sessions via `@supabase/ssr`.
+  `src/middleware.js` intercepts every `/admin/*` request, calls `getUser()` (network-validated),
+  and redirects unauthenticated requests to `/admin/login?next=<path>`.
+- **Identity allowlist:** The signed-in email must appear in the `ADMIN_EMAILS` env var.
+  This is checked server-side in each page component — the middleware only enforces that *a* session exists.
+- **AAL2 required:** Every admin page enforces an AAL2 (step-up) session before rendering.
+  AAL2 can be satisfied by **TOTP** (authenticator app) **or a registered passkey** — either path
+  is accepted.
+
+### Security controls
+| Control | Implementation |
+|---|---|
+| Session sign-out | "Sign out" button in the shared nav (`AdminNav`) — calls `supabase.auth.signOut()` and redirects to `/admin/login` |
+| Idle timeout | **15 minutes** of inactivity (NIST SP 800-53 AC-11) — any mouse, keyboard, scroll, or touch event resets the clock; on expiry the session is cleared and the browser is sent to `/admin/login?reason=idle` |
+| AAL2 enforcement | Every admin page server-component checks `aal?.currentLevel !== 'aal2'` and redirects to `/admin/mfa` if not met |
+
+---
+
+## Sign-in methods
+
+### Passkeys (recommended — fastest)
+Users who have registered a passkey can sign in with a single Face ID / Touch ID tap on any enrolled Apple device (or any FIDO2-capable device). Passkeys are phishing-resistant and satisfy AAL2 directly — no separate TOTP step required.
+
+- On the login page, tap **"Sign in with passkey"**.
+- The browser handles the WebAuthn ceremony and creates a full session.
+
+### TOTP (authenticator app)
+Users without a passkey sign in with GitHub OAuth or an email magic link, then complete a TOTP step-up at `/admin/mfa`. Supported apps: Google Authenticator, Authy, 1Password.
+
+After completing TOTP, the MFA page automatically checks whether the user has a passkey enrolled. If not, it offers a one-tap registration ("Register passkey for faster sign-in next time") before redirecting to the console. Users can skip this.
+
+### GitHub OAuth / Email magic link
+First-factor sign-in options available on the login page for users who have not yet enrolled (or choose not to use) a passkey.
+
+---
 
 ## One-time setup
 
-### 1. Choose a sign-in method
+### 1. Enable passkeys in Supabase
+Dashboard → **Authentication → Passkeys**:
+- Toggle **Enable Passkey authentication**
+- **Relying Party Display Name:** e.g. `Cultiness Spectrum Admin`
+- **Relying Party ID:** your bare production domain, e.g. `zacharymays.com`
+- **Relying Party Origins:** `https://zacharymays.com` (and any preview domains if needed)
 
-**Easiest — Email magic link (no external app to register).** This is integrated
-in Supabase: it emails a one-click sign-in link. Nothing to configure beyond
-Supabase's default email settings; the login page already offers it. Access is
-still gated by `ADMIN_EMAILS` + TOTP 2FA. *(Recommended for a solo admin.)*
+> **Note:** The RP ID is cryptographically bound to every passkey. Changing it after users enroll will invalidate all existing passkeys.
 
-**Or an OAuth provider** (requires registering your own app + pasting Client
-ID/Secret into Supabase → Auth → Providers):
-- **GitHub** (easy, free): GitHub → Settings → Developer settings → OAuth Apps.
-  Callback URL = `https://shgdrkrqjnwtlyxcdayp.supabase.co/auth/v1/callback`.
-- **Google** (free): Google Cloud Console → OAuth consent + credentials (same callback).
-- **Microsoft** (Azure/Entra) / **Apple** (paid Apple Developer account) also supported.
+### 2. Configure OAuth provider(s)
+Optional — only needed if you want GitHub/Google/etc. login in addition to email magic link.
 
-For all, the authorization callback / redirect URL is:
-`https://<your-domain>/auth/callback` (and `http://localhost:3000/auth/callback` for dev).
+- **GitHub:** GitHub → Settings → Developer settings → OAuth Apps.
+  Callback URL: `https://shgdrkrqjnwtlyxcdayp.supabase.co/auth/v1/callback`
+- Paste the Client ID / Secret into Supabase → Auth → Providers.
+- Add `https://<your-domain>/auth/callback` (and `http://localhost:3000/auth/callback`) to the redirect allowlist in Supabase → Auth → URL Configuration.
 
-### 2. Supabase
-- Auth → Providers → enable each provider you set up and paste its Client ID/secret.
-- Auth → URL Configuration → add the callback URLs above to the redirect allowlist.
-- 2FA/TOTP is enabled by default; no extra config needed. (Optionally enforce MFA
-  org-wide in Auth settings — the app already enforces it for `/admin`.)
+### 3. Environment variables
+Set in Vercel → Settings → Environment Variables and in `.env.local`:
 
-### 3. Environment variables (Vercel → Settings → Env Vars, and `.env.local`)
-See `.env.example`:
-- `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- `SUPABASE_SERVICE_ROLE_KEY` — **server-only secret**
-- `ADMIN_EMAILS` — your GitHub account email(s)
+```
+NEXT_PUBLIC_SUPABASE_URL=https://shgdrkrqjnwtlyxcdayp.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon key>
+SUPABASE_SERVICE_ROLE_KEY=<service role key — server-only, never expose client-side>
+ADMIN_EMAILS=you@example.com,colleague@example.com
+BLOB_READ_WRITE_TOKEN=<Vercel Blob token — required for /admin/photos uploads>
+```
 
 ### 4. Install + run
 ```bash
-npm install        # pulls @supabase/ssr
-npm run dev        # visit http://localhost:3000/admin/review → redirected to login
+npm install   # requires @supabase/supabase-js >=2.105.0 (currently pinned to ^2.108.2)
+npm run dev   # visit http://localhost:3000/admin/review → redirects to login
 ```
 
-## Optional hardening
-- Add a Vercel **Deployment Protection** / **Password Protection** layer in front
-  of `/admin` for defense-in-depth.
-- When you have more than one analyst, formalize roles: add an `app_role` JWT
-  claim hook and the RLS policy set in
-  `cultiness-spectrum/database-docs/sql/policies.sql`, and switch writes from the
-  service-role action to the user's RLS-scoped session.
+---
 
-## Scope / TODO
-This is a scaffold: per-criterion score edits with a required rationale, composite
-recompute, and audit. Not yet included — body-text editing UI, bulk accept-all,
-research_queue integration, and the sampling-frame / IRR work tracked in
-`cultiness-spectrum/database-docs/methodology/limitations.mdx`.
+## First-time passkey enrollment (existing users)
+
+1. Sign in via GitHub or email magic link.
+2. Complete the TOTP step at `/admin/mfa`.
+3. The MFA page shows: **"Register passkey for faster sign-in next time"**.
+4. Tap **Register passkey** — the browser prompts for Face ID / Touch ID.
+5. Done. Next sign-in: tap "Sign in with passkey" on the login page.
+
+---
+
+## Write gates
+
+All mutating operations (score changes, tag validation, photo uploads, etc.) go through
+Server Actions that re-run the `requireAdmin()` check (email allowlist + AAL2) independently
+of the page auth gate. This means the session cannot be forged client-side to trigger a write.
+
+---
+
+## Optional hardening
+- Add Vercel **Deployment Protection** in front of `/admin` for defense-in-depth.
+- To enforce MFA project-wide (not just for `/admin`): Auth → MFA settings → "Enforce MFA".
+- For multi-analyst setups: add an `app_role` JWT claim hook and RLS policies
+  (`cultiness-spectrum/database-docs/sql/policies.sql`) and switch writes to the
+  user's RLS-scoped session instead of service role.
