@@ -6,6 +6,7 @@ const LINKS = [
   { href: '/admin/review', label: 'Review' },
   { href: '/admin/curator', label: 'Curator' },
   { href: '/admin/intake', label: 'Intake' },
+  { href: '/admin/photos', label: 'Photos' },
 ];
 
 const GOLD = '#c9a86a';
