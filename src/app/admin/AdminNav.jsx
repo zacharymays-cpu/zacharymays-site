@@ -9,6 +9,7 @@ const LINKS = [
   { href: '/admin/curator', label: 'Curator' },
   { href: '/admin/intake', label: 'Intake' },
   { href: '/admin/photos', label: 'Photos' },
+  { href: '/admin/persons', label: 'Persons' },
 ];
 
 const GOLD = '#c9a86a';
