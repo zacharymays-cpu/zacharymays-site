@@ -10,15 +10,25 @@ const SAFE_COLS = 'id, identity_public, nationality, birth_year, status';
 export async function searchPersons(query: string) {
   await requireAdmin();
   const admin = createSupabaseAdminClient();
-  const { mode, value } = searchMode(query);
-  let rows: any[] | null = null;
-  if (mode === 'id') {
-    ({ data: rows } = await admin.from('persons').select(SAFE_COLS).ilike('id', `${value}%`).limit(25));
-  } else {
-    const bidx = blindIndex(value, process.env.PERSON_BIDX_HMAC_KEY as string);
-    ({ data: rows } = await admin.from('persons').select(SAFE_COLS).eq('canonical_name_bidx', bidx).limit(25));
+  // Support comma-separated batch search: "Faith Jones, Rose McGowan, P-1a2b3c4d".
+  // Each term is resolved independently; results are unioned and de-duplicated by id.
+  const terms = query.split(',').map((s) => s.trim()).filter(Boolean);
+  if (terms.length === 0) return [];
+  const MAX_RESULTS = 100;
+  const byId = new Map<string, any>();
+  for (const term of terms) {
+    if (byId.size >= MAX_RESULTS) break;
+    const { mode, value } = searchMode(term);
+    let rows: any[] | null = null;
+    if (mode === 'id') {
+      ({ data: rows } = await admin.from('persons').select(SAFE_COLS).ilike('id', `${value}%`).limit(25));
+    } else {
+      const bidx = blindIndex(value, process.env.PERSON_BIDX_HMAC_KEY as string);
+      ({ data: rows } = await admin.from('persons').select(SAFE_COLS).eq('canonical_name_bidx', bidx).limit(25));
+    }
+    for (const r of rows || []) if (!byId.has(r.id)) byId.set(r.id, r);
   }
-  return (rows || []).map((r) => ({
+  return Array.from(byId.values()).slice(0, MAX_RESULTS).map((r) => ({
     id: r.id, label: pLabel(r.id), identity_public: r.identity_public,
     nationality: r.nationality, birth_year: r.birth_year, status: r.status,
   }));
