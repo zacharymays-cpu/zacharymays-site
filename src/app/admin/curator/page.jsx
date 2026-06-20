@@ -15,7 +15,11 @@ function adminEmails() {
 
 export default async function AdminCuratorPage({ searchParams }) {
   const supabase = await createSupabaseServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  // Middleware already called getUser() (network-validated) on this request
+  // and would have redirected unauthenticated users. Reading the session
+  // cookie locally avoids a redundant round-trip to Supabase Auth.
+  const { data: { session } } = await supabase.auth.getSession();
+  const user = session?.user ?? null;
 
   const allow = adminEmails();
   const email = (user?.email || '').toLowerCase();

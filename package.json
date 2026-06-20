@@ -12,9 +12,11 @@
     "test": "node --test test/**/*.test.js"
   },
   "dependencies": {
+    "@dagrejs/dagre": "^3.0.0",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.49.4",
     "@vercel/blob": "^2.4.1",
+    "@xyflow/react": "^12.3.6",
     "exif-parser": "^0.1.12",
     "maplibre-gl": "^5.24.0",
     "next": "15.3.8",

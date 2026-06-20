@@ -5,25 +5,17 @@ import { useRouter } from 'next/navigation';
 import { SUPABASE_URL, ANON_KEY } from '../../lib/supabase/config';
 
 const TIER_COLORS = {
-  // Brightened for contrast against the warm-dark #272320 background — the
-  // previous muddy amber/red sat almost on the background tone. Shared across
-  // every visualization page so the tier colors stay consistent.
   'Super Culty':'#e8574d','Kinda Culty':'#d99b3e','Not Culty':'#5cb878',
 };
 const TIER_CLASS = {
   'Super Culty':'tier-super-culty','Kinda Culty':'tier-kinda-culty','Not Culty':'tier-not-culty',
 };
 const TIERS = ['Super Culty','Kinda Culty','Not Culty'];
-// Softer reader-facing labels for the DB tier enum (values themselves are
-// unchanged; they stay the keys for colors, filters, and comparisons).
 const TIER_LABELS = { 'Super Culty':'High-Control','Kinda Culty':'Moderate-Control','Not Culty':'Low-Control' };
 const lbl = (t) => TIER_LABELS[t] || t;
 const TRAJECTORIES = ['Stable','Escalating','Declining','Defunct'];
 
 // ── Lifton psychological-totalism tier (C11) ────────────────────────────────
-// Derived client-side from the 0–10 C11 score using the methodology cut-lines.
-// Cool/violet palette deliberately distinct from the warm behavioral TIER_COLORS
-// so the two tier systems never visually collide.
 const LIFTON_TIERS = ['Psychologically Totalizing','Moderately Totalizing','Non-Totalizing'];
 const LIFTON_TIER_COLORS = {
   'Psychologically Totalizing':'#a06cd5','Moderately Totalizing':'#6d83b5','Non-Totalizing':'#5f8f86',
@@ -102,7 +94,6 @@ function CriterionRow({ code, score, bodyText }) {
 }
 
 // ── Mini Political Compass ────────────────────────────────────────────────────
-// Four reference anchors: cover three quadrant extremes + one centrist landmark
 const COMPASS_REFS = [
   { label:'Stalin USSR', econ:-5.0, auth: 5.0 },
   { label:'Nazi Germany', econ: 1.0, auth: 5.0 },
@@ -120,31 +111,25 @@ function MiniCompass({ econ, auth, quadrant, tierColor }) {
 
   return (
     <svg viewBox={`0 0 ${SIZE} ${SIZE}`} style={{width:'100%',maxWidth:SIZE,display:'block',margin:'0 auto'}}>
-      {/* Quadrant fills */}
       <rect x={PAD} y={PAD} width={INNER/2} height={INNER/2} fill="rgba(139,32,32,0.07)"/>
       <rect x={PAD+INNER/2} y={PAD} width={INNER/2} height={INNER/2} fill="rgba(120,100,30,0.07)"/>
       <rect x={PAD} y={PAD+INNER/2} width={INNER/2} height={INNER/2} fill="rgba(42,107,74,0.06)"/>
       <rect x={PAD+INNER/2} y={PAD+INNER/2} width={INNER/2} height={INNER/2} fill="rgba(42,107,74,0.04)"/>
-      {/* Grid */}
       {[-3,0,3].map(v=>(
         <g key={v}>
           <line x1={px(v)} y1={PAD} x2={px(v)} y2={SIZE-PAD} stroke="rgba(212,206,196,0.05)" strokeWidth="0.5"/>
           <line x1={PAD} y1={py(v)} x2={SIZE-PAD} y2={py(v)} stroke="rgba(212,206,196,0.05)" strokeWidth="0.5"/>
         </g>
       ))}
-      {/* Axes */}
       <line x1={PAD} y1={SIZE/2} x2={SIZE-PAD} y2={SIZE/2} stroke="rgba(212,206,196,0.22)" strokeWidth="0.75"/>
       <line x1={SIZE/2} y1={PAD} x2={SIZE/2} y2={SIZE-PAD} stroke="rgba(212,206,196,0.22)" strokeWidth="0.75"/>
-      {/* Corner labels */}
       <text x={PAD+2} y={PAD+8} fill="rgba(212,206,196,0.15)" fontSize={5.5} fontFamily="monospace">AUTH L</text>
       <text x={SIZE-PAD-2} y={PAD+8} textAnchor="end" fill="rgba(212,206,196,0.15)" fontSize={5.5} fontFamily="monospace">AUTH R</text>
       <text x={PAD+2} y={SIZE-PAD-2} fill="rgba(212,206,196,0.15)" fontSize={5.5} fontFamily="monospace">LIB L</text>
       <text x={SIZE-PAD-2} y={SIZE-PAD-2} textAnchor="end" fill="rgba(212,206,196,0.15)" fontSize={5.5} fontFamily="monospace">LIB R</text>
-      {/* Reference anchors — diamonds */}
       {COMPASS_REFS.map(ref => {
         const rx = px(ref.econ), ry = py(ref.auth);
         const s = 4;
-        // Nudge labels to avoid overlapping corners/edges
         const labelBelow = ref.auth > 3;
         const labelRight = ref.econ < 0;
         const lx = rx + (labelRight ? 6 : -6);
@@ -159,11 +144,9 @@ function MiniCompass({ econ, auth, quadrant, tierColor }) {
           </g>
         );
       })}
-      {/* Org dot — rendered last so it's on top */}
       <circle cx={dotX} cy={dotY} r={10} fill={tierColor||'#888'} fillOpacity={0.15}/>
       <circle cx={dotX} cy={dotY} r={5.5} fill={tierColor||'#888'} fillOpacity={0.9}
         stroke="rgba(255,255,255,0.35)" strokeWidth="1"/>
-      {/* Axis value callout */}
       <text x={SIZE/2} y={SIZE-3} textAnchor="middle" fill="rgba(212,206,196,0.3)" fontSize={6.5} fontFamily="monospace">
         Econ {econ>0?'+':''}{econ} · Auth {auth>0?'+':''}{auth}
       </text>
@@ -195,7 +178,6 @@ function RadarChart({ scores }) {
 
   const polyPath = polyPts.map((p,i)=>`${i===0?'M':'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ')+'Z';
 
-  // Color by average score
   const validScores = CRITERIA.map(c=>scores[c]?.score).filter(v=>v!=null);
   const avg = validScores.length ? validScores.reduce((a,b)=>a+b,0)/validScores.length : 0;
   const fill = avg>=8?'rgba(232,87,77,0.25)':avg>=6?'rgba(176,96,32,0.22)':avg>=4?'rgba(160,144,48,0.2)':'rgba(92,184,120,0.18)';
@@ -203,27 +185,22 @@ function RadarChart({ scores }) {
 
   return (
     <svg viewBox={`0 0 ${SIZE} ${SIZE}`} style={{width:'100%',maxWidth:SIZE,display:'block',margin:'0 auto'}}>
-      {/* Rings */}
       {rings.map(f=>{
         const ringPts = CRITERIA.map((_,i)=>pt(i,R_INNER+(R-R_INNER)*f));
         const path=ringPts.map((p,i)=>`${i===0?'M':'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ')+'Z';
         return <path key={f} d={path} fill="none" stroke="rgba(212,206,196,0.1)" strokeWidth="0.5"/>;
       })}
-      {/* Spokes */}
       {CRITERIA.map((_,i)=>{
         const outer=pt(i,R+8);
         return <line key={i} x1={CX} y1={CY} x2={outer.x.toFixed(1)} y2={outer.y.toFixed(1)} stroke="rgba(212,206,196,0.1)" strokeWidth="0.5"/>;
       })}
-      {/* Data polygon */}
       <path d={polyPath} fill={fill} stroke={stroke} strokeWidth="1.5" strokeLinejoin="round"/>
-      {/* Data points */}
       {CRITERIA.map((c,i)=>{
         const v=scores[c]?.score??null;
         if(v===null) return null;
         const p=pt(i, R_INNER+(v/10)*(R-R_INNER));
         return <circle key={c} cx={p.x} cy={p.y} r={2.5} fill={stroke} stroke="rgba(26,20,14,0.6)" strokeWidth="0.5"/>;
       })}
-      {/* Criterion labels */}
       {CRITERIA.map((c,i)=>{
         const lp=pt(i,R+14);
         const v=scores[c]?.score??null;
@@ -233,7 +210,6 @@ function RadarChart({ scores }) {
           </g>
         );
       })}
-      {/* Center dot */}
       <circle cx={CX} cy={CY} r={2} fill="rgba(212,206,196,0.2)"/>
     </svg>
   );
@@ -247,14 +223,12 @@ function DetailModal({ org, criterionScores, politicalPos, loading, onClose }) {
   const compositeNum = org ? parseFloat(org.composite_score) : NaN;
   const composite = Number.isNaN(compositeNum) ? null : compositeNum.toFixed(1);
 
-  // Close on Escape
   useEffect(() => {
     const handler = (e) => { if (e.key === 'Escape') onClose(); };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
   }, [onClose]);
 
-  // Lock body scroll while open
   useEffect(() => {
     document.body.style.overflow = 'hidden';
     return () => { document.body.style.overflow = ''; };
@@ -264,14 +238,12 @@ function DetailModal({ org, criterionScores, politicalPos, loading, onClose }) {
 
   return (
     <>
-      {/* Backdrop */}
       <div onClick={onClose} style={{
         position:'fixed',inset:0,background:'rgba(10,8,6,0.75)',zIndex:1000,
         backdropFilter:'blur(2px)',
         animation:'fadeIn 0.18s ease',
       }}/>
 
-      {/* Panel — centered modal */}
       <div style={{
         position:'fixed',
         top:'50%',left:'50%',
@@ -286,8 +258,6 @@ function DetailModal({ org, criterionScores, politicalPos, loading, onClose }) {
         animation:'popIn 0.2s cubic-bezier(0.22,1,0.36,1)',
         boxShadow:'0 24px 80px rgba(0,0,0,0.7)',
       }}>
-
-        {/* Header */}
         <div style={{
           position:'sticky',top:0,background:'#1c1814',
           borderBottom:'1px solid rgba(212,206,196,0.12)',
@@ -311,8 +281,6 @@ function DetailModal({ org, criterionScores, politicalPos, loading, onClose }) {
         </div>
 
         <div style={{padding:'1.5rem'}}>
-
-          {/* Tier + trajectory badge row */}
           <div style={{display:'flex',alignItems:'center',gap:'0.75rem',marginBottom:'1.5rem',flexWrap:'wrap'}}>
             <div style={{display:'flex',alignItems:'center',gap:'0.5rem',padding:'0.35rem 0.75rem',
               background:`rgba(${hexToRgb(tierColor)},0.15)`,
@@ -327,7 +295,6 @@ function DetailModal({ org, criterionScores, politicalPos, loading, onClose }) {
             )}
           </div>
 
-          {/* Score cards */}
           <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'1px',background:'rgba(212,206,196,0.08)',marginBottom:'1.75rem'}}>
             {[
               {label:'Composite',value:composite!=null?`${composite}%`:'Pending',color:composite!=null?'var(--gold)':'var(--muted)'},
@@ -341,11 +308,8 @@ function DetailModal({ org, criterionScores, politicalPos, loading, onClose }) {
             ))}
           </div>
 
-          
-          {/* Criterion profile + political compass */}
           {!loading && Object.keys(scores).length > 0 && (
             <div style={{marginBottom:'1.75rem',display:'grid',gridTemplateColumns:politicalPos?'1fr 1fr':'1fr',gap:'0.75rem'}}>
-              {/* Radar */}
               <div style={{padding:'1rem',background:'rgba(244,240,232,0.02)',border:'1px solid rgba(212,206,196,0.08)'}}>
                 <div style={{fontFamily:'var(--mono)',fontSize:'0.58rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--gold)',marginBottom:'0.6rem',textAlign:'center'}}>Criterion Profile</div>
                 <RadarChart scores={scores} />
@@ -354,7 +318,6 @@ function DetailModal({ org, criterionScores, politicalPos, loading, onClose }) {
                   <span style={{fontFamily:'var(--mono)',fontSize:'0.55rem',color:'rgba(212,206,196,0.25)'}}>10 outer · N/A=center</span>
                 </div>
               </div>
-              {/* Political compass */}
               {politicalPos&&(
                 <div style={{padding:'1rem',background:'rgba(244,240,232,0.02)',border:'1px solid rgba(212,206,196,0.08)'}}>
                   <div style={{fontFamily:'var(--mono)',fontSize:'0.58rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--gold)',marginBottom:'0.6rem',textAlign:'center'}}>Political Position</div>
@@ -367,7 +330,6 @@ function DetailModal({ org, criterionScores, politicalPos, loading, onClose }) {
             </div>
           )}
 
-{/* Summary */}
           {org.summary_text&&(
             <div style={{marginBottom:'1.75rem',padding:'1rem 1.1rem',background:'rgba(244,240,232,0.03)',borderLeft:`3px solid ${tierColor}`,borderRight:'1px solid rgba(212,206,196,0.08)',borderTop:'1px solid rgba(212,206,196,0.08)',borderBottom:'1px solid rgba(212,206,196,0.08)'}}>
               <div style={{fontFamily:'var(--mono)',fontSize:'0.58rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--gold)',marginBottom:'0.6rem'}}>Assessment</div>
@@ -375,7 +337,6 @@ function DetailModal({ org, criterionScores, politicalPos, loading, onClose }) {
             </div>
           )}
 
-          {/* Criteria */}
           <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.15em',textTransform:'uppercase',color:'var(--gold)',marginBottom:'0.75rem'}}>
             Criterion Scores
             <span style={{color:'rgba(212,206,196,0.3)',marginLeft:'0.5rem',fontSize:'0.55rem'}}>— click any row to expand</span>
@@ -393,14 +354,12 @@ function DetailModal({ org, criterionScores, politicalPos, loading, onClose }) {
             </div>
           )}
 
-          {/* N/A note */}
           <div style={{padding:'0.75rem 1rem',background:'rgba(244,240,232,0.02)',border:'1px solid rgba(212,206,196,0.07)',marginBottom:'1.5rem'}}>
             <p style={{fontFamily:'var(--mono)',fontSize:'0.62rem',color:'rgba(212,206,196,0.3)',margin:0,lineHeight:1.65}}>
               N/A indicates structural inapplicability — the criterion describes a dynamic that is absent by design or whose documented behavior is the structural opposite of the criterion. It is not a low score.
             </p>
           </div>
 
-          {/* Scope / membership */}
           {org.membership_scope && (
             <div style={{marginBottom:'1.5rem'}}>
               <div style={{fontFamily:'var(--mono)',fontSize:'0.58rem',letterSpacing:'0.14em',textTransform:'uppercase',color:'var(--muted)',marginBottom:'0.35rem'}}>Scope</div>
@@ -408,7 +367,6 @@ function DetailModal({ org, criterionScores, politicalPos, loading, onClose }) {
             </div>
           )}
 
-          {/* Close footer */}
           <div style={{paddingTop:'1rem',borderTop:'1px solid rgba(212,206,196,0.08)',display:'flex',justifyContent:'flex-end'}}>
             <button onClick={onClose} style={{
               fontFamily:'var(--mono)',fontSize:'0.65rem',letterSpacing:'0.1em',textTransform:'uppercase',
@@ -427,7 +385,6 @@ function DetailModal({ org, criterionScores, politicalPos, loading, onClose }) {
   );
 }
 
-// Simple hex to rgb helper for rgba()
 function hexToRgb(hex) {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result ? `${parseInt(result[1],16)},${parseInt(result[2],16)},${parseInt(result[3],16)}` : '128,128,128';
@@ -442,6 +399,7 @@ export default function ExploreClient({ initialOrgs=[] }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [search, setSearch] = useState('');
   const [tierFilter, setTierFilter] = useState([]);
+  const [youngsBandFilter, setYoungsBandFilter] = useState([]);
   const [liftonTierFilter, setLiftonTierFilter] = useState([]);
   const [trajFilter, setTrajFilter] = useState([]);
   const [categoryFilter, setCategoryFilter] = useState([]);
@@ -464,19 +422,19 @@ export default function ExploreClient({ initialOrgs=[] }) {
   const toggle = (val,state,setter) =>
     setter(state.includes(val)?state.filter(v=>v!==val):[...state,val]);
 
-  const hasFilters = search||tierFilter.length||liftonTierFilter.length||trajFilter.length||categoryFilter.length||scoreMin>0||scoreMax<100;
+  const hasFilters = search||tierFilter.length||youngsBandFilter.length||liftonTierFilter.length||trajFilter.length||categoryFilter.length||scoreMin>0||scoreMax<100;
 
   const filtered = useMemo(()=>{
     let result = orgs.filter(o=>{
       if(search&&!o.name.toLowerCase().includes(search.toLowerCase())&&
          !o.category.toLowerCase().includes(search.toLowerCase())) return false;
       if(tierFilter.length&&!tierFilter.includes(o.composite_tier)) return false;
+      if(youngsBandFilter.length&&!youngsBandFilter.includes(o.youngs_band)) return false;
       if(liftonTierFilter.length&&!liftonTierFilter.includes(liftonTier(o.lifton_score))) return false;
       if(trajFilter.length&&!trajFilter.includes(o.trajectory)) return false;
       if(categoryFilter.length&&!categoryFilter.includes(o.category)) return false;
       const s=parseFloat(o.composite_score);
       if(Number.isNaN(s)){
-        // Unscored (Pending) orgs only appear when the score range is at its default span.
         if(scoreMin>0||scoreMax<100) return false;
       } else if(s<scoreMin||s>scoreMax) return false;
       return true;
@@ -484,14 +442,12 @@ export default function ExploreClient({ initialOrgs=[] }) {
     return [...result].sort((a,b)=>{
       let av=a[sortBy],bv=b[sortBy];
       if(sortBy==='composite_score'||sortBy==='youngs_score'||sortBy==='lifton_score'){
-        // Numeric sort; unscored (null/NaN) values sink to the bottom regardless of direction.
         av=parseFloat(av); bv=parseFloat(bv);
         const aNan=Number.isNaN(av), bNan=Number.isNaN(bv);
         if(aNan&&bNan) return 0;
         if(aNan) return 1;
         if(bNan) return -1;
-      } else if(sortBy==='composite_tier'){
-        // Sort by tier rank (Super → Kinda → Not); unscored last.
+      } else if(sortBy==='composite_tier'||sortBy==='youngs_band'){
         const rank=t=>{const i=TIERS.indexOf(t);return i===-1?99:i;};
         av=rank(av); bv=rank(bv);
       } else if(typeof av==='string'){av=av.toLowerCase();bv=(bv||'').toLowerCase();}
@@ -499,7 +455,7 @@ export default function ExploreClient({ initialOrgs=[] }) {
       if(av>bv) return sortDir==='asc'?1:-1;
       return 0;
     });
-  },[orgs,search,tierFilter,liftonTierFilter,trajFilter,categoryFilter,sortBy,sortDir,scoreMin,scoreMax]);
+  },[orgs,search,tierFilter,youngsBandFilter,liftonTierFilter,trajFilter,categoryFilter,sortBy,sortDir,scoreMin,scoreMax]);
 
   const handleSort=(col)=>{
     if(sortBy===col) setSortDir(d=>d==='asc'?'desc':'asc');
@@ -515,7 +471,6 @@ export default function ExploreClient({ initialOrgs=[] }) {
       <div style={{borderBottom:'1px solid rgba(212,206,196,0.1)',padding:'2rem 0 1.5rem',background:'var(--ink)',position:'sticky',top:'60px',zIndex:50}}>
         <div className="container--wide">
           <div className="explore-header-row">
-            {/* Dataset stats — chart switcher lives in the shared <ExploreNav/> above */}
             <div style={{display:'flex',gap:'1.5rem',alignItems:'center'}}>
               <div style={{textAlign:'center'}}>
                 <div style={{fontFamily:'var(--serif)',fontSize:'1.4rem',fontWeight:700,color:'var(--gold)',lineHeight:1}}>{filtered.length}</div>
@@ -549,16 +504,17 @@ export default function ExploreClient({ initialOrgs=[] }) {
           <div className="explore-sidebar">
             <button className="explore-filter-toggle" onClick={()=>setSidebarOpen(o=>!o)}>
               <span className="filter-label">
-                Filters{hasFilters?` (${tierFilter.length+liftonTierFilter.length+trajFilter.length+categoryFilter.length+(search?1:0)} active)`:''}
+                Filters{hasFilters?` (${tierFilter.length+youngsBandFilter.length+liftonTierFilter.length+trajFilter.length+categoryFilter.length+(search?1:0)} active)`:''}
               </span>
               <span style={{fontSize:'0.8rem'}}>{sidebarOpen?'◀':'▶'}</span>
             </button>
 
             <div className="explore-sidebar-body">
-              {/* Control Tier (behavioral, C1–C10) */}
+
+              {/* Control Tier (composite_tier, C1–C10 behavioral) */}
               <div style={{marginBottom:'1.25rem'}}>
                 <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--muted)',marginBottom:'0.5rem'}}>
-                  Control Tier <span style={{textTransform:'none',letterSpacing:0,color:'rgba(212,206,196,0.3)'}}>· behavioral</span>
+                  Composite Tier <span style={{textTransform:'none',letterSpacing:0,color:'rgba(212,206,196,0.3)'}}>· behavioral</span>
                 </div>
                 {TIERS.map(t=>(
                   <label key={t} style={{display:'flex',alignItems:'center',gap:'0.5rem',marginBottom:'0.3rem',cursor:'pointer'}}>
@@ -569,10 +525,24 @@ export default function ExploreClient({ initialOrgs=[] }) {
                 ))}
               </div>
 
-              {/* Psychological Tier (Lifton totalism, C11) */}
+              {/* Cultiness Tier (youngs_band, Young's scoring) */}
               <div style={{marginBottom:'1.25rem'}}>
                 <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--muted)',marginBottom:'0.5rem'}}>
-                  Psychological Tier <span style={{textTransform:'none',letterSpacing:0,color:'rgba(212,206,196,0.3)'}}>· Lifton</span>
+                  Cultiness Tier <span style={{textTransform:'none',letterSpacing:0,color:'rgba(212,206,196,0.3)'}}>· Young's</span>
+                </div>
+                {TIERS.map(t=>(
+                  <label key={t} style={{display:'flex',alignItems:'center',gap:'0.5rem',marginBottom:'0.3rem',cursor:'pointer'}}>
+                    <input type="checkbox" checked={youngsBandFilter.includes(t)} onChange={()=>toggle(t,youngsBandFilter,setYoungsBandFilter)} style={{accentColor:TIER_COLORS[t]}}/>
+                    <span style={{fontSize:'0.77rem',color:youngsBandFilter.includes(t)?'var(--paper)':'var(--muted)',flex:1}}>{t}</span>
+                    <span style={{fontFamily:'var(--mono)',fontSize:'0.63rem',color:'var(--muted)'}}>{orgs.filter(o=>o.youngs_band===t).length}</span>
+                  </label>
+                ))}
+              </div>
+
+              {/* Totalism Tier (Lifton C11, psychological) */}
+              <div style={{marginBottom:'1.25rem'}}>
+                <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--muted)',marginBottom:'0.5rem'}}>
+                  Totalism Tier <span style={{textTransform:'none',letterSpacing:0,color:'rgba(212,206,196,0.3)'}}>· Lifton</span>
                 </div>
                 {LIFTON_TIERS.map(t=>(
                   <label key={t} style={{display:'flex',alignItems:'center',gap:'0.5rem',marginBottom:'0.3rem',cursor:'pointer'}}>
@@ -619,13 +589,12 @@ export default function ExploreClient({ initialOrgs=[] }) {
               </div>
 
               {hasFilters&&(
-                <button onClick={()=>{setSearch('');setTierFilter([]);setLiftonTierFilter([]);setTrajFilter([]);setCategoryFilter([]);setScoreMin(0);setScoreMax(100);}}
+                <button onClick={()=>{setSearch('');setTierFilter([]);setYoungsBandFilter([]);setLiftonTierFilter([]);setTrajFilter([]);setCategoryFilter([]);setScoreMin(0);setScoreMax(100);}}
                   style={{fontFamily:'var(--mono)',fontSize:'0.63rem',letterSpacing:'0.1em',textTransform:'uppercase',padding:'0.45rem 0.9rem',width:'100%',background:'transparent',border:'1px solid rgba(212,206,196,0.25)',color:'var(--muted)',cursor:'pointer'}}>
                   Clear All
                 </button>
               )}
 
-              {/* Hint */}
               <div style={{marginTop:'1.5rem',padding:'0.75rem',background:'rgba(244,240,232,0.02)',border:'1px solid rgba(212,206,196,0.07)'}}>
                 <p style={{fontFamily:'var(--mono)',fontSize:'0.6rem',color:'rgba(212,206,196,0.3)',margin:0,lineHeight:1.65}}>
                   Click any row to open the full assessment in a new tab.
@@ -640,9 +609,8 @@ export default function ExploreClient({ initialOrgs=[] }) {
               <table style={{width:'100%',borderCollapse:'collapse',minWidth:'500px'}}>
                 <thead style={{position:'sticky',top:0,background:'#1a1512',zIndex:1}}>
                   <tr style={{borderBottom:'1px solid rgba(212,206,196,0.2)'}}>
-                    {[['name','Organization'],['composite_score','Score'],['composite_tier','Control Tier'],['youngs_score',"Young's"],['lifton_score','Lifton'],['__psych','Psych Tier'],['category','Category'],['trajectory','Trajectory']].map(([col,label])=>{
-                      const hideMobile = col==='category'||col==='trajectory'||col==='lifton_score'||col==='__psych';
-                      // Derived (non-sortable) columns use a sentinel key prefixed with '__'.
+                    {[['name','Organization'],['composite_score','Composite'],['composite_tier','Composite Tier'],['youngs_score',"Young's"],['youngs_band','Young Category'],['lifton_score','Totalism'],['__psych','Totalism Tier'],['category','Category'],['trajectory','Trajectory']].map(([col,label])=>{
+                      const hideMobile = col==='category'||col==='trajectory'||col==='youngs_band'||col==='lifton_score'||col==='__psych';
                       if(col.startsWith('__')) return (
                         <th key={col} className={hideMobile?'explore-table-hide-mobile':''} style={{fontFamily:'var(--mono)',fontSize:'0.65rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'rgba(212,206,196,0.72)',textAlign:'left',padding:'0.6rem 0.75rem',whiteSpace:'nowrap'}}>{label}</th>
                       );
@@ -681,6 +649,11 @@ export default function ExploreClient({ initialOrgs=[] }) {
                           : <span style={{fontFamily:'var(--mono)',fontSize:'0.62rem',fontStyle:'italic',color:'rgba(212,206,196,0.3)'}}>Pending</span>}
                       </td>
                       <td style={{padding:'0.65rem 0.75rem',fontFamily:'var(--mono)',fontSize:'0.82rem',color:'rgba(212,206,196,0.8)'}}>{org.youngs_score==null?'—':`${org.youngs_score}/10`}</td>
+                      <td className="explore-table-hide-mobile" style={{padding:'0.65rem 0.75rem',whiteSpace:'nowrap'}}>
+                        {org.youngs_band
+                          ? <span style={{display:'inline-flex',alignItems:'center',gap:'0.4rem',fontFamily:'var(--mono)',fontSize:'0.62rem',color:'rgba(212,206,196,0.8)'}}><span style={{width:8,height:8,borderRadius:'50%',background:TIER_COLORS[org.youngs_band],flexShrink:0}}/>{lbl(org.youngs_band)}</span>
+                          : <span style={{fontFamily:'var(--mono)',fontSize:'0.62rem',color:'rgba(212,206,196,0.3)'}}>—</span>}
+                      </td>
                       <td className="explore-table-hide-mobile" style={{padding:'0.65rem 0.75rem',fontFamily:'var(--mono)',fontSize:'0.82rem',fontWeight:600,color:'var(--paper)',whiteSpace:'nowrap'}}>{org.lifton_score==null?<span style={{color:'rgba(212,206,196,0.35)',fontWeight:400}}>—</span>:`${parseFloat(org.lifton_score)}/10`}</td>
                       <td className="explore-table-hide-mobile" style={{padding:'0.65rem 0.75rem',whiteSpace:'nowrap'}}>
                         {(() => { const lt = liftonTier(org.lifton_score); return lt
@@ -693,7 +666,7 @@ export default function ExploreClient({ initialOrgs=[] }) {
                     </tr>
                   ))}
                   {filtered.length===0&&(
-                    <tr><td colSpan={9} style={{padding:'3rem',textAlign:'center',color:'var(--muted)',fontFamily:'var(--mono)',fontSize:'0.8rem'}}>No organizations match current filters.</td></tr>
+                    <tr><td colSpan={10} style={{padding:'3rem',textAlign:'center',color:'var(--muted)',fontFamily:'var(--mono)',fontSize:'0.8rem'}}>No organizations match current filters.</td></tr>
                   )}
                 </tbody>
               </table>
