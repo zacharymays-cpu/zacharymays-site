@@ -1,15 +1,12 @@
 'use client';
 
-// Two-factor (TOTP) enrollment + step-up. On first visit with no verified factor
-// it enrolls one (shows a QR for Google Authenticator / Authy / 1Password). On
-// later visits it challenges the existing factor to step the session up to AAL2.
-// On success it returns to /admin/review (which requires AAL2).
+// TOTP enrollment + step-up, with passkey registration offer after successful verify.
 import { useEffect, useState } from 'react';
 import { createSupabaseBrowserClient } from '../../../lib/supabase/client';
 
 export default function MfaPage() {
   const [supabase] = useState(() => createSupabaseBrowserClient());
-  const [phase, setPhase] = useState('loading'); // loading|enroll|verify|error
+  const [phase, setPhase] = useState('loading'); // loading|enroll|verify|passkey_offer|error
   const [factorId, setFactorId] = useState(null);
   const [qr, setQr] = useState(null);
   const [secret, setSecret] = useState(null);
@@ -27,7 +24,6 @@ export default function MfaPage() {
         setPhase('verify');
         return;
       }
-      // Clean up any half-finished unverified factors, then enroll fresh.
       for (const f of factors?.totp || []) {
         if (f.status !== 'verified') await supabase.auth.mfa.unenroll({ factorId: f.id });
       }
@@ -56,9 +52,33 @@ export default function MfaPage() {
       challengeId: ch.id,
       code: code.trim(),
     });
-    if (vErr) { setBusy(false); return setError(vErr.message); }
+    setBusy(false);
+    if (vErr) return setError(vErr.message);
+    // Check if user already has a passkey registered; if not, offer enrollment.
+    const { data: passkeys } = await supabase.auth.passkey.list();
+    if (!passkeys || passkeys.length === 0) {
+      setPhase('passkey_offer');
+    } else {
+      window.location.href = '/admin/review';
+    }
+  }
+
+  async function registerPasskey() {
+    setBusy(true);
+    setError('');
+    const { error: pkErr } = await supabase.auth.registerPasskey();
+    setBusy(false);
+    if (pkErr) {
+      setError(pkErr.message);
+      return;
+    }
     window.location.href = '/admin/review';
   }
+
+  const btn = {
+    padding: '0.6rem 1.2rem', borderRadius: 8, border: '1px solid #333',
+    background: '#111', color: '#fff', cursor: busy ? 'wait' : 'pointer', fontWeight: 600,
+  };
 
   return (
     <main style={{ minHeight: '70vh', display: 'flex', flexDirection: 'column',
@@ -73,11 +93,10 @@ export default function MfaPage() {
             Scan this with Google Authenticator (or Authy / 1Password), then enter
             the 6-digit code to finish enrollment.
           </p>
-          {/* qr_code is an SVG data URI */}
           {qr ? <img src={qr} alt="TOTP QR code" width={200} height={200} /> : null}
           {secret ? (
             <p style={{ fontSize: 12, opacity: 0.6 }}>
-              Or enter this key manually: <code>{secret}</code>
+              Or enter manually: <code>{secret}</code>
             </p>
           ) : null}
         </>
@@ -98,13 +117,26 @@ export default function MfaPage() {
             placeholder="123456"
             style={{ width: 160, padding: '0.5rem', textAlign: 'center', fontSize: 18, letterSpacing: 4 }}
           />
-          <button
-            onClick={submit}
-            disabled={busy || code.trim().length < 6}
-            style={{ padding: '0.6rem 1.2rem', borderRadius: 8, border: '1px solid #333',
-              background: '#111', color: '#fff', cursor: busy ? 'wait' : 'pointer', fontWeight: 600 }}
-          >
+          <button onClick={submit} disabled={busy || code.trim().length < 6} style={btn}>
             {busy ? 'Verifying…' : 'Verify'}
+          </button>
+        </>
+      ) : null}
+
+      {phase === 'passkey_offer' ? (
+        <>
+          <p style={{ opacity: 0.75, maxWidth: 440, textAlign: 'center' }}>
+            You&apos;re verified. Register a passkey so you can sign in with Face ID
+            or Touch ID next time — no authenticator app needed.
+          </p>
+          <button onClick={registerPasskey} disabled={busy} style={btn}>
+            {busy ? 'Registering…' : 'Register passkey'}
+          </button>
+          <button
+            onClick={() => { window.location.href = '/admin/review'; }}
+            style={{ ...btn, background: 'transparent', border: '1px solid #555', color: '#aaa' }}
+          >
+            Skip for now
           </button>
         </>
       ) : null}

@@ -47,11 +47,7 @@ export default async function AdminReviewPage() {
   // Enforce TOTP 2FA for admins: must have a verified factor AND a stepped-up
   // (AAL2) session. Otherwise route to enrollment / step-up.
   const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-  const { data: factors } = await supabase.auth.mfa.listFactors();
-  const hasVerifiedTotp = (factors?.totp || []).some((f) => f.status === 'verified');
-  if (!hasVerifiedTotp || aal?.currentLevel !== 'aal2') {
-    redirect('/admin/mfa');
-  }
+  if (aal?.currentLevel !== 'aal2') redirect('/admin/mfa');
 
   let queue = [];
   let loadError = null;
