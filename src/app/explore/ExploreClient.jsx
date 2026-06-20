@@ -525,24 +525,24 @@ export default function ExploreClient({ initialOrgs=[] }) {
                 ))}
               </div>
 
-              {/* Cultiness Tier (youngs_band, Young’s scoring) */}
-              <div style={{marginBottom:’1.25rem’}}>
-                <div style={{fontFamily:’var(--mono)’,fontSize:’0.6rem’,letterSpacing:’0.12em’,textTransform:’uppercase’,color:’var(--muted)’,marginBottom:’0.5rem’}}>
-                  Cultiness Tier <span style={{textTransform:’none’,letterSpacing:0,color:’rgba(212,206,196,0.3)’}}>· Young’s</span>
+              {/* Cultiness Tier (youngs_band, Young's scoring) */}
+              <div style={{marginBottom:'1.25rem'}}>
+                <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--muted)',marginBottom:'0.5rem'}}>
+                  Cultiness Tier <span style={{textTransform:'none',letterSpacing:0,color:'rgba(212,206,196,0.3)'}}>· Young's</span>
                 </div>
                 {TIERS.map(t=>(
-                  <label key={t} style={{display:’flex’,alignItems:’center’,gap:’0.5rem’,marginBottom:’0.3rem’,cursor:’pointer’}}>
+                  <label key={t} style={{display:'flex',alignItems:'center',gap:'0.5rem',marginBottom:'0.3rem',cursor:'pointer'}}>
                     <input type="checkbox" checked={youngsBandFilter.includes(t)} onChange={()=>toggle(t,youngsBandFilter,setYoungsBandFilter)} style={{accentColor:TIER_COLORS[t]}}/>
-                    <span style={{fontSize:’0.77rem’,color:youngsBandFilter.includes(t)?’var(--paper)’:’var(--muted)’,flex:1}}>{t}</span>
-                    <span style={{fontFamily:’var(--mono)’,fontSize:’0.63rem’,color:’var(--muted)’}}>{orgs.filter(o=>o.youngs_band===t).length}</span>
+                    <span style={{fontSize:'0.77rem',color:youngsBandFilter.includes(t)?'var(--paper)':'var(--muted)',flex:1}}>{t}</span>
+                    <span style={{fontFamily:'var(--mono)',fontSize:'0.63rem',color:'var(--muted)'}}>{orgs.filter(o=>o.youngs_band===t).length}</span>
                   </label>
                 ))}
               </div>
 
               {/* Totalism Tier (Lifton C11, psychological) */}
-              <div style={{marginBottom:’1.25rem’}}>
-                <div style={{fontFamily:’var(--mono)’,fontSize:’0.6rem’,letterSpacing:’0.12em’,textTransform:’uppercase’,color:’var(--muted)’,marginBottom:’0.5rem’}}>
-                  Totalism Tier <span style={{textTransform:’none’,letterSpacing:0,color:’rgba(212,206,196,0.3)’}}>· Lifton</span>
+              <div style={{marginBottom:'1.25rem'}}>
+                <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--muted)',marginBottom:'0.5rem'}}>
+                  Totalism Tier <span style={{textTransform:'none',letterSpacing:0,color:'rgba(212,206,196,0.3)'}}>· Lifton</span>
                 </div>
                 {LIFTON_TIERS.map(t=>(
                   <label key={t} style={{display:'flex',alignItems:'center',gap:'0.5rem',marginBottom:'0.3rem',cursor:'pointer'}}>
