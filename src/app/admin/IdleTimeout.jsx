@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { createSupabaseBrowserClient } from '../../lib/supabase/client';
 
-const IDLE_MS = 30 * 60 * 1000; // 30 minutes
+const IDLE_MS = 15 * 60 * 1000; // 15 minutes (NIST SP 800-53 AC-11)
 const EVENTS = ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart'];
 
 export default function IdleTimeout() {
