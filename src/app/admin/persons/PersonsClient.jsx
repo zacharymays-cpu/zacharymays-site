@@ -82,8 +82,9 @@ export default function PersonsClient() {
   return (
     <div>
       <form onSubmit={doSearch} style={{ display: 'flex', gap: 8, margin: '12px 0' }}>
-        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="P-xxxxxxxx or name"
-               style={{ padding: '0.5rem 0.75rem', borderRadius: 8, border: '1px solid #ccc', width: 320 }} />
+        <input value={q} onChange={(e) => setQ(e.target.value)}
+               placeholder="P-xxxxxxxx or name — separate multiple with commas"
+               style={{ padding: '0.5rem 0.75rem', borderRadius: 8, border: '1px solid #ccc', width: 440 }} />
         <button type="submit" disabled={busy}
                 style={{ padding: '0.5rem 1rem', borderRadius: 8, border: '1px solid #333', background: '#111', color: '#fff', cursor: 'pointer' }}>
           {busy ? '…' : 'Search'}
