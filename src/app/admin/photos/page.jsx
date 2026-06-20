@@ -33,9 +33,7 @@ export default async function AdminPhotosPage({ searchParams }) {
   }
 
   const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-  const { data: factors } = await supabase.auth.mfa.listFactors();
-  const hasVerifiedTotp = (factors?.totp || []).some((f) => f.status === 'verified');
-  if (!hasVerifiedTotp || aal?.currentLevel !== 'aal2') redirect('/admin/mfa');
+  if (aal?.currentLevel !== 'aal2') redirect('/admin/mfa');
 
   const sp = await searchParams;
   const selectedOrgId = typeof sp?.org === 'string' ? sp.org : '';

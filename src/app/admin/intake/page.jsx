@@ -28,9 +28,7 @@ export default async function AdminIntakePage() {
     );
   }
   const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-  const { data: factors } = await supabase.auth.mfa.listFactors();
-  const hasVerifiedTotp = (factors?.totp || []).some((f) => f.status === 'verified');
-  if (!hasVerifiedTotp || aal?.currentLevel !== 'aal2') redirect('/admin/mfa');
+  if (aal?.currentLevel !== 'aal2') redirect('/admin/mfa');
 
   let proposals = [];
   let categories = [];
