@@ -19,9 +19,13 @@ function adminEmails() {
 
 export default async function AdminReviewPage() {
   const supabase = await createSupabaseServerClient();
+  // Middleware already called getUser() (network-validated) on this request
+  // and would have redirected unauthenticated users. Reading the session
+  // cookie locally avoids a redundant round-trip to Supabase Auth.
   const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    data: { session },
+  } = await supabase.auth.getSession();
+  const user = session?.user ?? null;
 
   const allow = adminEmails();
   const email = (user?.email || '').toLowerCase();
@@ -63,7 +67,7 @@ export default async function AdminReviewPage() {
       <header style={{ marginBottom: '1.5rem' }}>
         <h1 style={{ fontSize: '1.6rem', fontWeight: 700 }}>Score review console</h1>
         <p style={{ opacity: 0.7, marginTop: '0.4rem' }}>
-          Prioritized worklist — orgs where the AI jury is most likely wrong (high
+          Prioritized worklist &mdash; orgs where the AI jury is most likely wrong (high
           model disagreement and tier-boundary cases). Signed in as {email}.
           Every change is recorded in the immutable <code>score_history</code> audit
           trail with you as the actor.
