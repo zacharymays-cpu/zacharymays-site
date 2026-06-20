@@ -1,6 +1,7 @@
 // Shared nav for the admin consoles (Review / Curator / Intake). Pass `active`
 // (the current path) to highlight the current page. Server component — plain links.
 import Link from 'next/link';
+import LogoutButton from './LogoutButton';
 
 const LINKS = [
   { href: '/admin/review', label: 'Review' },
@@ -15,7 +16,7 @@ const MUTED = 'rgba(244,240,232,0.62)';
 
 export default function AdminNav({ active }) {
   return (
-    <nav style={{ display: 'flex', gap: 8, marginBottom: '1.25rem', flexWrap: 'wrap' }}>
+    <nav style={{ display: 'flex', gap: 8, marginBottom: '1.25rem', flexWrap: 'wrap', alignItems: 'center' }}>
       {LINKS.map((l) => {
         const isActive = l.href === active;
         return (
@@ -38,6 +39,7 @@ export default function AdminNav({ active }) {
           </Link>
         );
       })}
+      <LogoutButton />
     </nav>
   );
 }
