@@ -23,3 +23,10 @@ test('blindIndex matches HMAC-SHA256 of normalized name (cross-language parity)'
 test('pLabel derives P-<first 8 of uuid>', () => {
   assert.strictEqual(pLabel('550e8400-e29b-41d4-a716-446655440000'), 'P-550e8400');
 });
+
+const { searchMode } = require('../../src/lib/identity/blindIndex.js');
+test('searchMode: P- queries -> id prefix; else name', () => {
+  assert.deepStrictEqual(searchMode('P-550e8400'), { mode: 'id', value: '550e8400' });
+  assert.deepStrictEqual(searchMode('p-AbC'), { mode: 'id', value: 'abc' });
+  assert.deepStrictEqual(searchMode('Jane Doe'), { mode: 'name', value: 'Jane Doe' });
+});
