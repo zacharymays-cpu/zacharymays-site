@@ -55,7 +55,11 @@ export default async function AdminPhotosPage({ searchParams }) {
       .from('photos')
       .select(`
         id, url, filename, source_type, source_url, exif_date,
+        exif_latitude, exif_longitude,
         processing_status, uploaded_at, created_at,
+        ai_analysis_status, ai_analysis_at, ai_analysis_error,
+        ai_location_name, ai_location_description, ai_location_confidence,
+        ai_location_lat, ai_location_lng, ai_scene_description,
         photo_persons (
           id, person_id, confidence, identified_by, inference_reasoning,
           validation_status, validation_notes, validated_at,
