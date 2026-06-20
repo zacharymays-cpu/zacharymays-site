@@ -6,6 +6,9 @@ import { revalidatePath } from 'next/cache';
 import { createSupabaseServerClient } from '../../lib/supabase/server';
 import { createSupabaseAdminClient } from '../../lib/supabase/admin';
 
+const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
+const VISION_MODEL = 'google/gemini-2.5-flash';
+
 function adminEmails() {
   return (process.env.ADMIN_EMAILS || '')
     .split(',').map((s) => s.trim().toLowerCase()).filter(Boolean);
@@ -77,12 +80,224 @@ export async function uploadPhoto(formData: FormData) {
     uploaded_by: user.id,
     uploaded_at: new Date().toISOString(),
     processing_status: 'extracted',
+    ai_analysis_status: 'pending',
   }]).select().single();
 
   if (error) return { ok: false, error: error.message };
   revalidatePath('/admin/photos');
   return { ok: true, photo: data };
 }
+
+// ─── AI analysis ──────────────────────────────────────────────────────────────
+
+type PersonRow = { id: string; canonical_name: string; display_name: string | null; birth_year: number | null };
+
+interface AiPerson {
+  matched_name: string | null;
+  confidence: number;
+  description: string;
+  reasoning: string;
+}
+
+interface AiLocation {
+  name: string | null;
+  description: string;
+  confidence: 'high' | 'medium' | 'low' | 'none';
+  lat: number | null;
+  lng: number | null;
+}
+
+interface AiResponse {
+  persons: AiPerson[];
+  location: AiLocation;
+  scene_description: string;
+}
+
+async function callVisionAPI(imageUrl: string, prompt: string): Promise<AiResponse> {
+  const key = process.env.OPENROUTER_KEY_RESEARCH;
+  if (!key) throw new Error('OPENROUTER_KEY_RESEARCH not configured.');
+
+  const res = await fetch(OPENROUTER_URL, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${key}`,
+      'Content-Type': 'application/json',
+      'HTTP-Referer': 'https://zacharymays.com',
+      'X-Title': 'Cultiness Spectrum Research',
+    },
+    body: JSON.stringify({
+      model: VISION_MODEL,
+      response_format: { type: 'json_object' },
+      messages: [{
+        role: 'user',
+        content: [
+          { type: 'image_url', image_url: { url: imageUrl } },
+          { type: 'text', text: prompt },
+        ],
+      }],
+    }),
+  });
+
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`OpenRouter error ${res.status}: ${body}`);
+  }
+
+  const json = await res.json();
+  const raw = json.choices?.[0]?.message?.content;
+  if (!raw) throw new Error('Empty response from vision model.');
+
+  try {
+    return JSON.parse(typeof raw === 'string' ? raw : JSON.stringify(raw)) as AiResponse;
+  } catch {
+    throw new Error('Vision model returned non-JSON response.');
+  }
+}
+
+export async function analyzePhotoWithAI(photoId: string) {
+  await requireAdmin();
+  if (!photoId) return { ok: false, error: 'Missing photoId.' };
+
+  const admin = createSupabaseAdminClient();
+
+  // Fetch photo + org persons
+  const { data: photo, error: photoErr } = await admin
+    .from('photos')
+    .select('id, url, filename, org_id, exif_date, exif_latitude, exif_longitude, ai_analysis_status')
+    .eq('id', photoId)
+    .single();
+
+  if (photoErr || !photo) return { ok: false, error: 'Photo not found.' };
+
+  const { data: roles } = await admin
+    .from('person_org_roles')
+    .select('person_id, role_type, persons (id, canonical_name, display_name, birth_year)')
+    .eq('org_id', photo.org_id);
+
+  const persons: (PersonRow & { role_type: string })[] = (roles || [])
+    .map((r) => {
+      const p = r.persons as unknown as PersonRow | null;
+      return p ? { ...p, role_type: r.role_type ?? '' } : null;
+    })
+    .filter(Boolean) as (PersonRow & { role_type: string })[];
+
+  // Mark as processing
+  await admin.from('photos').update({ ai_analysis_status: 'processing' }).eq('id', photoId);
+
+  const personList = persons.length
+    ? persons.map((p) =>
+        `- ${p.canonical_name}${p.birth_year ? ` (born ${p.birth_year})` : ''}${p.role_type ? `, ${p.role_type}` : ''}`
+      ).join('\n')
+    : '(no known persons for this organization yet)';
+
+  const exifHint = photo.exif_latitude && photo.exif_longitude
+    ? `\nEXIF GPS: ${photo.exif_latitude}, ${photo.exif_longitude} — use this as ground-truth location.`
+    : '';
+
+  const prompt = `You are analyzing a photograph for a religious-organization research database.
+
+Known persons associated with this organization:
+${personList}
+${exifHint}
+
+Analyze the photo and respond with a JSON object exactly matching this schema:
+{
+  "persons": [
+    {
+      "matched_name": "<canonical name from the list above, or null if no match>",
+      "confidence": <0.0–1.0>,
+      "description": "<physical description of this person>",
+      "reasoning": "<why you matched or didn't match>"
+    }
+  ],
+  "location": {
+    "name": "<location name if identifiable, else null>",
+    "description": "<visible location clues: landmarks, architecture, signage, vegetation, geography>",
+    "confidence": "<high|medium|low|none>",
+    "lat": <latitude number if determinable from landmarks, else null>,
+    "lng": <longitude number if determinable from landmarks, else null>
+  },
+  "scene_description": "<1–2 sentence summary of what is happening in the photo>"
+}
+
+Only match a person if you have genuine confidence. Null is better than a wrong match.`;
+
+  let aiResult: AiResponse;
+  try {
+    aiResult = await callVisionAPI(photo.url, prompt);
+  } catch (err) {
+    await admin.from('photos').update({
+      ai_analysis_status: 'error',
+      ai_analysis_error: String(err),
+      ai_analysis_at: new Date().toISOString(),
+    }).eq('id', photoId);
+    return { ok: false, error: String(err) };
+  }
+
+  // Write location back to photo
+  const loc = aiResult.location ?? {};
+  await admin.from('photos').update({
+    ai_analysis_status: 'complete',
+    ai_analysis_at: new Date().toISOString(),
+    ai_analysis_error: null,
+    ai_location_name: loc.name ?? null,
+    ai_location_description: loc.description ?? null,
+    ai_location_confidence: loc.confidence ?? 'none',
+    ai_location_lat: loc.lat ?? null,
+    ai_location_lng: loc.lng ?? null,
+    ai_scene_description: aiResult.scene_description ?? null,
+    processing_status: 'analyzed',
+  }).eq('id', photoId);
+
+  // Build a lookup map: canonical_name (lowercase) → person record
+  const personByName = new Map(persons.map((p) => [p.canonical_name.toLowerCase(), p]));
+
+  // Insert photo_persons for AI-identified persons (skip duplicates)
+  const { data: existingTags } = await admin
+    .from('photo_persons')
+    .select('person_id')
+    .eq('photo_id', photoId);
+  const alreadyTagged = new Set((existingTags || []).map((t) => t.person_id));
+
+  const newTags = (aiResult.persons ?? [])
+    .filter((ap) => ap.matched_name && ap.confidence >= 0.4)
+    .map((ap) => {
+      const p = personByName.get(ap.matched_name!.toLowerCase());
+      if (!p || alreadyTagged.has(p.id)) return null;
+      return {
+        photo_id: photoId,
+        person_id: p.id,
+        identified_by: 'ai_vision',
+        confidence: Math.min(1, Math.max(0, ap.confidence)),
+        inference_reasoning: ap.reasoning ?? null,
+        validation_status: 'pending',
+      };
+    })
+    .filter(Boolean);
+
+  if (newTags.length > 0) {
+    await admin.from('photo_persons').insert(newTags);
+  }
+
+  revalidatePath('/admin/photos');
+  return { ok: true, aiResult, newTagCount: newTags.length };
+}
+
+export async function analyzeBatchPhotos(photoIds: string[]) {
+  await requireAdmin();
+  if (!photoIds.length) return { ok: false, error: 'No photo IDs provided.' };
+
+  const results = await Promise.allSettled(
+    photoIds.map((id) => analyzePhotoWithAI(id))
+  );
+
+  const succeeded = results.filter((r) => r.status === 'fulfilled' && (r.value as { ok: boolean }).ok).length;
+  const failed = results.length - succeeded;
+  revalidatePath('/admin/photos');
+  return { ok: true, succeeded, failed, total: results.length };
+}
+
+// ─── Existing actions ─────────────────────────────────────────────────────────
 
 export async function suggestPhotoAssociations(photoId: string) {
   await requireAdmin();
@@ -99,7 +314,6 @@ export async function suggestPhotoAssociations(photoId: string) {
     .eq('org_id', photo.org_id);
   if (rolesErr) return { ok: false, error: rolesErr.message };
 
-  type PersonRow = { id: string; canonical_name: string; display_name: string | null; birth_year: number | null };
   const suggestions = (roles || []).map((r) => {
     const p = r.persons as unknown as PersonRow | null;
     return {

@@ -2,13 +2,17 @@
 
 import { useState, useTransition, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { uploadPhoto, tagPhotoPerson, validatePhotoAssociation } from '../../actions/photos';
+import {
+  uploadPhoto, tagPhotoPerson, validatePhotoAssociation,
+  analyzePhotoWithAI, analyzeBatchPhotos,
+} from '../../actions/photos';
 
 const C = {
   paper: '#f4f0e8', muted: 'rgba(244,240,232,0.62)', faint: 'rgba(244,240,232,0.40)',
   panel: '#2f2a25', panel2: '#26221e', border: 'rgba(244,240,232,0.16)',
   borderStrong: 'rgba(244,240,232,0.30)', inputBg: '#1f1c19',
   gold: '#c9a86a', ok: '#7fbf9b', err: '#e08b8b', warn: '#d4a574',
+  ai: '#8bb8e0',
 };
 
 const input = {
@@ -23,6 +27,7 @@ const btn = (color = C.gold, textColor = '#1f1c19') => ({
 });
 
 const STATUS_COLORS = { confirmed: C.ok, disputed: C.warn, rejected: C.err, pending: C.muted };
+const AI_STATUS_COLORS = { complete: C.ok, error: C.err, processing: C.ai, pending: C.faint, skipped: C.faint };
 
 function Msg({ msg }) {
   if (!msg) return null;
@@ -53,52 +58,57 @@ function OrgPicker({ orgs, selectedOrgId }) {
   );
 }
 
-// ─── Upload form ─────────────────────────────────────────────────────────────
+// ─── Bulk upload form ─────────────────────────────────────────────────────────
 function UploadForm({ orgId }) {
   const router = useRouter();
   const fileRef = useRef(null);
-  const [sourceType, setSourceType] = useState('user_upload');
+  const [sourceType, setSourceType] = useState('xfamily');
   const [sourceUrl, setSourceUrl] = useState('');
-  const [msg, setMsg] = useState(null);
+  const [progress, setProgress] = useState(null); // { done, total, errors }
   const [pending, start] = useTransition();
 
   function submit() {
-    const file = fileRef.current?.files?.[0];
-    if (!file) { setMsg({ ok: false, t: 'Select a file first.' }); return; }
-    setMsg(null);
-    const fd = new FormData();
-    fd.set('file', file);
-    fd.set('orgId', orgId);
-    fd.set('sourceType', sourceType);
-    fd.set('sourceUrl', sourceUrl);
+    const files = Array.from(fileRef.current?.files || []);
+    if (!files.length) return;
+    setProgress({ done: 0, total: files.length, errors: [] });
+
     start(async () => {
-      const res = await uploadPhoto(fd);
-      if (res.ok) {
-        setMsg({ ok: true, t: 'Uploaded ✓' });
-        if (fileRef.current) fileRef.current.value = '';
-        setSourceUrl('');
-        router.refresh();
-      } else {
-        setMsg({ ok: false, t: res.error });
+      let done = 0;
+      const errors = [];
+      for (const file of files) {
+        const fd = new FormData();
+        fd.set('file', file);
+        fd.set('orgId', orgId);
+        fd.set('sourceType', sourceType);
+        fd.set('sourceUrl', sourceUrl);
+        const res = await uploadPhoto(fd);
+        done++;
+        if (!res.ok) errors.push(`${file.name}: ${res.error}`);
+        setProgress({ done, total: files.length, errors: [...errors] });
       }
+      if (fileRef.current) fileRef.current.value = '';
+      setSourceUrl('');
+      router.refresh();
     });
   }
 
   return (
     <div style={{ border: `1px solid ${C.borderStrong}`, borderRadius: 8, padding: '14px 16px', background: C.panel, marginBottom: '1.5rem' }}>
-      <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 10 }}>Upload photo</div>
+      <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 10 }}>Bulk upload photos</div>
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'flex-end' }}>
         <div style={{ flex: '0 0 auto' }}>
-          <label style={{ fontSize: 11, color: C.muted, display: 'block', marginBottom: 4 }}>FILE (JPEG/PNG/WebP, max 50 MB)</label>
-          <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp"
+          <label style={{ fontSize: 11, color: C.muted, display: 'block', marginBottom: 4 }}>
+            FILES (JPEG/PNG/WebP, max 50 MB each — select multiple)
+          </label>
+          <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" multiple
             style={{ color: C.paper, fontSize: 13 }} />
         </div>
         <div style={{ flex: '0 0 160px' }}>
           <label style={{ fontSize: 11, color: C.muted, display: 'block', marginBottom: 4 }}>SOURCE TYPE</label>
           <select value={sourceType} onChange={(e) => setSourceType(e.target.value)} style={{ ...input }}>
-            <option value="user_upload">User upload</option>
-            <option value="archive">Archive</option>
             <option value="xfamily">xFamily</option>
+            <option value="archive">Archive</option>
+            <option value="user_upload">User upload</option>
             <option value="research_scan">Research scan</option>
           </select>
         </div>
@@ -112,7 +122,30 @@ function UploadForm({ orgId }) {
           {pending ? 'Uploading…' : 'Upload'}
         </button>
       </div>
-      <Msg msg={msg} />
+
+      {progress && (
+        <div style={{ marginTop: 10 }}>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 4 }}>
+            <div style={{ flex: 1, height: 6, background: C.panel2, borderRadius: 3, overflow: 'hidden' }}>
+              <div style={{
+                height: '100%', borderRadius: 3,
+                background: progress.errors.length ? C.warn : C.ok,
+                width: `${(progress.done / progress.total) * 100}%`,
+                transition: 'width 0.2s',
+              }} />
+            </div>
+            <span style={{ fontSize: 12, color: C.muted, flexShrink: 0 }}>
+              {progress.done}/{progress.total}
+            </span>
+          </div>
+          {progress.errors.map((e, i) => (
+            <p key={i} style={{ fontSize: 11, color: C.err, margin: 0 }}>{e}</p>
+          ))}
+          {progress.done === progress.total && progress.errors.length === 0 && (
+            <p style={{ fontSize: 12, color: C.ok, margin: 0 }}>All uploaded ✓</p>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -194,6 +227,7 @@ function ValidateRow({ tag, onSaved }) {
   const person = tag.persons;
   const name = person?.canonical_name || tag.person_id.slice(0, 8);
   const statusColor = STATUS_COLORS[tag.validation_status] || C.muted;
+  const isAi = tag.identified_by === 'ai_vision';
 
   function submit() {
     if (!notes) { setMsg({ ok: false, t: 'Notes required.' }); return; }
@@ -219,8 +253,8 @@ function ValidateRow({ tag, onSaved }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
         <div>
           <span style={{ fontWeight: 700, fontSize: 13 }}>{name}</span>
-          <span style={{ fontSize: 12, color: C.muted, marginLeft: 8 }}>
-            {tag.identified_by} · {Math.round(tag.confidence * 100)}%
+          <span style={{ fontSize: 12, color: isAi ? C.ai : C.muted, marginLeft: 8 }}>
+            {isAi ? '🤖 AI' : tag.identified_by} · {Math.round(tag.confidence * 100)}%
           </span>
           {tag.inference_reasoning && (
             <span style={{ fontSize: 11, color: C.faint, marginLeft: 8 }}>"{tag.inference_reasoning}"</span>
@@ -254,6 +288,73 @@ function ValidateRow({ tag, onSaved }) {
           <Msg msg={msg} />
         </div>
       )}
+    </div>
+  );
+}
+
+// ─── AI analysis panel (inside photo detail) ──────────────────────────────────
+function AiAnalysisPanel({ photo, onSaved }) {
+  const [msg, setMsg] = useState(null);
+  const [pending, start] = useTransition();
+
+  const status = photo.ai_analysis_status;
+  const statusColor = AI_STATUS_COLORS[status] || C.faint;
+
+  function runAnalysis() {
+    setMsg(null);
+    start(async () => {
+      const res = await analyzePhotoWithAI(photo.id);
+      if (res.ok) {
+        setMsg({ ok: true, t: `Analysis complete — ${res.newTagCount} new person tag(s) added.` });
+        onSaved?.();
+      } else {
+        setMsg({ ok: false, t: res.error });
+      }
+    });
+  }
+
+  return (
+    <div style={{ border: `1px solid ${C.border}`, borderRadius: 6, padding: '10px 12px', background: C.panel2, marginTop: 12 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+        <div style={{ fontSize: 12, fontWeight: 700, color: C.ai }}>AI ANALYSIS</div>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <span style={{ fontSize: 11, color: statusColor, fontWeight: 700, textTransform: 'uppercase' }}>{status}</span>
+          <button
+            onClick={runAnalysis}
+            disabled={pending || status === 'processing'}
+            style={{ ...btn(C.ai, '#1f1c19'), opacity: (pending || status === 'processing') ? 0.6 : 1, cursor: pending ? 'wait' : 'pointer', fontSize: 12 }}>
+            {pending ? 'Analyzing…' : status === 'complete' ? 'Re-analyze' : 'Analyze'}
+          </button>
+        </div>
+      </div>
+
+      {photo.ai_scene_description && (
+        <p style={{ fontSize: 13, color: C.paper, marginBottom: 8 }}>{photo.ai_scene_description}</p>
+      )}
+
+      {(photo.ai_location_name || photo.ai_location_description) && (
+        <div style={{ fontSize: 12, color: C.muted, marginBottom: 4 }}>
+          <strong style={{ color: C.paper }}>Location:</strong>{' '}
+          {photo.ai_location_name && <span style={{ color: C.gold }}>{photo.ai_location_name} · </span>}
+          <span style={{ color: `${AI_STATUS_COLORS[photo.ai_location_confidence] || C.faint}` }}>
+            {photo.ai_location_confidence} confidence
+          </span>
+          {photo.ai_location_description && (
+            <p style={{ fontSize: 11, color: C.faint, marginTop: 4, marginBottom: 0 }}>{photo.ai_location_description}</p>
+          )}
+          {(photo.ai_location_lat || photo.exif_latitude) && (
+            <p style={{ fontSize: 11, color: C.faint, marginTop: 2, marginBottom: 0 }}>
+              GPS: {photo.ai_location_lat ?? photo.exif_latitude}, {photo.ai_location_lng ?? photo.exif_longitude}
+            </p>
+          )}
+        </div>
+      )}
+
+      {photo.ai_analysis_error && (
+        <p style={{ fontSize: 11, color: C.err, marginTop: 4 }}>{photo.ai_analysis_error}</p>
+      )}
+
+      <Msg msg={msg} />
     </div>
   );
 }
@@ -297,7 +398,9 @@ function PhotoDetail({ photo, orgPersons, onClose, onSaved }) {
           <span>Status: <strong style={{ color: C.paper }}>{photo.processing_status}</strong></span>
         </div>
 
-        <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 6 }}>
+        <AiAnalysisPanel photo={photo} onSaved={onSaved} />
+
+        <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 6, marginTop: 16 }}>
           Person tags{tags.length > 0 && ` (${tags.length}${pendingCount ? `, ${pendingCount} pending` : ''})`}
         </div>
         {tags.length === 0 && (
@@ -316,6 +419,24 @@ function PhotoDetail({ photo, orgPersons, onClose, onSaved }) {
 // ─── Photo grid ───────────────────────────────────────────────────────────────
 function PhotoGrid({ photos, orgPersons, onRefresh }) {
   const [selected, setSelected] = useState(null);
+  const [batchMsg, setBatchMsg] = useState(null);
+  const [pending, start] = useTransition();
+
+  const unanalyzed = photos.filter((p) => p.ai_analysis_status === 'pending' || p.ai_analysis_status === 'error');
+
+  function analyzeAll() {
+    setBatchMsg(null);
+    const ids = unanalyzed.map((p) => p.id);
+    start(async () => {
+      const res = await analyzeBatchPhotos(ids);
+      if (res.ok) {
+        setBatchMsg({ ok: true, t: `Analyzed ${res.succeeded}/${res.total} photos. ${res.failed ? `${res.failed} failed.` : ''}` });
+        onRefresh();
+      } else {
+        setBatchMsg({ ok: false, t: res.error });
+      }
+    });
+  }
 
   if (photos.length === 0) {
     return <p style={{ color: C.muted, fontSize: 14 }}>No photos uploaded for this organization yet.</p>;
@@ -323,20 +444,41 @@ function PhotoGrid({ photos, orgPersons, onRefresh }) {
 
   return (
     <>
+      {unanalyzed.length > 0 && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+          <button
+            onClick={analyzeAll}
+            disabled={pending}
+            style={{ ...btn(C.ai, '#1f1c19'), opacity: pending ? 0.6 : 1, cursor: pending ? 'wait' : 'pointer' }}>
+            {pending ? 'Analyzing…' : `Analyze all (${unanalyzed.length} pending)`}
+          </button>
+          <Msg msg={batchMsg} />
+        </div>
+      )}
+
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 12 }}>
         {photos.map((photo) => {
           const tags = photo.photo_persons || [];
           const pending = tags.filter((t) => t.validation_status === 'pending').length;
+          const aiStatus = photo.ai_analysis_status;
+          const aiBadgeColor = AI_STATUS_COLORS[aiStatus] || C.faint;
           return (
             <button key={photo.id} onClick={() => setSelected(photo)}
               style={{
                 background: C.panel, border: `1px solid ${pending ? C.warn : C.border}`,
                 borderRadius: 8, overflow: 'hidden', cursor: 'pointer', padding: 0, textAlign: 'left',
               }}>
-              <div style={{ height: 120, background: '#111', overflow: 'hidden' }}>
+              <div style={{ height: 120, background: '#111', overflow: 'hidden', position: 'relative' }}>
                 <img src={photo.url} alt={photo.filename}
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                   onError={(e) => { e.target.style.display = 'none'; }} />
+                {aiStatus !== 'complete' && (
+                  <span style={{
+                    position: 'absolute', top: 4, right: 4, fontSize: 9, fontWeight: 700,
+                    background: 'rgba(0,0,0,0.7)', color: aiBadgeColor,
+                    padding: '2px 5px', borderRadius: 4, textTransform: 'uppercase',
+                  }}>{aiStatus}</span>
+                )}
               </div>
               <div style={{ padding: '6px 8px' }}>
                 <div style={{ fontSize: 11, color: C.paper, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
