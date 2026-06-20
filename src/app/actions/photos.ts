@@ -5,6 +5,8 @@ import * as exifParser from 'exif-parser';
 import { revalidatePath } from 'next/cache';
 import { createSupabaseServerClient } from '../../lib/supabase/server';
 import { createSupabaseAdminClient } from '../../lib/supabase/admin';
+import { requireDecryptor } from '../../lib/auth';
+import { decryptField } from '../../lib/identity/decrypt';
 
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 const VISION_MODEL = 'google/gemini-2.5-flash';
@@ -25,6 +27,18 @@ async function requireAdmin() {
   const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
   if (aal?.currentLevel !== 'aal2') throw new Error('Two-factor step-up required.');
   return user;
+}
+
+// Decrypt a person's KMS-encrypted name (bytea \x-hex). Identity resolution
+// (photo AI-ID) is evidence-tier, so callers must be decryptor-gated.
+async function decryptCanonicalName(encHex: string | null | undefined, personId: string): Promise<string> {
+  if (!encHex) return '';
+  const hex = encHex.startsWith('\\x') ? encHex.slice(2) : encHex;
+  try {
+    return await decryptField(Buffer.from(hex, 'hex'), personId, 'canonical_name');
+  } catch {
+    return '';
+  }
 }
 
 export async function uploadPhoto(formData: FormData) {
@@ -155,7 +169,7 @@ async function callVisionAPI(imageUrl: string, prompt: string): Promise<AiRespon
 }
 
 export async function analyzePhotoWithAI(photoId: string) {
-  await requireAdmin();
+  await requireDecryptor();
   if (!photoId) return { ok: false, error: 'Missing photoId.' };
 
   const admin = createSupabaseAdminClient();
@@ -171,15 +185,23 @@ export async function analyzePhotoWithAI(photoId: string) {
 
   const { data: roles } = await admin
     .from('person_org_roles')
-    .select('person_id, role_type, persons (id, canonical_name, display_name, birth_year)')
+    .select('person_id, role_type, persons (id, canonical_name_enc, display_name, birth_year)')
     .eq('org_id', photo.org_id);
 
-  const persons: (PersonRow & { role_type: string })[] = (roles || [])
+  type PersonEnc = { id: string; canonical_name_enc: string | null; display_name: string | null; birth_year: number | null };
+  const personsRaw = (roles || [])
     .map((r) => {
-      const p = r.persons as unknown as PersonRow | null;
+      const p = r.persons as unknown as (PersonEnc | null);
       return p ? { ...p, role_type: r.role_type ?? '' } : null;
     })
-    .filter(Boolean) as (PersonRow & { role_type: string })[];
+    .filter(Boolean) as (PersonEnc & { role_type: string })[];
+  // Decrypt names (caller is decryptor-gated) so the AI prompt + match map use real names.
+  const persons: (PersonRow & { role_type: string })[] = await Promise.all(
+    personsRaw.map(async (p) => ({
+      id: p.id, display_name: p.display_name, birth_year: p.birth_year, role_type: p.role_type,
+      canonical_name: await decryptCanonicalName(p.canonical_name_enc, p.id),
+    }))
+  );
 
   // Mark as processing
   await admin.from('photos').update({ ai_analysis_status: 'processing' }).eq('id', photoId);
@@ -284,7 +306,7 @@ Only match a person if you have genuine confidence. Null is better than a wrong 
 }
 
 export async function analyzeBatchPhotos(photoIds: string[]) {
-  await requireAdmin();
+  await requireDecryptor();
   if (!photoIds.length) return { ok: false, error: 'No photo IDs provided.' };
 
   const results = await Promise.allSettled(
@@ -300,7 +322,7 @@ export async function analyzeBatchPhotos(photoIds: string[]) {
 // ─── Existing actions ─────────────────────────────────────────────────────────
 
 export async function suggestPhotoAssociations(photoId: string) {
-  await requireAdmin();
+  await requireDecryptor();
   if (!photoId) return { ok: false, error: 'Missing photoId.' };
 
   const admin = createSupabaseAdminClient();
@@ -310,21 +332,22 @@ export async function suggestPhotoAssociations(photoId: string) {
 
   const { data: roles, error: rolesErr } = await admin
     .from('person_org_roles')
-    .select('person_id, role_type, persons (id, canonical_name, display_name, birth_year)')
+    .select('person_id, role_type, persons (id, canonical_name_enc, display_name, birth_year)')
     .eq('org_id', photo.org_id);
   if (rolesErr) return { ok: false, error: rolesErr.message };
 
-  const suggestions = (roles || []).map((r) => {
-    const p = r.persons as unknown as PersonRow | null;
+  type PersonEnc = { id: string; canonical_name_enc: string | null; display_name: string | null; birth_year: number | null };
+  const suggestions = (await Promise.all((roles || []).map(async (r) => {
+    const p = r.persons as unknown as (PersonEnc | null);
     return {
       person_id: r.person_id,
-      canonical_name: p?.canonical_name ?? '',
+      canonical_name: p ? await decryptCanonicalName(p.canonical_name_enc, p.id) : '',
       display_name: p?.display_name ?? null,
       birth_year: p?.birth_year ?? null,
       role_type: r.role_type,
       confidence: 0.6,
     };
-  }).filter((s) => s.canonical_name);
+  }))).filter((s) => s.canonical_name);
 
   return { ok: true, suggestions };
 }
