@@ -231,7 +231,7 @@ function OrgCard({ item }) {
               fontSize: 13, color: C.paper, background: C.panel2, border: `1px solid ${C.border}`,
               borderRadius: 8, padding: '10px 14px', marginBottom: 14,
             }}>
-              <span style={{ color: C.muted, fontSize: 12 }}>Jury composites:</span>
+              <span style={{ color: C.muted, fontSize: 12 }}>Jury YM Composites:</span>
               {item.models.map((m) => (
                 <span key={m.key} title={item.modelScoresMissing ? 'coverage updating' : `${m.scored}/10 criteria scored`}>
                   {m.label}{' '}
@@ -249,7 +249,7 @@ function OrgCard({ item }) {
                   ? 'Per-model coverage is updating (rescore in progress) — the spread may be temporarily inflated; recheck shortly.'
                   : <>Spread {item.jurySpread ?? '—'} = range across the models that scored.
                       {item.anyAbstained
-                        ? ' A model marked “abstained” scored every criterion N/A (it declined to rate this org); it is excluded from the AI composite and the spread above.'
+                        ? ' A model marked “abstained” scored every criterion N/A (it declined to rate this org); it is excluded from the AI YM Composite and the spread above.'
                         : ''}</>}
               </span>
             </div>

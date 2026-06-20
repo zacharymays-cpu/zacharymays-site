@@ -114,7 +114,7 @@ export default function V50Page() {
           <p>V5.0 generates two scoring outputs simultaneously for each organization:</p>
           <ul style={{ marginTop: '1rem', paddingLeft: '2rem', color: '#f4f0e8' }}>
             <li><strong>Young's Original Score:</strong> 0-10 binary checklist across the 10 criteria. How many of Young's indicators are present?</li>
-            <li><strong>Composite Score:</strong> 0-100% formula-based: (Breadth ÷ 10) × (Mean Intensity ÷ 10) × 100. Measures evidence-weighted prevalence and intensity.</li>
+            <li><strong>YM Composite Score:</strong> 0-100% formula-based: (Breadth ÷ 10) × (Mean Intensity ÷ 10) × 100. Measures evidence-weighted prevalence and intensity.</li>
           </ul>
           <p style={{ marginTop: '1rem' }}>
             Both scores are generated from the same jury consensus and evidence package. Users receive both perspectives on each organization.

@@ -164,7 +164,7 @@ export default function FindingsClient({ orgs=[] }) {
         {/* ── CHART 1: Distribution histogram ── */}
         <div style={{marginBottom:'3rem'}}>
           <div style={{fontFamily:'var(--mono)',fontSize:'0.63rem',letterSpacing:'0.18em',textTransform:'uppercase',color:'var(--gold)',marginBottom:'0.4rem'}}>Distribution</div>
-          <h2 style={{fontFamily:'var(--serif)',fontSize:'1.5rem',fontWeight:700,color:'var(--paper)',marginBottom:'0.3rem',marginTop:0}}>Composite Score Distribution</h2>
+          <h2 style={{fontFamily:'var(--serif)',fontSize:'1.5rem',fontWeight:700,color:'var(--paper)',marginBottom:'0.3rem',marginTop:0}}>YM Composite Score Distribution</h2>
           <p style={{fontFamily:'var(--mono)',fontSize:'0.68rem',color:'var(--muted)',marginBottom:'1.5rem',lineHeight:1.6}}>
             Organization counts per 5-point bin. Dashed curve: normal distribution (μ={mu.toFixed(1)}, σ={sigma.toFixed(1)}).
             Tier thresholds marked. Hover bars for details.
@@ -306,10 +306,10 @@ export default function FindingsClient({ orgs=[] }) {
         {/* ── CHART 2: Instrument variance scatter ── */}
         <div style={{marginBottom:'2rem'}}>
           <div style={{fontFamily:'var(--mono)',fontSize:'0.63rem',letterSpacing:'0.18em',textTransform:'uppercase',color:'var(--gold)',marginBottom:'0.4rem'}}>Instrument Variance</div>
-          <h2 style={{fontFamily:'var(--serif)',fontSize:'1.5rem',fontWeight:700,color:'var(--paper)',marginBottom:'0.3rem',marginTop:0}}>Composite vs. Young's Score</h2>
+          <h2 style={{fontFamily:'var(--serif)',fontSize:'1.5rem',fontWeight:700,color:'var(--paper)',marginBottom:'0.3rem',marginTop:0}}>YM Composite vs. Young's Score</h2>
           <p style={{fontFamily:'var(--mono)',fontSize:'0.68rem',color:'var(--muted)',marginBottom:'1.5rem',lineHeight:1.6}}>
             Young's score (0–10) normalized to 0–100 (×10) for direct comparison.
-            Points above the diagonal: composite exceeds Young's. Below: Young's exceeds composite.
+            Points above the diagonal: YM Composite exceeds Young's. Below: Young's exceeds YM Composite.
             Divergence is analytically meaningful — not an error to collapse.
           </p>
         </div>
@@ -361,11 +361,11 @@ export default function FindingsClient({ orgs=[] }) {
                   Young's Score (normalized 0–100)
                 </text>
                 <text x={14} y={scY(50)} textAnchor="middle" fill="rgba(212,206,196,0.3)" fontSize={10}
-                  transform={`rotate(-90,14,${scY(50)})`}>Composite Score (%)</text>
+                  transform={`rotate(-90,14,${scY(50)})`}>YM Composite Score (%)</text>
 
                 {/* Region labels */}
-                <text x={scX(75)} y={scY(90)} textAnchor="middle" fill="rgba(212,206,196,0.2)" fontSize={9}>Composite &gt;&gt; Young's</text>
-                <text x={scX(75)} y={scY(55)} textAnchor="middle" fill="rgba(212,206,196,0.2)" fontSize={9}>Young's &gt;&gt; Composite</text>
+                <text x={scX(75)} y={scY(90)} textAnchor="middle" fill="rgba(212,206,196,0.2)" fontSize={9}>YM Composite &gt;&gt; Young's</text>
+                <text x={scX(75)} y={scY(55)} textAnchor="middle" fill="rgba(212,206,196,0.2)" fontSize={9}>Young's &gt;&gt; YM Composite</text>
               </svg>
             </div>
 
@@ -374,8 +374,8 @@ export default function FindingsClient({ orgs=[] }) {
               {[
                 ['Mean variance', `${meanVariance > 0 ? '+' : ''}${meanVariance.toFixed(1)}`],
                 ['Std deviation', stdVariance.toFixed(1)],
-                ['Max composite ≫ Young\'s', `+${maxPositive.toFixed(0)}`],
-                ['Max Young\'s ≫ composite', `${maxNegative.toFixed(0)}`],
+                ['Max YM Composite ≫ Young\'s', `+${maxPositive.toFixed(0)}`],
+                ['Max Young\'s ≫ YM Composite', `${maxNegative.toFixed(0)}`],
               ].map(([k,v])=>(
                 <div key={k} style={{padding:'0.6rem 0.8rem',background:'rgba(244,240,232,0.02)',border:'1px solid rgba(212,206,196,0.08)'}}>
                   <div style={{fontFamily:'var(--mono)',fontSize:'0.58rem',color:'var(--muted)',marginBottom:'0.2rem'}}>{k}</div>
@@ -390,7 +390,7 @@ export default function FindingsClient({ orgs=[] }) {
             {/* Controls */}
             <div style={{display:'flex',gap:'0.75rem',marginBottom:'1rem',flexWrap:'wrap',alignItems:'center'}}>
               <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',color:'var(--muted)'}}>Show:</div>
-              {[['all','Largest divergence'],['composite','Composite ≫ Young\'s'],['youngs','Young\'s ≫ Composite']].map(([v,l])=>(
+              {[['all','Largest divergence'],['composite','YM Composite ≫ Young\'s'],['youngs','Young\'s ≫ YM Composite']].map(([v,l])=>(
                 <button key={v} onClick={()=>setVarianceView(v)}
                   style={{fontFamily:'var(--mono)',fontSize:'0.62rem',padding:'0.25rem 0.6rem',
                     background:varianceView===v?'rgba(200,168,75,0.15)':'transparent',
@@ -441,9 +441,9 @@ export default function FindingsClient({ orgs=[] }) {
           <p style={{fontFamily:'var(--mono)',fontSize:'0.68rem',color:'var(--muted)',margin:0,lineHeight:1.7}}>
             <span style={{color:'var(--gold)'}}>Instrument design: </span>
             The two instruments measure different things. Young's Original Score is a binary checklist — each criterion
-            either fires or it doesn't. The Composite Score captures intensity across all criteria. Large positive variance
-            (composite ≫ Young's) typically signals broad, distributed moderate-intensity dynamics. Large negative variance
-            (Young's ≫ composite) typically signals narrow but extreme dynamics — a few criteria at high intensity with low breadth.
+            either fires or it doesn't. The YM Composite Score captures intensity across all criteria. Large positive variance
+            (YM Composite ≫ Young's) typically signals broad, distributed moderate-intensity dynamics. Large negative variance
+            (Young's ≫ YM Composite) typically signals narrow but extreme dynamics — a few criteria at high intensity with low breadth.
             Neither direction is a scoring error on its own; divergence is the signal.
           </p>
         </div>
@@ -471,7 +471,7 @@ export default function FindingsClient({ orgs=[] }) {
           padding:'0.5rem 0.75rem',pointerEvents:'none',zIndex:9999,fontFamily:'monospace',fontSize:'0.7rem',maxWidth:220}}>
           <div style={{color:'var(--paper)',fontWeight:600,marginBottom:'0.2rem'}}>{hoveredScatter.name}</div>
           <div style={{color:TIER_COLORS[hoveredScatter.composite_tier]}}>{hoveredScatter.composite_tier}</div>
-          <div style={{color:'rgba(200,168,75,0.8)'}}>Composite: {hoveredScatter.composite.toFixed(0)}%</div>
+          <div style={{color:'rgba(200,168,75,0.8)'}}>YM Composite: {hoveredScatter.composite.toFixed(0)}%</div>
           <div style={{color:'rgba(200,168,75,0.8)'}}>Young's: {hoveredScatter.youngs_score}/10 (norm. {hoveredScatter.youngsNorm})</div>
           <div style={{color:hoveredScatter.variance>0?'var(--gold)':'rgba(160,140,200,0.8)',marginTop:'0.15rem'}}>
             Variance: {hoveredScatter.variance>0?'+':''}{hoveredScatter.variance.toFixed(0)}

@@ -5,7 +5,7 @@ import { SUPABASE_URL, ANON_KEY } from '../../lib/supabase/config';
 
 export const metadata = {
   title: 'Dataset Explorer — The Cultiness Spectrum',
-  description: 'Browse and filter the Cultiness Spectrum dataset. Search by organization, filter by tier, trajectory, and composite score.',
+  description: 'Browse and filter the Cultiness Spectrum dataset. Search by organization, filter by tier, trajectory, and YM Composite score.',
 };
 
 export const revalidate = 3600;

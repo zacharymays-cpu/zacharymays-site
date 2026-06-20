@@ -97,7 +97,7 @@ export default async function FindingsPage() {
           <div className="section__label">Tier Distribution</div>
 
           <p style={{color: 'var(--muted)', marginBottom: '2rem', fontSize: '0.9rem'}}>
-            How the {scored} scored organizations distribute across the three composite tiers:
+            How the {scored} scored organizations distribute across the three YM Composite tiers:
           </p>
 
           <div style={{display: 'flex', flexDirection: 'column', gap: '0.5rem', margin: '0 0 2rem'}}>
@@ -158,11 +158,11 @@ export default async function FindingsPage() {
               },
               {
                 heading: 'The secrecy gradient drives variance in federal employers',
-                body: 'Among federal agencies and defense-adjacent organizations, the strongest predictor of composite score is classification architecture — the degree to which secrecy is structurally embedded in the institution\'s operating culture. The relationship between mission intensity and institutional harm cover-up capacity is a documented analytical finding, not an assumption.',
+                body: 'Among federal agencies and defense-adjacent organizations, the strongest predictor of YM Composite score is classification architecture — the degree to which secrecy is structurally embedded in the institution\'s operating culture. The relationship between mission intensity and institutional harm cover-up capacity is a documented analytical finding, not an assumption.',
               },
               {
-                heading: 'C9 (Exit Costs) is the strongest composite predictor',
-                body: 'Of the ten criteria, exit cost intensity shows the strongest correlation with overall composite score. Organizations that engineer high exit costs — whether through spiritual absolutism, deferred compensation traps, classified knowledge burdens, or social network dependency — tend to score high across the other criteria as well. Exit cost architecture appears to be both a symptom and an enabler of other high-control dynamics.',
+                heading: 'C9 (Exit Costs) is the strongest YM Composite predictor',
+                body: 'Of the ten criteria, exit cost intensity shows the strongest correlation with overall YM Composite score. Organizations that engineer high exit costs — whether through spiritual absolutism, deferred compensation traps, classified knowledge burdens, or social network dependency — tend to score high across the other criteria as well. Exit cost architecture appears to be both a symptom and an enabler of other high-control dynamics.',
               },
               {
                 heading: 'C6 (Private Vernacular) is the most universal criterion',
@@ -223,7 +223,7 @@ export default async function FindingsPage() {
           <div className="section__label">What the Findings Don't Say</div>
 
           <p>
-            High composite scores are descriptive, not normative. A score
+            High YM Composite scores are descriptive, not normative. A score
             documents what an organization's institutional architecture looks
             like — it does not determine whether membership is beneficial,
             whether the organization's goals are worthy, or whether individuals

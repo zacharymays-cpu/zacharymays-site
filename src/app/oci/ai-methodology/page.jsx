@@ -108,7 +108,7 @@ export default function AiMethodologyPage() {
               },
               {
                 heading: 'Structured, auditable output',
-                body: 'Every AI-generated assessment produces a complete structured record: scores, body text, confidence ratings, sources, and calculated composite metrics. This makes the human review process tractable — the reviewer is checking a complete record against documented standards, not filling in gaps or reconstructing reasoning.',
+                body: 'Every AI-generated assessment produces a complete structured record: scores, body text, confidence ratings, sources, and calculated YM Composite metrics. This makes the human review process tractable — the reviewer is checking a complete record against documented standards, not filling in gaps or reconstructing reasoning.',
               },
               {
                 heading: 'Calibration anchor consistency',
@@ -193,8 +193,8 @@ export default function AiMethodologyPage() {
               'Cited sources are plausible and consistent with the claims made in the body text',
               'The assessment reflects consistent application across the ideological and cultural spectrum — a comparable organization on the other side of the political spectrum would be scored the same way',
               'Confidence ratings reflect actual evidence quality, not just structural completeness of the output',
-              'The composite score matches the formula exactly given the criterion scores',
-              "Young's Original Score was derived from independent application of the binary checklist, not mechanically from composite intensity",
+              'The YM Composite score matches the formula exactly given the criterion scores',
+              "Young's Original Score was derived from independent application of the binary checklist, not mechanically from YM Composite intensity",
               'The trajectory assessment reflects documented current state, not just historical reputation',
             ].map((item, i) => (
               <div key={i} style={{
@@ -231,7 +231,7 @@ export default function AiMethodologyPage() {
           <p>
             The appropriate use of this dataset is as a research resource
             and analytical tool — a structured starting point for investigation,
-            not a final determination. High composite scores document
+            not a final determination. High YM Composite scores document
             institutional architecture worth examining. They are not
             verdicts. Low scores do not certify institutional health.
             Every entry should be read with the understanding that it

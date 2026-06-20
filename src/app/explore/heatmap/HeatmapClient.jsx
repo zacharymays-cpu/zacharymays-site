@@ -70,7 +70,7 @@ export default function HeatmapClient({ orgs=[], scoreMap={} }) {
             Exit Costs, Ends/Means). A cell is that org's score on that criterion, 0–10 —
             <span style={{color:'#5cb878'}}> green = low</span>,
             <span style={{color:'#d99b3e'}}> amber = moderate</span>,
-            <span style={{color:'#e8574d'}}> red = high</span>; the right column is the overall composite.
+            <span style={{color:'#e8574d'}}> red = high</span>; the right column is the overall YM Composite.
             Hover a cell for its criterion name; click a column header to sort by it.
           </p>
           {/* Controls */}

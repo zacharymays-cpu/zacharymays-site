@@ -872,7 +872,7 @@ export default function MapClient({ orgs=[], stateStats=[], foundingData=[], wit
                 {selected.abbr}
               </h2>
               <div style={{ padding:'0.75rem', background:'rgba(244,240,232,0.03)', border:'1px solid rgba(212,206,196,0.08)' }}>
-                <div style={{ fontFamily:'var(--mono)', fontSize:'0.55rem', textTransform:'uppercase', letterSpacing:'0.1em', color:'var(--muted)', marginBottom:'0.4rem' }}>Avg Composite Score</div>
+                <div style={{ fontFamily:'var(--mono)', fontSize:'0.55rem', textTransform:'uppercase', letterSpacing:'0.1em', color:'var(--muted)', marginBottom:'0.4rem' }}>Avg YM Composite Score</div>
                 <div style={{ fontFamily:'var(--serif)', fontSize:'2rem', fontWeight:700, lineHeight:1,
                   color: scoreToFill(selectedStateStats.avg_score).replace('rgba','rgb').replace(/,[\d.]+\)/,')') }}>
                   {selectedStateStats.avg_score}%

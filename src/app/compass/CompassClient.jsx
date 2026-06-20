@@ -131,7 +131,7 @@ export default function CompassClient({ orgs=[], regimes=[], presidentialEras=[]
       ['Auth Axis', `${parseFloat(item.authority_axis)>0?'+':''}${item.authority_axis}`],
       ['Type', 'Presidential Era ★'],
     ] : [
-      ['Composite', `${parseFloat(item.composite_score).toFixed(1)}%`],
+      ['YM Composite', `${parseFloat(item.composite_score).toFixed(1)}%`],
       ["Young's",   `${item.youngs_score}/10`],
       ['Tier',       item.composite_tier],
       ['Econ',       `${item.econ>0?'+':''}${item.econ}`],

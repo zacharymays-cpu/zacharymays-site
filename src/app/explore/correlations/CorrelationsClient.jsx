@@ -87,7 +87,7 @@ export default function CorrelationsClient({ orgs=[], scoreMap={} }) {
         <div style={{display:'flex',gap:'0.75rem',alignItems:'center',marginBottom:'1.25rem',flexWrap:'wrap'}}>
           <label style={{display:'flex',alignItems:'center',gap:'0.5rem',cursor:'pointer'}}>
             <input type="checkbox" checked={includeComposite} onChange={e=>setIncludeComposite(e.target.checked)} style={{accentColor:'var(--gold)'}}/>
-            <span style={{fontFamily:'var(--mono)',fontSize:'0.66rem',color:'var(--muted)'}}>Include composite</span>
+            <span style={{fontFamily:'var(--mono)',fontSize:'0.66rem',color:'var(--muted)'}}>Include YM Composite</span>
           </label>
           <span style={{width:1,height:14,background:'rgba(212,206,196,0.15)',margin:'0 0.25rem'}}/>
           <span style={{fontFamily:'var(--mono)',fontSize:'0.6rem',color:'var(--muted)'}}>r =</span>
@@ -109,7 +109,7 @@ export default function CorrelationsClient({ orgs=[], scoreMap={} }) {
                   <div key={c} style={{width:CELL,flexShrink:0,height:90,display:'flex',alignItems:'flex-end',justifyContent:'center',paddingBottom:'4px'}}>
                     <span style={{display:'block',transform:'rotate(-60deg)',transformOrigin:'bottom center',
                       fontFamily:'var(--mono)',fontSize:'0.62rem',color:'var(--muted)',whiteSpace:'nowrap'}}>
-                      {c==='COMPOSITE'?'Composite':c}
+                      {c==='COMPOSITE'?'YM Composite':c}
                     </span>
                   </div>
                 ))}
@@ -120,7 +120,7 @@ export default function CorrelationsClient({ orgs=[], scoreMap={} }) {
                 <div key={rowC} style={{display:'flex',alignItems:'center',marginBottom:'1px'}}>
                   {/* Row label */}
                   <div style={{width:LABEL_W,flexShrink:0,fontFamily:'var(--mono)',fontSize:'0.62rem',color:'var(--muted)',paddingRight:'8px',textAlign:'right',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>
-                    {rowC==='COMPOSITE'?'Composite':rowC}
+                    {rowC==='COMPOSITE'?'YM Composite':rowC}
                   </div>
                   {/* Cells */}
                   {cols.map((colC, ci) => {
@@ -187,13 +187,13 @@ export default function CorrelationsClient({ orgs=[], scoreMap={} }) {
                         <title>{p.name}: ({p.x}, {p.y})</title>
                       </circle>
                     ))}
-                    <text x={SW/2} y={SH-4} textAnchor="middle" fill="rgba(212,206,196,0.3)" fontSize={9}>{a==='COMPOSITE'?'Composite %':a+' score'}</text>
-                    <text x={10} y={SH/2} textAnchor="middle" fill="rgba(212,206,196,0.3)" fontSize={9} transform={`rotate(-90,10,${SH/2})`}>{b==='COMPOSITE'?'Composite %':b+' score'}</text>
+                    <text x={SW/2} y={SH-4} textAnchor="middle" fill="rgba(212,206,196,0.3)" fontSize={9}>{a==='COMPOSITE'?'YM Composite %':a+' score'}</text>
+                    <text x={10} y={SH/2} textAnchor="middle" fill="rgba(212,206,196,0.3)" fontSize={9} transform={`rotate(-90,10,${SH/2})`}>{b==='COMPOSITE'?'YM Composite %':b+' score'}</text>
                   </svg>
                   </div>
                   <div style={{padding:'1rem',background:'rgba(244,240,232,0.02)',border:'1px solid rgba(212,206,196,0.1)'}}>
                     <div style={{fontFamily:'var(--serif)',fontSize:'1rem',fontWeight:700,color:'var(--paper)',marginBottom:'0.75rem'}}>
-                      {a==='COMPOSITE'?'Composite Score':C_NAMES[a]} × {b==='COMPOSITE'?'Composite Score':C_NAMES[b]}
+                      {a==='COMPOSITE'?'YM Composite Score':C_NAMES[a]} × {b==='COMPOSITE'?'YM Composite Score':C_NAMES[b]}
                     </div>
                     <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0.75rem',marginBottom:'0.75rem'}}>
                       {[['r',r!==null?(r>0?'+':'')+r.toFixed(3):'—'],['r²',r!==null?(r*r).toFixed(3):'—'],['n',pairs.length+' orgs'],['Strength',!r?'—':Math.abs(r)>=0.7?'Strong':Math.abs(r)>=0.4?'Moderate':Math.abs(r)>=0.2?'Weak':'Negligible']].map(([k,v])=>(

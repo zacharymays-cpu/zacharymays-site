@@ -330,7 +330,7 @@ function DetailModal({ org, criterionScores, politicalPos, loading, onClose }) {
           {/* Score cards */}
           <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'1px',background:'rgba(212,206,196,0.08)',marginBottom:'1.75rem'}}>
             {[
-              {label:'Composite',value:composite!=null?`${composite}%`:'Pending',color:composite!=null?'var(--gold)':'var(--muted)'},
+              {label:'YM Composite',value:composite!=null?`${composite}%`:'Pending',color:composite!=null?'var(--gold)':'var(--muted)'},
               {label:"Young's",value:org.youngs_score!=null?`${org.youngs_score}/10`:'—',color:'var(--paper)'},
               {label:"Young's Band",value:org.youngs_band||'—',color:'var(--muted)'},
             ].map((s,i)=>(
@@ -614,8 +614,8 @@ export default function ExploreClient({ initialOrgs=[] }) {
                 <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--muted)',marginBottom:'0.5rem'}}>
                   Score: {scoreMin}%–{scoreMax}%
                 </div>
-                <input type="range" min="0" max="100" value={scoreMin} aria-label={`Minimum composite score: ${scoreMin}%`} onChange={e=>setScoreMin(Math.min(Number(e.target.value),scoreMax-5))} style={{width:'100%',marginBottom:'0.35rem',accentColor:'var(--gold)'}}/>
-                <input type="range" min="0" max="100" value={scoreMax} aria-label={`Maximum composite score: ${scoreMax}%`} onChange={e=>setScoreMax(Math.max(Number(e.target.value),scoreMin+5))} style={{width:'100%',accentColor:'var(--gold)'}}/>
+                <input type="range" min="0" max="100" value={scoreMin} aria-label={`Minimum YM Composite score: ${scoreMin}%`} onChange={e=>setScoreMin(Math.min(Number(e.target.value),scoreMax-5))} style={{width:'100%',marginBottom:'0.35rem',accentColor:'var(--gold)'}}/>
+                <input type="range" min="0" max="100" value={scoreMax} aria-label={`Maximum YM Composite score: ${scoreMax}%`} onChange={e=>setScoreMax(Math.max(Number(e.target.value),scoreMin+5))} style={{width:'100%',accentColor:'var(--gold)'}}/>
               </div>
 
               {hasFilters&&(

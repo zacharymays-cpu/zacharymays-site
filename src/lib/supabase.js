@@ -70,6 +70,13 @@ export function tierLabel(tier) {
 // Score" reads as "Group Dynamics Score" on charts, axes, and tooltips.
 export const SCORE_LABEL = 'Group Dynamics Score';
 
+// DEFERRED RENAME: The composite cultiness score is displayed as 'YM Composite'
+// (Young Mays Composite) but the underlying DB columns (composite_score,
+// composite_tier) and the scorer/ingest/query scripts still use the name
+// 'composite'. The full identifier-level rename to ym_composite is deferred to
+// the next major refactor. See cultiness-spectrum/docs/ANCHOR_VALIDITY_AUDIT.md
+// and the methodology docs.
+
 export const CRITERIA_NAMES = {
   C1:  'Charismatic Leadership',
   C2:  'Sacred Assumptions',

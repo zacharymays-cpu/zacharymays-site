@@ -84,7 +84,7 @@ export default function CultinessPage() {
             This project extends that diagnostic capacity to comparative,
             dataset-scale analysis. A dual-metric scoring system was developed
             specifically for this purpose: Young's original binary instrument
-            runs fully independently alongside a composite score that captures
+            runs fully independently alongside a YM Composite score that captures
             both the breadth and intensity of cult-adjacent dynamics across
             all ten criteria. The two instruments are never converted between
             each other — their divergence is itself analytically meaningful.
@@ -203,10 +203,10 @@ export default function CultinessPage() {
               <a href="https://uncultureyourself.com" target="_blank" rel="noopener noreferrer">
                 <em>The Culting of America: What Makes a Cult and Why We Love Them</em>
               </a>{' '}
-              (Otterpine, 2026). The composite scoring system and dual-metric
+              (Otterpine, 2026). The YM Composite scoring system and dual-metric
               architecture were developed independently as an extension for
               dataset-scale application. Young's binary instrument runs fully
-              independently and is never mechanically converted from composite
+              independently and is never mechanically converted from YM Composite
               scores.
             </p>
           </div>

@@ -88,11 +88,11 @@ export default function V60Page() {
           <p>V6.0 generates three scoring outputs simultaneously for each organization:</p>
           <ul style={{ marginTop: '1rem', paddingLeft: '2rem', color: '#f4f0e8' }}>
             <li><strong>Young's Original Score:</strong> 0-10 binary checklist from C1-C10 jury track (Not Culty, Kinda Culty, Super Culty)</li>
-            <li><strong>Composite Score:</strong> 0-100% formula-based from C1-C10 jury track</li>
+            <li><strong>YM Composite Score:</strong> 0-100% formula-based from C1-C10 jury track</li>
             <li><strong>Lifton's Totalism Score:</strong> 0-10 from C11 jury track (Non-Totalizing, Moderately Totalizing, Psychologically Totalizing)</li>
           </ul>
           <p style={{ marginTop: '1rem' }}>
-            All three scores are generated from the same evidence package via parallel jury processing. Users receive all three perspectives on each organization—Young's behavior-based analysis, Composite evidence-weighted prevalence, and Lifton's system-level totalism assessment.
+            All three scores are generated from the same evidence package via parallel jury processing. Users receive all three perspectives on each organization—Young's behavior-based analysis, YM Composite evidence-weighted prevalence, and Lifton's system-level totalism assessment.
           </p>
 
           <div style={{ background: 'rgba(200, 168, 75, 0.08)', padding: '1.5rem', marginTop: '1.5rem', borderLeft: '3px solid #c8a84b' }}>

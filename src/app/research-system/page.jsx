@@ -31,7 +31,7 @@ export default function ResearchSystemHub() {
           </p>
           <ul style={{ marginTop: '1rem', paddingLeft: '2rem', color: '#f4f0e8' }}>
             <li><strong>Young's Original Score:</strong> 0-10 binary checklist (Young & Reed's 10 criteria)</li>
-            <li><strong>Composite Score:</strong> 0-100% formula-based (evidence-weighted across all criteria)</li>
+            <li><strong>YM Composite Score:</strong> 0-100% formula-based (evidence-weighted across all criteria)</li>
             <li><strong>Lifton's Totalism Score:</strong> System-level analysis of ideological totalism (C11 criterion)</li>
           </ul>
           <p style={{ marginTop: '1.5rem' }}>

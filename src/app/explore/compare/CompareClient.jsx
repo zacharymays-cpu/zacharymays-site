@@ -342,7 +342,7 @@ export default function CompareClient({ orgs=[], scoreMap={} }) {
                   </div>
                 </div>
                 <div style={{textAlign:'center',fontFamily:'var(--mono)',fontSize:'0.6rem',
-                  letterSpacing:'0.1em',textTransform:'uppercase',color:'rgba(212,206,196,0.4)'}}>Composite</div>
+                  letterSpacing:'0.1em',textTransform:'uppercase',color:'rgba(212,206,196,0.4)'}}>YM Composite</div>
                 <div style={{display:'flex',alignItems:'center',gap:'0.5rem',justifyContent:'flex-start'}}>
                   <div style={{width:120,height:18,position:'relative',display:'flex',alignItems:'center'}}>
                     <div style={{position:'absolute',left:0,

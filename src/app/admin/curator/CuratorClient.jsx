@@ -91,7 +91,7 @@ function CriterionRow({ orgId, c }) {
     fd.set('score', score); fd.set('rationale', rationale);
     start(async () => {
       const res = await modifyCriterionScore(fd);
-      setMsg(res.ok ? { ok: true, t: 'Saved ✓ (composite recomputed)' } : { ok: false, t: res.error });
+      setMsg(res.ok ? { ok: true, t: 'Saved ✓ (YM Composite recomputed)' } : { ok: false, t: res.error });
       if (res.ok) setRationale('');
     });
   }
@@ -206,7 +206,7 @@ function Detail({ item, onSaved }) {
 
       <div style={{ border: `1px solid ${C.border}`, borderRadius: 8, padding: '12px 14px', marginBottom: 12, background: C.panel2, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
         <div>
-          <div style={{ color: C.muted, fontSize: 12, marginBottom: 2 }}>Composite (C1–C10)</div>
+          <div style={{ color: C.muted, fontSize: 12, marginBottom: 2 }}>YM Composite (C1–C10)</div>
           <div style={{ color: C.paper, fontWeight: 700, fontSize: 18 }}>{fmt(item.dualTrack.youngReed, '/100')}</div>
         </div>
         <div>
