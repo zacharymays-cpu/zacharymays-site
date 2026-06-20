@@ -101,7 +101,7 @@ export async function suggestPhotoAssociations(photoId: string) {
 
   type PersonRow = { id: string; canonical_name: string; display_name: string | null; birth_year: number | null };
   const suggestions = (roles || []).map((r) => {
-    const p = r.persons as PersonRow | null;
+    const p = r.persons as unknown as PersonRow | null;
     return {
       person_id: r.person_id,
       canonical_name: p?.canonical_name ?? '',
