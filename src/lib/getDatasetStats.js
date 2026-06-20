@@ -3,7 +3,7 @@
 // conservative rounded number if the fetch fails so prose never breaks.
 import { SUPABASE_URL, ANON_KEY } from './supabase/config';
 
-export const FALLBACK_ORG_COUNT = 500;
+export const FALLBACK_ORG_COUNT = 700;
 
 export async function getDatasetStats() {
   try {
