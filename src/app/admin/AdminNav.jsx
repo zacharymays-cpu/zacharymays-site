@@ -2,6 +2,7 @@
 // (the current path) to highlight the current page. Server component — plain links.
 import Link from 'next/link';
 import LogoutButton from './LogoutButton';
+import IdleTimeout from './IdleTimeout';
 
 const LINKS = [
   { href: '/admin/review', label: 'Review' },
@@ -40,6 +41,7 @@ export default function AdminNav({ active }) {
         );
       })}
       <LogoutButton />
+      <IdleTimeout />
     </nav>
   );
 }
