@@ -273,7 +273,7 @@ Only match a person if you have genuine confidence. Null is better than a wrong 
         validation_status: 'pending',
       };
     })
-    .filter(Boolean);
+    .filter((t): t is NonNullable<typeof t> => t !== null);
 
   if (newTags.length > 0) {
     await admin.from('photo_persons').insert(newTags);
