@@ -17,7 +17,7 @@ async function getOrgs() {
     // in criterion_scores (one row per org). Merged by org_id below.
     const [orgRes, liftonRes] = await Promise.all([
       fetch(
-        `${SUPABASE_URL}/rest/v1/organizations?select=id,name,slug,category,composite_score,youngs_score,youngs_band,composite_tier,trajectory,summary_text&active=eq.true&order=composite_score.desc`,
+        `${SUPABASE_URL}/rest/v1/organizations?select=id,name,slug,category,composite_score,youngs_score,youngs_band,composite_tier,trajectory,summary_text&order=composite_score.desc`,
         { headers, next: { revalidate: 3600 } }
       ),
       fetch(
