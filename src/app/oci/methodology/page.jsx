@@ -42,19 +42,23 @@ export default function MethodologyPage() {
           <div className="section__label">The Source Framework</div>
 
           <p>
-            <strong>Methodology Version: V6.0 (June 2026)</strong> — Dual-track scoring combining Young-Reed behavioral analysis (C1-C10) with Lifton's psychological totalism framework (C11). Evidence-based jury methodology with formal validation metrics.
+            <strong>Methodology Version: V6.0 (June 2026)</strong> — Dual-track scoring combining Young-Reed behavioral analysis (C1-C10) with Lifton’s psychological totalism framework (C11). Evidence-based jury methodology with formal validation metrics.
           </p>
 
           <p>
-            Criteria C1–C10 are derived verbatim from Daniella Mestyanek Young and Amy Reed's{' '}
+            Criteria C1–C10 are derived verbatim from Daniella Mestyanek Young and Amy Reed’s{' '}
             <a href="https://uncultureyourself.com" target="_blank" rel="noopener noreferrer">
               <em>The Culting of America: What Makes a Cult and Why We Love Them</em>
             </a>{' '}
-            (Otterpine, 2026). Young and Reed define a cult as a group that meets these ten behavioral conditions. The composite scoring system was developed independently to extend analytical range for dataset-scale application — but the criteria themselves are Young and Reed's.
+            (Otterpine, 2026). Young and Reed define a cult as a group that meets these ten behavioral conditions. The composite scoring system was developed independently to extend analytical range for dataset-scale application — but the criteria themselves are Young and Reed’s.
           </p>
 
           <p>
-            Criterion C11 (Psychological Totalism) is derived from Robert Jay Lifton's clinical and historical research on ideological systems. Lifton's framework examines the structural mechanisms that create totalizing control over thought, emotion, and identity — independent of the specific ideology. Young's framework measures behavioral patterns; Lifton's measures system-level psychological architecture. Both are provided for each organization.
+            Criterion C11 (Psychological Totalism) is derived from Robert Jay Lifton’s clinical and historical research on ideological systems. Lifton’s framework examines the structural mechanisms that create totalizing control over thought, emotion, and identity — independent of the specific ideology.
+          </p>
+
+          <p>
+            The three scoring outputs each measure a distinct dimension: Young’s Cultiness Score is a binary criterion checklist (0–10) that measures whether each behavioral pattern is present or absent. The Composite Score extends that checklist by weighting both intensity (how strongly each criterion applies) and breadth (how many criteria apply) — producing a 0–100% scale that captures not just which criteria fire, but how powerfully and broadly. Lifton’s Totalism Score (C11) is an independent third axis measuring system-level psychological architecture: whether the organization structurally prevents exit from thought itself, regardless of its behavioral profile. None of the three is derived from the others.
           </p>
 
           <hr className="rule" />
@@ -62,7 +66,7 @@ export default function MethodologyPage() {
           <div className="section__label">The Eleven Criteria</div>
 
           <p style={{color: 'var(--muted)', marginBottom: '2rem'}}>
-            Young and Reed define a cult as a group that exhibits these ten behavioral patterns. Lifton's eleventh criterion examines the system-level psychological totalism that enables and sustains those patterns.
+            Young and Reed define a cult as a group that exhibits these ten behavioral patterns. Lifton’s eleventh criterion examines the system-level psychological totalism that enables and sustains those patterns.
           </p>
 
           <div style={{display: 'flex', flexDirection: 'column', gap: '0'}}>
@@ -112,17 +116,17 @@ export default function MethodologyPage() {
           <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1px', background: 'rgba(212,206,196,0.1)', margin: '2rem 0'}}>
             {[
               {
-                label: "Young's Original Score",
+                label: "Young's Cultiness Score",
                 sub: '0–10 binary checklist',
                 body: "Each of the ten criteria either checks or does not check. Produces three bands: Not Culty (0–2), Kinda Culty (3–5), Super Culty (6–10). Must be derived from direct application of Young's checklist — never mechanically converted from composite intensity. Mechanical conversion produces systematically inflated results.",
               },
               {
-                label: 'Composite Cultiness Score',
+                label: 'Composite Score',
                 sub: 'Formula-based 0–100%',
-                body: 'Formula: (Breadth ÷ 10) × (Mean Intensity ÷ 10) × 100 (C1-C10 only). Breadth = criteria with non-N/A scores. Mean Intensity = average of those scores. Adds two dimensions the binary instrument cannot capture: intensity variance and breadth-intensity interaction. Produces three tiers from Not Culty (0–29%) through Super Culty (≥60%).',
+                body: 'Formula: (Breadth ÷ 10) × (Mean Intensity ÷ 10) × 100 (C1-C10 only). Breadth = criteria with non-N/A scores. Mean Intensity = average of those scores. Adds two dimensions the binary instrument cannot capture: intensity variance and breadth-intensity interaction. Produces three tiers: Low-Control (0–29%), Moderate-Control (30–59%), High-Control (≥60%).',
               },
               {
-                label: "Lifton's Totalism Score",
+                label: "Totalism Score",
                 sub: '0–10 intensity scale',
                 body: 'Scores C11 (Psychological Totalism) on a 0–10 intensity scale, measuring the degree to which the organization exhibits system-level mechanisms that create totalizing control over thought and identity. Produces three classifications: Non-Totalizing (0–2.9), Moderately Totalizing (3–5.9), Psychologically Totalizing (6–10). Independent of C1-C10 scores. A behavioral cult (high C1-C10) may have low totalism (temporary structures); a totalizing system (high C11) may lack some behavioral hallmarks.',
               },
@@ -141,17 +145,89 @@ export default function MethodologyPage() {
 
           <hr className="rule" />
 
-          <div className="section__label">Composite Tiers</div>
+          <div className="section__label">Composite Score Tiers</div>
+
+          <p style={{color: 'var(--muted)', fontSize: '0.9rem', marginBottom: '1.5rem'}}>
+            The Composite Score (0–100%) maps to three tiers. These are the labels shown in the Dataset Explorer under the “Control Tier” column.
+          </p>
 
           <div style={{margin: '1.5rem 0'}}>
             {[
-              { range: '0–29%',    tier: 'Not Culty',    color: '#2a6b4a' },
-              { range: '30–59%',   tier: 'Kinda Culty',  color: '#7a4a1a' },
-              { range: '≥60%',     tier: 'Super Culty',  color: '#6b1010' },
+              { range: '0–29%',    tier: 'Low-Control',       sub: 'Not Culty',    color: '#5cb878' },
+              { range: '30–59%',   tier: 'Moderate-Control',  sub: 'Kinda Culty',  color: '#d99b3e' },
+              { range: '≥60%',     tier: 'High-Control',      sub: 'Super Culty',  color: '#e8574d' },
             ].map((t, i) => (
               <div key={i} style={{
                 display: 'grid',
-                gridTemplateColumns: '80px 160px 1fr',
+                gridTemplateColumns: '80px 200px 1fr',
+                gap: '1.5rem',
+                padding: '0.85rem 0',
+                borderBottom: '1px solid rgba(212,206,196,0.08)',
+                alignItems: 'center',
+              }}>
+                <div style={{fontFamily: 'var(--mono)', fontSize: '0.78rem', color: 'var(--muted)'}}>{t.range}</div>
+                <div style={{display: 'flex', alignItems: 'center', gap: '0.75rem'}}>
+                  <div style={{
+                    fontFamily: 'var(--mono)', fontSize: '0.72rem',
+                    letterSpacing: '0.08em', textTransform: 'uppercase',
+                    color: 'var(--paper)', padding: '0.3rem 0.75rem',
+                    background: t.color, display: 'inline-block', whiteSpace: 'nowrap',
+                  }}>{t.tier}</div>
+                  <div style={{fontFamily: 'var(--mono)', fontSize: '0.68rem', color: 'rgba(212,206,196,0.4)'}}>{t.sub}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="section__label" style={{marginTop: '2.5rem'}}>Cultiness Score Tiers (Young’s)</div>
+
+          <p style={{color: 'var(--muted)', fontSize: '0.9rem', marginBottom: '1.5rem'}}>
+            Young’s binary checklist (0–10 criteria met) maps to three bands, shown in the Dataset Explorer under the “Cultiness Tier” column.
+          </p>
+
+          <div style={{margin: '1.5rem 0'}}>
+            {[
+              { range: '0–2',  tier: 'Low-Control',       sub: 'Not Culty',    color: '#5cb878' },
+              { range: '3–5',  tier: 'Moderate-Control',  sub: 'Kinda Culty',  color: '#d99b3e' },
+              { range: '6–10', tier: 'High-Control',      sub: 'Super Culty',  color: '#e8574d' },
+            ].map((t, i) => (
+              <div key={i} style={{
+                display: 'grid',
+                gridTemplateColumns: '80px 200px 1fr',
+                gap: '1.5rem',
+                padding: '0.85rem 0',
+                borderBottom: '1px solid rgba(212,206,196,0.08)',
+                alignItems: 'center',
+              }}>
+                <div style={{fontFamily: 'var(--mono)', fontSize: '0.78rem', color: 'var(--muted)'}}>{t.range}</div>
+                <div style={{display: 'flex', alignItems: 'center', gap: '0.75rem'}}>
+                  <div style={{
+                    fontFamily: 'var(--mono)', fontSize: '0.72rem',
+                    letterSpacing: '0.08em', textTransform: 'uppercase',
+                    color: 'var(--paper)', padding: '0.3rem 0.75rem',
+                    background: t.color, display: 'inline-block', whiteSpace: 'nowrap',
+                  }}>{t.tier}</div>
+                  <div style={{fontFamily: 'var(--mono)', fontSize: '0.68rem', color: 'rgba(212,206,196,0.4)'}}>{t.sub}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="section__label" style={{marginTop: '2.5rem'}}>Totalism Score Tiers (Lifton)</div>
+
+          <p style={{color: 'var(--muted)', fontSize: '0.9rem', marginBottom: '1.5rem'}}>
+            The Totalism Score (0–10) maps to three classifications, shown in the Dataset Explorer under the “Totalism Tier” column.
+          </p>
+
+          <div style={{margin: '1.5rem 0'}}>
+            {[
+              { range: '0–2.9', tier: 'Non-Totalizing',            color: '#5f8f86' },
+              { range: '3–5.9', tier: 'Moderately Totalizing',      color: '#6d83b5' },
+              { range: '6–10',  tier: 'Psychologically Totalizing', color: '#a06cd5' },
+            ].map((t, i) => (
+              <div key={i} style={{
+                display: 'grid',
+                gridTemplateColumns: '80px 1fr',
                 gap: '1.5rem',
                 padding: '0.85rem 0',
                 borderBottom: '1px solid rgba(212,206,196,0.08)',
@@ -159,10 +235,10 @@ export default function MethodologyPage() {
               }}>
                 <div style={{fontFamily: 'var(--mono)', fontSize: '0.78rem', color: 'var(--muted)'}}>{t.range}</div>
                 <div style={{
-                  fontFamily: 'var(--mono)', fontSize: '0.75rem',
+                  fontFamily: 'var(--mono)', fontSize: '0.72rem',
                   letterSpacing: '0.08em', textTransform: 'uppercase',
                   color: 'var(--paper)', padding: '0.3rem 0.75rem',
-                  background: t.color, display: 'inline-block',
+                  background: t.color, display: 'inline-block', whiteSpace: 'nowrap',
                 }}>{t.tier}</div>
               </div>
             ))}
@@ -177,7 +253,7 @@ export default function MethodologyPage() {
             N/A is not a floor score. N/A designates structural absence —
             the criterion describes a dynamic that is inapplicable because
             the organization lacks the architecture for it, or because the
-            organization's documented behavior is the structural opposite
+            organization’s documented behavior is the structural opposite
             of what the criterion describes.
           </p>
 
@@ -240,21 +316,21 @@ export default function MethodologyPage() {
           <div className="section__label">Evidence-Based Jury Methodology (V6.0)</div>
 
           <p>
-            All scores — across all three output tracks (Young's, Composite, and Lifton's) — are generated by an evidence-based jury protocol that eliminates calibration drift:
+            All scores — across all three output tracks (Young’s, Composite, and Totalism) — are generated by an evidence-based jury protocol that eliminates calibration drift:
           </p>
 
           <ol style={{color: 'var(--muted)', fontSize: '0.9rem', lineHeight: 1.7}}>
             <li style={{marginBottom: '0.75rem'}}>An evidence brief is compiled for each criterion — documented behaviors from court records, investigative journalism, academic scholarship, and institutional documentation.</li>
-            <li style={{marginBottom: '0.75rem'}}>The evidence brief is scored independently by four AI models (Claude, GPT-4o, Gemini, Llama) — no general knowledge, only the provided evidence. Models never see each other's scores.</li>
+            <li style={{marginBottom: '0.75rem'}}>The evidence brief is scored independently by four AI models (Claude, GPT-4o, Gemini, Llama) — no general knowledge, only the provided evidence. Models never see each other’s scores.</li>
             <li style={{marginBottom: '0.75rem'}}>The jury mean becomes the proposed score; a score spread greater than 5 points triggers additional review and evidence re-evaluation.</li>
-            <li style={{marginBottom: '0.75rem'}}>For Young's Original Score: the binary checklist is derived from the jury intensity scores (≥5 = checks; &lt;5 = does not check) for consistency and auditability.</li>
+            <li style={{marginBottom: '0.75rem'}}>For Young’s Cultiness Score: the binary checklist is derived from the jury intensity scores (≥5 = checks; &lt;5 = does not check) for consistency and auditability.</li>
             <li style={{marginBottom: '0.75rem'}}>For Composite: formula applied to the jury-derived intensity scores, using the four-model consensus as the basis.</li>
-            <li style={{marginBottom: '0.75rem'}}>For Lifton's Totalism (C11): jury intensity scores for psychological totalism mechanisms, independent of C1-C10.</li>
-            <li style={{marginBottom: '0.75rem'}}>A four-model consensus at 0–2 point spread indicates high reliability. Results include Krippendorff's alpha and pairwise agreement metrics.</li>
+            <li style={{marginBottom: '0.75rem'}}>For Totalism (C11): jury intensity scores for psychological totalism mechanisms, independent of C1-C10.</li>
+            <li style={{marginBottom: '0.75rem'}}>A four-model consensus at 0–2 point spread indicates high reliability. Results include Krippendorff’s alpha and pairwise agreement metrics.</li>
           </ol>
 
           <p style={{color: 'var(--muted)', fontSize: '0.9rem', marginTop: '1rem'}}>
-            This dual-track methodology corrected systematic upward bias that existed in previous anchor-calibrated versions, particularly for C5 (Isolation), C8 (Labor Exploitation), and C9 (Exit Costs) when applied to political and media organizations. The addition of Lifton's C11 adds system-level totalism measurement orthogonal to behavioral indicators.
+            This dual-track methodology corrected systematic upward bias that existed in previous anchor-calibrated versions, particularly for C5 (Isolation), C8 (Labor Exploitation), and C9 (Exit Costs) when applied to political and media organizations. The addition of Lifton’s C11 adds system-level totalism measurement orthogonal to behavioral indicators.
           </p>
 
           <hr className="rule" />

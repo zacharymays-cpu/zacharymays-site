@@ -1,5 +1,8 @@
 'use client';
 import { useState, useMemo } from 'react';
+import dynamic from 'next/dynamic';
+
+const LineageGraphClient = dynamic(() => import('./LineageGraphClient'), { ssr: false });
 
 const TIER_COLORS = {
   'Super Culty': '#e8574d',
@@ -80,6 +83,7 @@ const NODE_W = 150, NODE_H = 48, H_GAP = 16, V_GAP = 54, PAD = 12;
 const safe = (s) => s.replace(/[^a-z0-9]/gi, '');
 
 export default function LineageClient({ nodes = [], edges = [] }) {
+  const [view, setView] = useState('graph'); // 'tree' | 'graph'
   const [mode, setMode] = useState(NAZI);
   const [hover, setHover] = useState(null);          // hovered node slug
   const [branchHL, setBranchHL] = useState(null);    // highlighted branch (chain)
@@ -215,12 +219,23 @@ export default function LineageClient({ nodes = [], edges = [] }) {
     (branchHL && slug !== rootSlug && branchOf[slug] !== branchHL) ||
     (hover && hover !== slug);
 
+  if (view === 'graph') {
+    return (
+      <>
+        <ViewToggle view={view} onSwitch={setView} />
+        <LineageGraphClient nodes={nodes} edges={edges} />
+      </>
+    );
+  }
+
   return (
     <div style={{ minHeight: '100vh' }}>
       <div className="container--wide" style={{ paddingTop: '1.25rem', paddingBottom: '3rem' }}>
 
-        {/* Mode selector */}
+        {/* View / Mode selector row */}
         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center', marginBottom: '1.25rem' }}>
+          <ViewToggle view={view} onSwitch={setView} inline />
+          <span style={{ color: 'rgba(212,206,196,0.2)', fontSize: '0.7rem' }}>|</span>
           <span style={{ fontFamily: 'var(--mono)', fontSize: '0.6rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--muted)', marginRight: '0.4rem' }}>
             Origin
           </span>
@@ -358,6 +373,51 @@ export default function LineageClient({ nodes = [], edges = [] }) {
           </svg>
         </div>
       </div>
+    </div>
+  );
+}
+
+// ── View toggle shared between both modes ─────────────────────────────────
+function ViewToggle({ view, onSwitch, inline }) {
+  const btn = (id, label) => {
+    const active = view === id;
+    return (
+      <button
+        key={id}
+        onClick={() => onSwitch(id)}
+        style={{
+          fontFamily: 'var(--mono)', fontSize: '0.66rem', letterSpacing: '0.06em',
+          textTransform: 'uppercase', cursor: 'pointer',
+          padding: '0.4rem 0.9rem',
+          border: `1px solid ${active ? 'rgba(200,168,75,0.55)' : 'rgba(212,206,196,0.22)'}`,
+          color: active ? 'var(--gold)' : 'var(--muted)',
+          background: active ? 'rgba(200,168,75,0.08)' : 'transparent',
+        }}
+      >
+        {label}
+      </button>
+    );
+  };
+
+  if (inline) {
+    return (
+      <>
+        <span style={{ fontFamily: 'var(--mono)', fontSize: '0.6rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--muted)', marginRight: '0.2rem' }}>
+          View
+        </span>
+        {btn('graph', 'Graph')}
+        {btn('tree', 'Tree')}
+      </>
+    );
+  }
+
+  return (
+    <div className="container--wide" style={{ paddingTop: '1rem', paddingBottom: '0.5rem', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+      <span style={{ fontFamily: 'var(--mono)', fontSize: '0.6rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--muted)', marginRight: '0.2rem' }}>
+        View
+      </span>
+      {btn('graph', 'Graph')}
+      {btn('tree', 'Tree')}
     </div>
   );
 }
