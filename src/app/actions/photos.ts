@@ -104,7 +104,7 @@ export async function uploadPhoto(formData: FormData) {
 
 // ─── AI analysis ──────────────────────────────────────────────────────────────
 
-type PersonRow = { id: string; canonical_name: string; display_name: string | null; birth_year: number | null };
+type PersonRow = { id: string; canonical_name: string; birth_year: number | null };
 
 interface AiPerson {
   matched_name: string | null;
@@ -185,10 +185,10 @@ export async function analyzePhotoWithAI(photoId: string) {
 
   const { data: roles } = await admin
     .from('person_org_roles')
-    .select('person_id, role_type, persons (id, canonical_name_enc, display_name, birth_year)')
+    .select('person_id, role_type, persons (id, canonical_name_enc, birth_year)')
     .eq('org_id', photo.org_id);
 
-  type PersonEnc = { id: string; canonical_name_enc: string | null; display_name: string | null; birth_year: number | null };
+  type PersonEnc = { id: string; canonical_name_enc: string | null; birth_year: number | null };
   const personsRaw = (roles || [])
     .map((r) => {
       const p = r.persons as unknown as (PersonEnc | null);
@@ -198,7 +198,7 @@ export async function analyzePhotoWithAI(photoId: string) {
   // Decrypt names (caller is decryptor-gated) so the AI prompt + match map use real names.
   const persons: (PersonRow & { role_type: string })[] = await Promise.all(
     personsRaw.map(async (p) => ({
-      id: p.id, display_name: p.display_name, birth_year: p.birth_year, role_type: p.role_type,
+      id: p.id, birth_year: p.birth_year, role_type: p.role_type,
       canonical_name: await decryptCanonicalName(p.canonical_name_enc, p.id),
     }))
   );
@@ -332,17 +332,16 @@ export async function suggestPhotoAssociations(photoId: string) {
 
   const { data: roles, error: rolesErr } = await admin
     .from('person_org_roles')
-    .select('person_id, role_type, persons (id, canonical_name_enc, display_name, birth_year)')
+    .select('person_id, role_type, persons (id, canonical_name_enc, birth_year)')
     .eq('org_id', photo.org_id);
   if (rolesErr) return { ok: false, error: rolesErr.message };
 
-  type PersonEnc = { id: string; canonical_name_enc: string | null; display_name: string | null; birth_year: number | null };
+  type PersonEnc = { id: string; canonical_name_enc: string | null; birth_year: number | null };
   const suggestions = (await Promise.all((roles || []).map(async (r) => {
     const p = r.persons as unknown as (PersonEnc | null);
     return {
       person_id: r.person_id,
       canonical_name: p ? await decryptCanonicalName(p.canonical_name_enc, p.id) : '',
-      display_name: p?.display_name ?? null,
       birth_year: p?.birth_year ?? null,
       role_type: r.role_type,
       confidence: 0.6,

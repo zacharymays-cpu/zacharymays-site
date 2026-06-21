@@ -3,12 +3,25 @@ import { createSupabaseServerClient } from '../../../lib/supabase/server';
 import { createSupabaseAdminClient } from '../../../lib/supabase/admin';
 import AdminNav from '../AdminNav';
 import PhotosClient from './PhotosClient';
+import { isActiveDecryptor } from '../../../lib/authCore.js';
+import { decryptField } from '../../../lib/identity/decrypt';
 
 export const dynamic = 'force-dynamic';
 
 function adminEmails() {
   return (process.env.ADMIN_EMAILS || '')
     .split(',').map((s) => s.trim().toLowerCase()).filter(Boolean);
+}
+
+const pLabel = (id) => 'P-' + String(id ?? '').slice(0, 8);
+
+// Real names live only as canonical_name_enc. Decryptors see the decrypted name;
+// other admins see the P-<uuid8> label. Never throws — falls back to the label.
+async function nameFor(encHex, personId, canDecrypt) {
+  if (!canDecrypt || !encHex) return pLabel(personId);
+  const hex = String(encHex).startsWith('\\x') ? String(encHex).slice(2) : String(encHex);
+  try { return await decryptField(Buffer.from(hex, 'hex'), personId, 'canonical_name'); }
+  catch { return pLabel(personId); }
 }
 
 export default async function AdminPhotosPage({ searchParams }) {
@@ -39,6 +52,7 @@ export default async function AdminPhotosPage({ searchParams }) {
   const selectedOrgId = typeof sp?.org === 'string' ? sp.org : '';
 
   const admin = createSupabaseAdminClient();
+  const canDecrypt = await isActiveDecryptor(admin, email);
 
   const { data: orgs } = await admin
     .from('organizations')
@@ -63,25 +77,30 @@ export default async function AdminPhotosPage({ searchParams }) {
         photo_persons (
           id, person_id, confidence, identified_by, inference_reasoning,
           validation_status, validation_notes, validated_at,
-          persons ( canonical_name, display_name )
+          persons ( id, canonical_name_enc )
         )
       `)
       .eq('org_id', selectedOrgId)
       .order('uploaded_at', { ascending: false });
     photos = photoData || [];
+    // Replace each tag's nested person with a decrypted name / P-label (no plaintext in DB).
+    for (const photo of photos) {
+      for (const pp of (photo.photo_persons || [])) {
+        const pid = pp.persons?.id ?? pp.person_id;
+        pp.persons = { canonical_name: await nameFor(pp.persons?.canonical_name_enc, pid, canDecrypt) };
+      }
+    }
 
     const { data: roleData } = await admin
       .from('person_org_roles')
-      .select('person_id, role_type, persons ( id, canonical_name, display_name, birth_year )')
+      .select('person_id, role_type, persons ( id, canonical_name_enc, birth_year )')
       .eq('org_id', selectedOrgId);
-    orgPersons = (roleData || [])
-      .map((r) => ({
-        id: r.person_id,
-        canonical_name: r.persons?.canonical_name ?? '',
-        display_name: r.persons?.display_name ?? null,
-        birth_year: r.persons?.birth_year ?? null,
-        role_type: r.role_type,
-      }))
+    orgPersons = (await Promise.all((roleData || []).map(async (r) => ({
+      id: r.person_id,
+      canonical_name: await nameFor(r.persons?.canonical_name_enc, r.person_id, canDecrypt),
+      birth_year: r.persons?.birth_year ?? null,
+      role_type: r.role_type,
+    }))))
       .filter((p) => p.canonical_name)
       .sort((a, b) => a.canonical_name.localeCompare(b.canonical_name));
   }
