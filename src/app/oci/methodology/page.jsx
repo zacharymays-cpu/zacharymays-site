@@ -58,7 +58,7 @@ export default function MethodologyPage() {
           </p>
 
           <p>
-            The three scoring outputs each measure a distinct dimension: Young’s Cultiness Score is a binary criterion checklist (0–10) that measures whether each behavioral pattern is present or absent. The Composite Score extends that checklist by weighting both intensity (how strongly each criterion applies) and breadth (how many criteria apply) — producing a 0–100% scale that captures not just which criteria fire, but how powerfully and broadly. Lifton’s Totalism Score (C11) is an independent third axis measuring system-level psychological architecture: whether the organization structurally prevents exit from thought itself, regardless of its behavioral profile. None of the three is derived from the others.
+            The three scoring outputs each measure a distinct dimension. Young’s Cultiness Score is a presence checklist (0–10): each of the ten behavioral criteria counts as “present” when the evidence shows it operating at a documented, recurring level — an intensity of 5 or higher on the criterion scale — and the score is simply the number of criteria present. The Composite Score reads those same per-criterion intensities but weights both how strongly each criterion applies (intensity) and how many apply (breadth) — producing a 0–100% scale that captures not just which criteria fire, but how powerfully and broadly. Lifton’s Totalism Score (C11) is an independent third axis measuring system-level psychological architecture: whether the organization structurally prevents exit from thought itself, regardless of its behavioral profile. The Cultiness and Composite scores are two different reductions of the same C1–C10 evidence (a presence count versus an intensity-weighted index); the Lifton totalism score is generated independently.
           </p>
 
           <hr className="rule" />
@@ -110,7 +110,7 @@ export default function MethodologyPage() {
           <div className="section__label">Three Parallel Score Outputs</div>
 
           <p>
-            Every organization receives three independent scores generated in parallel by the jury system. They use different measurement models and capture different dimensions of institutional coercion. All three are provided; none is derived from the others.
+            Every organization receives three scores capturing different dimensions of institutional coercion. The Cultiness and Composite scores are two reductions of the same C1–C10 criterion intensities (a presence count versus an intensity-weighted index); the Lifton totalism score is generated independently. All three are provided.
           </p>
 
           <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1px', background: 'rgba(212,206,196,0.1)', margin: '2rem 0'}}>
@@ -118,7 +118,7 @@ export default function MethodologyPage() {
               {
                 label: "Young's Cultiness Score",
                 sub: '0–10 binary checklist',
-                body: "Each of the ten criteria either checks or does not check. Produces three bands: Not Culty (0–2), Kinda Culty (3–5), Super Culty (6–10). Must be derived from direct application of Young's checklist — never mechanically converted from composite intensity. Mechanical conversion produces systematically inflated results.",
+                body: "Each of the ten criteria counts as present when its evidence reaches a documented, recurring intensity (5 or higher on the 1–10 criterion scale); the score is the count of present criteria. Produces three bands matching Young's Group Exit Checklist: Not Culty (0–2), Kinda Culty (3–5), Super Culty (6+). The presence threshold is essential — counting every criterion that merely has some evidence, rather than genuine documented presence, systematically inflates the score (an organization absent on every dynamic would otherwise read as a perfect 10).",
               },
               {
                 label: 'Composite Score',
