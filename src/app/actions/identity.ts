@@ -54,6 +54,28 @@ export async function revealPerson(personId: string) {
   return { name };
 }
 
+// Decrypt a person's alternate names (legal/birth/maiden/family) from person_aliases.
+// alias plaintext was dropped; names live only as alias_enc (encryption context field='alias').
+export async function revealAliases(personId: string) {
+  const user = await requireDecryptor();
+  const email = (user.email || '').toLowerCase();
+  const admin = createSupabaseAdminClient();
+  const { data, error } = await admin
+    .from('person_aliases')
+    .select('id, alias_type, alias_enc')
+    .eq('person_id', personId);
+  if (error) throw new Error(error.message);
+  const aliases = await Promise.all((data || []).map(async (r) => {
+    const raw: string | null = r.alias_enc;
+    if (!raw) return { id: r.id, alias_type: r.alias_type, alias: '' };
+    const hex = raw.startsWith('\\x') ? raw.slice(2) : raw;
+    const alias = await decryptField(Buffer.from(hex, 'hex'), personId, 'alias');
+    return { id: r.id, alias_type: r.alias_type, alias };
+  }));
+  await logDecryptAttempt({ actorEmail: email, personId, field: 'alias', succeeded: true });
+  return { aliases };
+}
+
 export async function publishPerson(personId: string, justificationType: string, sourceNote: string | null) {
   const user = await requireDecryptor();
   const email = (user.email || '').toLowerCase();
