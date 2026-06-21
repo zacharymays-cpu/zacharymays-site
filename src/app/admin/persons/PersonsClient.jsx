@@ -27,6 +27,8 @@ export default function PersonsClient() {
   const [publishId, setPublishId] = useState(null); // id with the publish form open
   const [justification, setJustification] = useState(JUSTIFICATIONS[0]);
   const [note, setNote] = useState('');
+  const [anonymizeId, setAnonymizeId] = useState(null); // id with the anonymize form open
+  const [reason, setReason] = useState('');
 
   async function run(fn) {
     setErr(''); setBusy(true);
@@ -48,6 +50,7 @@ export default function PersonsClient() {
 
   function startPublish(id) {
     setErr('');
+    setAnonymizeId(null);
     setPublishId(id);
     setJustification(JUSTIFICATIONS[0]);
     setNote('');
@@ -58,6 +61,18 @@ export default function PersonsClient() {
     setNote('');
   }
 
+  function startAnonymize(id) {
+    setErr('');
+    setPublishId(null);
+    setAnonymizeId(id);
+    setReason('');
+  }
+
+  function cancelAnonymize() {
+    setAnonymizeId(null);
+    setReason('');
+  }
+
   async function confirmPublish(id) {
     const x = await run(() => publishPerson(id, justification, note.trim() || null));
     if (x) {
@@ -66,13 +81,13 @@ export default function PersonsClient() {
     }
   }
 
-  async function doAnonymize(id) {
-    const reason = window.prompt('Reason for re-anonymizing:');
-    if (!reason) return;
-    const x = await run(() => anonymizePerson(id, reason));
+  async function confirmAnonymize(id) {
+    if (!reason.trim()) { setErr('A reason is required to re-anonymize.'); return; }
+    const x = await run(() => anonymizePerson(id, reason.trim()));
     if (x) {
       setRows((rr) => rr.map((z) => (z.id === id ? { ...z, identity_public: false } : z)));
       setRevealed((m) => { const c = { ...m }; delete c[id]; return c; });
+      cancelAnonymize();
     }
   }
 
@@ -108,7 +123,7 @@ export default function PersonsClient() {
                     <button onClick={() => doReveal(r.id)} disabled={busy}>Reveal</button>{' '}
                     {!r.identity_public
                       ? <button onClick={() => startPublish(r.id)} disabled={busy || publishId === r.id}>Publish</button>
-                      : <button onClick={() => doAnonymize(r.id)} disabled={busy}>Anonymize</button>}
+                      : <button onClick={() => startAnonymize(r.id)} disabled={busy || anonymizeId === r.id}>Anonymize</button>}
                   </td>
                 </tr>
                 {publishId === r.id && (
@@ -131,6 +146,26 @@ export default function PersonsClient() {
                           {busy ? '…' : 'Confirm publish'}
                         </button>
                         <button onClick={cancelPublish} disabled={busy}
+                                style={{ padding: '0.4rem 0.9rem', borderRadius: 6, border: '1px solid #ccc', background: '#fff', cursor: 'pointer' }}>
+                          Cancel
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+                {anonymizeId === r.id && (
+                  <tr>
+                    <td style={{ ...td, background: '#fafafa' }} colSpan={5}>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 10 }}>
+                        <input value={reason} onChange={(e) => setReason(e.target.value)}
+                               placeholder="Reason for re-anonymizing (required)" autoFocus
+                               onKeyDown={(e) => { if (e.key === 'Enter') confirmAnonymize(r.id); }}
+                               style={{ ...ctrl, flex: '1 1 280px', minWidth: 220 }} />
+                        <button onClick={() => confirmAnonymize(r.id)} disabled={busy}
+                                style={{ padding: '0.4rem 0.9rem', borderRadius: 6, border: '1px solid #8a1f1f', background: '#a12626', color: '#fff', cursor: 'pointer' }}>
+                          {busy ? '…' : 'Confirm anonymize'}
+                        </button>
+                        <button onClick={cancelAnonymize} disabled={busy}
                                 style={{ padding: '0.4rem 0.9rem', borderRadius: 6, border: '1px solid #ccc', background: '#fff', cursor: 'pointer' }}>
                           Cancel
                         </button>
