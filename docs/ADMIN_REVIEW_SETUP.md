@@ -37,10 +37,36 @@ All four share the same auth gate and navigation bar.
 ## Sign-in methods
 
 ### Passkeys (recommended — fastest)
-Users who have registered a passkey can sign in with a single Face ID / Touch ID tap on any enrolled Apple device (or any FIDO2-capable device). Passkeys are phishing-resistant and satisfy AAL2 directly — no separate TOTP step required.
+Users who have registered a passkey can sign in with a single tap on any enrolled
+authenticator — a platform authenticator (Face ID / Touch ID / Windows Hello) **or** a
+roaming FIDO2 hardware security key such as a **YubiKey**. Passkeys are phishing-resistant
+and satisfy AAL2 directly — no separate TOTP step required.
 
 - On the login page, tap **"Sign in with passkey"**.
 - The browser handles the WebAuthn ceremony and creates a full session.
+
+### Hardware security keys (YubiKey)
+A YubiKey (or any FIDO2/WebAuthn security key) is just a passkey backed by dedicated
+hardware. It registers and signs in through the exact same `registerPasskey()` /
+`signInWithPasskey()` flow as a platform passkey — no extra code or configuration is
+required beyond the one-time passkey enablement below.
+
+Two ways to use a YubiKey:
+1. **As a passkey (recommended).** Register the key as a WebAuthn credential (steps below).
+   USB-A, USB-C, and NFC keys all work in modern browsers; NFC requires tapping the key to
+   a phone/reader during the prompt. The credential is cryptographically bound to the
+   Relying Party ID (`zacharymays.com`), so a key registered against production will not
+   work against `localhost`/preview origins unless those origins are added to the RP config.
+2. **As a TOTP token.** A YubiKey 5-series can also store the TOTP secret via the **Yubico
+   Authenticator** app, then supply the 6-digit code at `/admin/mfa` like any authenticator
+   app. This is a fallback — the passkey path is stronger and faster.
+
+> **Roaming-only enforcement is not supported.** Supabase's managed passkey flow generates
+> the WebAuthn options server-side and does not expose `authenticatorAttachment` /
+> attestation controls, so the admin app **cannot force** "security key only" and reject
+> platform passkeys (Face ID / Touch ID). Both authenticator types are accepted. Any
+> client-side attempt to restrict this would be cosmetic and bypassable, so it is
+> intentionally not implemented.
 
 ### TOTP (authenticator app)
 Users without a passkey sign in with GitHub OAuth or an email magic link, then complete a TOTP step-up at `/admin/mfa`. Supported apps: Google Authenticator, Authy, 1Password.
@@ -92,11 +118,20 @@ npm run dev   # visit http://localhost:3000/admin/review → redirects to login
 
 ## First-time passkey enrollment (existing users)
 
-1. Sign in via GitHub or email magic link.
+1. Sign in with your first factor.
 2. Complete the TOTP step at `/admin/mfa`.
 3. The MFA page shows: **"Register passkey for faster sign-in next time"**.
-4. Tap **Register passkey** — the browser prompts for Face ID / Touch ID.
-5. Done. Next sign-in: tap "Sign in with passkey" on the login page.
+4. Tap **Register passkey** — the browser prompts for the authenticator.
+   - **Platform passkey:** approve with Face ID / Touch ID / Windows Hello.
+   - **YubiKey:** insert the key (or tap it to the NFC reader) and touch the gold contact
+     when it blinks; set a PIN if the browser asks. The credential's friendly name is
+     auto-derived from the key's AAGUID (e.g. "YubiKey 5 Series").
+5. Done. Next sign-in: tap "Sign in with passkey" on the login page and present the same
+   authenticator.
+
+> A user can register more than one passkey (e.g. Touch ID **and** a YubiKey as a backup).
+> Manage them via `supabase.auth.passkey.list()` / `delete()`. Registering a backup
+> hardware key is recommended so a lost or wiped device doesn't lock the analyst out.
 
 ---
 
