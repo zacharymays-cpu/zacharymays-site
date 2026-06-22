@@ -267,6 +267,11 @@ export default async function OrgPage({ params }) {
     : liftonScore >= 6 ? 'Psychologically Totalizing'
     : liftonScore >= 3 ? 'Moderately Totalizing'
     : 'Non-Totalizing'
+  // C11 totalism narrative (the jury's own rationale). Suppress legacy label-only
+  // stubs (e.g. "Lifton psychological totalism (C11): Psychologically Totalizing").
+  const liftonBody = (liftonRow?.body_text && liftonRow.body_text.trim().length > 120
+    && !/^Lifton psychological totalism \(C11\)/i.test(liftonRow.body_text.trim()))
+    ? liftonRow.body_text.trim() : null
 
   // De-duplicate evidence sources across all criteria (each source is attached
   // per-criterion, so the same reference recurs). Best factual tier first, then newest.
@@ -550,6 +555,36 @@ export default async function OrgPage({ params }) {
                   )
                 })}
               </div>
+
+              {/* Psychological Totalism (C11) — separate Lifton track, shown as its own card */}
+              {liftonScore != null && (
+                <>
+                  <div style={{ fontFamily: 'var(--mono)', fontSize: '0.62rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: '#a06cd5', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    Psychological Totalism · Lifton (C11)
+                    <span style={{ flex: 1, height: 1, background: 'rgba(212,206,196,0.15)' }} />
+                  </div>
+                  <div style={{ background: 'rgba(160,108,213,0.05)', border: '1px solid rgba(160,108,213,0.2)', borderLeft: '3px solid #a06cd5', padding: '1.25rem 1.25rem 1.25rem 1.5rem', marginBottom: '3rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: liftonBody ? '0.75rem' : 0, gap: '1rem', flexWrap: 'wrap' }}>
+                      <span style={{ fontFamily: 'var(--serif)', fontSize: '0.95rem', fontWeight: 700, color: 'var(--paper)' }}>
+                        {liftonTier}
+                      </span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
+                        <div style={{ width: 48, height: 4, background: 'rgba(212,206,196,0.1)', borderRadius: 2 }}>
+                          <div style={{ width: `${(liftonScore/10)*100}%`, height: '100%', background: '#a06cd5', borderRadius: 2 }} />
+                        </div>
+                        <span style={{ fontFamily: 'var(--mono)', fontSize: '0.95rem', fontWeight: 700, color: '#a06cd5', minWidth: '2.8rem', textAlign: 'right' }}>
+                          {liftonScore}/10
+                        </span>
+                      </div>
+                    </div>
+                    {liftonBody && (
+                      <p style={{ fontSize: '0.9rem', color: '#d4cec4', margin: 0, lineHeight: 1.8 }}>
+                        {liftonBody}
+                      </p>
+                    )}
+                  </div>
+                </>
+              )}
 
               {/* Lineage cross-link */}
               {org.in_lineage && (
