@@ -34,6 +34,7 @@ async function getOrg(slug) {
       political_scores ( economic_axis, authority_axis, political_quadrant, scoring_notes ),
       criterion_scores ( criterion, score, confidence, na_rationale, body_text,
         evidence_sources ( source_type, title, author, publication, year, url, doi, factual_tier ) ),
+      organization_sources ( source_type, agency, title, url, description, tier, factual_tier ),
       organization_research_narratives ( id, narrative_type, title, content, summary, confidence_level, sources, created_at )
     `)
     .eq('slug', slug)
@@ -595,6 +596,49 @@ export default async function OrgPage({ params }) {
                   <p style={{ fontSize: '0.9rem', color: '#d4cec4', margin: 0, lineHeight: 1.6 }}>
                     This organization is part of a documented lineage chain. <Link href="/explore/lineage" style={{ color: 'var(--gold)', textDecoration: 'none', fontWeight: 500 }}>Explore the lineage →</Link>
                   </p>
+                </div>
+              )}
+
+              {/* Official Records & Archives — org-level authoritative sources (FOIA/SEC/agency/archive) */}
+              {(org.organization_sources || []).length > 0 && (
+                <div style={{ marginBottom: '3rem' }}>
+                  <div style={{ fontFamily: 'var(--mono)', fontSize: '0.62rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    Official Records &amp; Archives
+                    <span style={{ flex: 1, height: 1, background: 'rgba(212,206,196,0.15)' }} />
+                  </div>
+                  <p style={{ fontSize: '0.82rem', color: 'var(--muted)', lineHeight: 1.7, marginBottom: '1.25rem' }}>
+                    Org-level government records, regulatory filings, and archival holdings documenting this organization.
+                  </p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                    {[...org.organization_sources]
+                      .sort((a, b) => (a.factual_tier ?? 9) - (b.factual_tier ?? 9))
+                      .map((s, i) => (
+                        <div key={i} style={{ background: 'rgba(244,240,232,0.025)', border: '1px solid rgba(212,206,196,0.08)', padding: '0.9rem 1.1rem', display: 'flex', gap: '1rem', alignItems: 'baseline', flexWrap: 'wrap' }}>
+                          <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center', flexShrink: 0, minWidth: '8.5rem' }}>
+                            <span style={{ fontFamily: 'var(--mono)', fontSize: '0.52rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--gold)', padding: '0.18rem 0.45rem', border: '1px solid rgba(200,168,75,0.3)', whiteSpace: 'nowrap' }}>
+                              {(s.source_type || 'record').replace(/_/g, ' ')}
+                            </span>
+                            {s.factual_tier != null && (
+                              <span title="Factual reliability tier (1 = highest)" style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', color: 'rgba(212,206,196,0.5)' }}>T{s.factual_tier}</span>
+                            )}
+                          </div>
+                          <div style={{ flex: 1, minWidth: '14rem' }}>
+                            <div style={{ fontFamily: 'var(--serif)', fontSize: '0.92rem', color: 'var(--paper)', lineHeight: 1.4 }}>
+                              {s.url ? (
+                                <a href={s.url} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--paper)', textDecoration: 'none', borderBottom: '1px solid rgba(200,168,75,0.3)' }}>
+                                  {s.title || s.url}<span style={{ color: 'var(--gold)', fontSize: '0.7rem' }}> ↗</span>
+                                </a>
+                              ) : (s.title || s.agency || '—')}
+                            </div>
+                            {(s.agency || s.description) && (
+                              <div style={{ fontFamily: 'var(--mono)', fontSize: '0.62rem', color: 'var(--muted)', marginTop: '0.3rem' }}>
+                                {[s.agency, s.description].filter(Boolean).join(' · ')}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                  </div>
                 </div>
               )}
 
