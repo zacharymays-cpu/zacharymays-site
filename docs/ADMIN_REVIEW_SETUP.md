@@ -68,13 +68,20 @@ Two ways to use a YubiKey:
 > client-side attempt to restrict this would be cosmetic and bypassable, so it is
 > intentionally not implemented.
 
-### TOTP (authenticator app)
-Users without a passkey sign in with GitHub OAuth or an email magic link, then complete a TOTP step-up at `/admin/mfa`. Supported apps: Google Authenticator, Authy, 1Password.
+**Passkey is the only sign-in method.** The login page (`src/app/admin/login/page.jsx`)
+exposes a single **"Sign in with passkey"** button — GitHub OAuth and email magic-link were
+removed to minimize the admin login attack surface. Removing the UI does not disable those
+flows at the API level, so they must **also** be turned off in the Supabase project
+(Auth → Providers / Email) to actually close the surface.
 
-After completing TOTP, the MFA page automatically checks whether the user has a passkey enrolled. If not, it offers a one-tap registration ("Register passkey for faster sign-in next time") before redirecting to the console. Users can skip this.
+### TOTP (authenticator app) — step-up / enrollment factor, not a login method
+TOTP is **not** a way to sign in. It is an AAL2 factor that an already-signed-in analyst
+enrolls and verifies at `/admin/mfa`. A passkey sign-in already satisfies AAL2 on its own
+(see the gate below), so TOTP mainly exists as a second registered factor and a YubiKey-as-
+TOTP fallback. Supported apps: Google Authenticator, Authy, 1Password, Yubico Authenticator.
 
-### GitHub OAuth / Email magic link
-First-factor sign-in options available on the login page for users who have not yet enrolled (or choose not to use) a passkey.
+When a user lands on `/admin/mfa` after verifying TOTP, the page checks whether they have a
+passkey enrolled; if not, it offers one-tap registration before redirecting to the console.
 
 ---
 
@@ -89,13 +96,13 @@ Dashboard → **Authentication → Passkeys**:
 
 > **Note:** The RP ID is cryptographically bound to every passkey. Changing it after users enroll will invalidate all existing passkeys.
 
-### 2. Configure OAuth provider(s)
-Optional — only needed if you want GitHub/Google/etc. login in addition to email magic link.
-
-- **GitHub:** GitHub → Settings → Developer settings → OAuth Apps.
-  Callback URL: `https://shgdrkrqjnwtlyxcdayp.supabase.co/auth/v1/callback`
-- Paste the Client ID / Secret into Supabase → Auth → Providers.
-- Add `https://<your-domain>/auth/callback` (and `http://localhost:3000/auth/callback`) to the redirect allowlist in Supabase → Auth → URL Configuration.
+### 2. Lock down first-factor providers
+The login UI only offers passkeys, but Supabase still honors any auth method enabled at the
+project level. To match the intended attack surface, **disable email magic-link, OAuth
+providers, and password sign-in** in Supabase → Auth (Providers / Email) — except for a
+single bootstrap method kept available only while onboarding new analysts (see *Onboarding a
+new analyst* below). The catch-22 is intentional: a passkey can only be registered from an
+existing session, so the very first sign-in for a new analyst needs a temporary first factor.
 
 ### 3. Environment variables
 Set in Vercel → Settings → Environment Variables and in `.env.local`:
@@ -116,9 +123,22 @@ npm run dev   # visit http://localhost:3000/admin/review → redirects to login
 
 ---
 
-## First-time passkey enrollment (existing users)
+## Onboarding a new analyst (first passkey)
 
-1. Sign in with your first factor.
+Because passkey is the only login button and `registerPasskey()` requires an existing
+session, a brand-new analyst cannot bootstrap themselves from the UI alone. Use one of:
+
+- **Temporary first factor (simplest):** enable email magic-link in Supabase → Auth just
+  long enough for the analyst to sign in once, then immediately follow the enrollment steps
+  below and disable magic-link again.
+- **Admin-provisioned session:** an existing admin invites/creates the user via the Supabase
+  dashboard or `auth.admin` API so they can establish the first session.
+
+Add the analyst's email to `ADMIN_EMAILS` first, or the gate will reject them after sign-in.
+
+### Enrollment steps (once a session exists)
+
+1. Sign in with the temporary first factor (or the provisioned session).
 2. Complete the TOTP step at `/admin/mfa`.
 3. The MFA page shows: **"Register passkey for faster sign-in next time"**.
 4. Tap **Register passkey** — the browser prompts for the authenticator.
