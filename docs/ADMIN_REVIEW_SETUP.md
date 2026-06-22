@@ -1,6 +1,6 @@
 # Admin consoles — setup and authentication
 
-Four restricted consoles live under `/admin`:
+Restricted consoles live under `/admin`:
 
 | Path | Purpose |
 |---|---|
@@ -8,8 +8,9 @@ Four restricted consoles live under `/admin`:
 | `/admin/curator` | Data curation — HC + dual-track scores |
 | `/admin/intake` | Propose and approve/reject org intake |
 | `/admin/photos` | Upload, tag, and validate photos linked to organizations |
+| `/admin/persons` | Personnel identity — search, reveal, and publish encrypted identities (reveal/publish require decryptor authorization; every reveal is logged) |
 
-All four share the same auth gate and navigation bar.
+All consoles share the same auth gate and navigation bar.
 
 ---
 
