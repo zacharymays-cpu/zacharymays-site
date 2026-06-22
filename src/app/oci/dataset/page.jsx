@@ -15,7 +15,7 @@ const CATEGORIES = [
   { name: 'Media institutions',               count: '~20', note: 'Broadcast, print, digital, and ideological media formations' },
   { name: 'Educational institutions',         count: '~15', note: 'Universities, K-12 systems, and homeschool formations' },
   { name: 'Advocacy & civil society',         count: '~30', note: 'Civil rights, labor, environmental, and ideological advocacy organizations' },
-  { name: 'Historical calibration anchors',  count: '37',  note: 'Domestic and international historical formations used to bracket the scoring spectrum' },
+  { name: 'Historical calibration anchors',  count: '20',  note: 'Domestic and international historical formations used to bracket the scoring spectrum' },
 ];
 
 export default function DatasetPage() {
@@ -29,7 +29,7 @@ export default function DatasetPage() {
           </span>
           <h1 className="hero__title hero__title--compact animate-up-2">What Was<br />Assessed</h1>
           <p className="hero__subtitle hero__subtitle--compact animate-up-3">
-            <OrgCount /> active American organizations. 37 calibration anchors.
+            <OrgCount /> active American organizations. 20 calibration anchors.
             Publicly available, openly documented, and ongoing.
           </p>
         </div>
@@ -102,7 +102,7 @@ export default function DatasetPage() {
           <div className="section__label">Calibration Anchors</div>
 
           <p>
-            The dataset includes 37 calibration anchors — historical and
+            The dataset includes 20 calibration anchors — historical and
             international organizations used to bracket the scoring spectrum
             and ensure consistency across assessment sessions. Anchors span
             from organizations scoring at the Super Culty ceiling (100% composite,
