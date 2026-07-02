@@ -1,6 +1,6 @@
 # Admin consoles — setup and authentication
 
-Four restricted consoles live under `/admin`:
+Restricted consoles live under `/admin`:
 
 | Path | Purpose |
 |---|---|
@@ -8,8 +8,9 @@ Four restricted consoles live under `/admin`:
 | `/admin/curator` | Data curation — HC + dual-track scores |
 | `/admin/intake` | Propose and approve/reject org intake |
 | `/admin/photos` | Upload, tag, and validate photos linked to organizations |
+| `/admin/persons` | Personnel identity — search, reveal, and publish encrypted identities (reveal/publish require decryptor authorization; every reveal is logged) |
 
-All four share the same auth gate and navigation bar.
+All consoles share the same auth gate and navigation bar.
 
 ---
 
@@ -37,18 +38,51 @@ All four share the same auth gate and navigation bar.
 ## Sign-in methods
 
 ### Passkeys (recommended — fastest)
-Users who have registered a passkey can sign in with a single Face ID / Touch ID tap on any enrolled Apple device (or any FIDO2-capable device). Passkeys are phishing-resistant and satisfy AAL2 directly — no separate TOTP step required.
+Users who have registered a passkey can sign in with a single tap on any enrolled
+authenticator — a platform authenticator (Face ID / Touch ID / Windows Hello) **or** a
+roaming FIDO2 hardware security key such as a **YubiKey**. Passkeys are phishing-resistant
+and satisfy AAL2 directly — no separate TOTP step required.
 
 - On the login page, tap **"Sign in with passkey"**.
 - The browser handles the WebAuthn ceremony and creates a full session.
 
-### TOTP (authenticator app)
-Users without a passkey sign in with GitHub OAuth or an email magic link, then complete a TOTP step-up at `/admin/mfa`. Supported apps: Google Authenticator, Authy, 1Password.
+### Hardware security keys (YubiKey)
+A YubiKey (or any FIDO2/WebAuthn security key) is just a passkey backed by dedicated
+hardware. It registers and signs in through the exact same `registerPasskey()` /
+`signInWithPasskey()` flow as a platform passkey — no extra code or configuration is
+required beyond the one-time passkey enablement below.
 
-After completing TOTP, the MFA page automatically checks whether the user has a passkey enrolled. If not, it offers a one-tap registration ("Register passkey for faster sign-in next time") before redirecting to the console. Users can skip this.
+Two ways to use a YubiKey:
+1. **As a passkey (recommended).** Register the key as a WebAuthn credential (steps below).
+   USB-A, USB-C, and NFC keys all work in modern browsers; NFC requires tapping the key to
+   a phone/reader during the prompt. The credential is cryptographically bound to the
+   Relying Party ID (`zacharymays.com`), so a key registered against production will not
+   work against `localhost`/preview origins unless those origins are added to the RP config.
+2. **As a TOTP token.** A YubiKey 5-series can also store the TOTP secret via the **Yubico
+   Authenticator** app, then supply the 6-digit code at `/admin/mfa` like any authenticator
+   app. This is a fallback — the passkey path is stronger and faster.
 
-### GitHub OAuth / Email magic link
-First-factor sign-in options available on the login page for users who have not yet enrolled (or choose not to use) a passkey.
+> **Roaming-only enforcement is not supported.** Supabase's managed passkey flow generates
+> the WebAuthn options server-side and does not expose `authenticatorAttachment` /
+> attestation controls, so the admin app **cannot force** "security key only" and reject
+> platform passkeys (Face ID / Touch ID). Both authenticator types are accepted. Any
+> client-side attempt to restrict this would be cosmetic and bypassable, so it is
+> intentionally not implemented.
+
+**Passkey is the only sign-in method.** The login page (`src/app/admin/login/page.jsx`)
+exposes a single **"Sign in with passkey"** button — GitHub OAuth and email magic-link were
+removed to minimize the admin login attack surface. Removing the UI does not disable those
+flows at the API level, so they must **also** be turned off in the Supabase project
+(Auth → Providers / Email) to actually close the surface.
+
+### TOTP (authenticator app) — step-up / enrollment factor, not a login method
+TOTP is **not** a way to sign in. It is an AAL2 factor that an already-signed-in analyst
+enrolls and verifies at `/admin/mfa`. A passkey sign-in already satisfies AAL2 on its own
+(see the gate below), so TOTP mainly exists as a second registered factor and a YubiKey-as-
+TOTP fallback. Supported apps: Google Authenticator, Authy, 1Password, Yubico Authenticator.
+
+When a user lands on `/admin/mfa` after verifying TOTP, the page checks whether they have a
+passkey enrolled; if not, it offers one-tap registration before redirecting to the console.
 
 ---
 
@@ -63,13 +97,13 @@ Dashboard → **Authentication → Passkeys**:
 
 > **Note:** The RP ID is cryptographically bound to every passkey. Changing it after users enroll will invalidate all existing passkeys.
 
-### 2. Configure OAuth provider(s)
-Optional — only needed if you want GitHub/Google/etc. login in addition to email magic link.
-
-- **GitHub:** GitHub → Settings → Developer settings → OAuth Apps.
-  Callback URL: `https://shgdrkrqjnwtlyxcdayp.supabase.co/auth/v1/callback`
-- Paste the Client ID / Secret into Supabase → Auth → Providers.
-- Add `https://<your-domain>/auth/callback` (and `http://localhost:3000/auth/callback`) to the redirect allowlist in Supabase → Auth → URL Configuration.
+### 2. Lock down first-factor providers
+The login UI only offers passkeys, but Supabase still honors any auth method enabled at the
+project level. To match the intended attack surface, **disable email magic-link, OAuth
+providers, and password sign-in** in Supabase → Auth (Providers / Email) — except for a
+single bootstrap method kept available only while onboarding new analysts (see *Onboarding a
+new analyst* below). The catch-22 is intentional: a passkey can only be registered from an
+existing session, so the very first sign-in for a new analyst needs a temporary first factor.
 
 ### 3. Environment variables
 Set in Vercel → Settings → Environment Variables and in `.env.local`:
@@ -90,13 +124,35 @@ npm run dev   # visit http://localhost:3000/admin/review → redirects to login
 
 ---
 
-## First-time passkey enrollment (existing users)
+## Onboarding a new analyst (first passkey)
 
-1. Sign in via GitHub or email magic link.
+Because passkey is the only login button and `registerPasskey()` requires an existing
+session, a brand-new analyst cannot bootstrap themselves from the UI alone. Use one of:
+
+- **Temporary first factor (simplest):** enable email magic-link in Supabase → Auth just
+  long enough for the analyst to sign in once, then immediately follow the enrollment steps
+  below and disable magic-link again.
+- **Admin-provisioned session:** an existing admin invites/creates the user via the Supabase
+  dashboard or `auth.admin` API so they can establish the first session.
+
+Add the analyst's email to `ADMIN_EMAILS` first, or the gate will reject them after sign-in.
+
+### Enrollment steps (once a session exists)
+
+1. Sign in with the temporary first factor (or the provisioned session).
 2. Complete the TOTP step at `/admin/mfa`.
 3. The MFA page shows: **"Register passkey for faster sign-in next time"**.
-4. Tap **Register passkey** — the browser prompts for Face ID / Touch ID.
-5. Done. Next sign-in: tap "Sign in with passkey" on the login page.
+4. Tap **Register passkey** — the browser prompts for the authenticator.
+   - **Platform passkey:** approve with Face ID / Touch ID / Windows Hello.
+   - **YubiKey:** insert the key (or tap it to the NFC reader) and touch the gold contact
+     when it blinks; set a PIN if the browser asks. The credential's friendly name is
+     auto-derived from the key's AAGUID (e.g. "YubiKey 5 Series").
+5. Done. Next sign-in: tap "Sign in with passkey" on the login page and present the same
+   authenticator.
+
+> A user can register more than one passkey (e.g. Touch ID **and** a YubiKey as a backup).
+> Manage them via `supabase.auth.passkey.list()` / `delete()`. Registering a backup
+> hardware key is recommended so a lost or wiped device doesn't lock the analyst out.
 
 ---
 
