@@ -54,16 +54,20 @@ export async function revealPerson(personId: string) {
   return { name };
 }
 
+// Visibility changes go through the set_person_visibility RPC, which records a
+// txn-local justification reason BEFORE the update so the audit + enforcement
+// triggers see it. Direct UPDATEs to identity_public are rejected by the
+// require-justification trigger (no silent/back-channel flips).
 export async function publishPerson(personId: string, justificationType: string, sourceNote: string | null) {
   const user = await requireDecryptor();
   const email = (user.email || '').toLowerCase();
   const admin = createSupabaseAdminClient();
   const name = await decryptName(admin, personId, email);
-  await admin.from('person_visibility_justifications').insert({
-    person_id: personId, justification_type: justificationType, source_note: sourceNote, created_by: email,
+  const reason = sourceNote && sourceNote.trim() ? sourceNote.trim() : `published: ${justificationType}`;
+  const { error } = await admin.rpc('set_person_visibility', {
+    p_person_id: personId, p_make_public: true, p_reason: reason,
+    p_justification_type: justificationType, p_public_name: name, p_actor: email,
   });
-  const { error } = await admin.from('persons')
-    .update({ identity_public: true, public_display_name: name }).eq('id', personId);
   if (error) throw new Error(error.message);
   await logDecryptAttempt({ actorEmail: email, personId, field: FIELD, justification: justificationType, succeeded: true });
   return { ok: true as const };
@@ -73,8 +77,10 @@ export async function anonymizePerson(personId: string, reason: string) {
   const user = await requireDecryptor();
   const email = (user.email || '').toLowerCase();
   const admin = createSupabaseAdminClient();
-  const { error } = await admin.from('persons')
-    .update({ identity_public: false, public_display_name: null }).eq('id', personId);
+  const justReason = reason && reason.trim() ? reason.trim() : 'anonymized via admin console';
+  const { error } = await admin.rpc('set_person_visibility', {
+    p_person_id: personId, p_make_public: false, p_reason: justReason, p_actor: email,
+  });
   if (error) throw new Error(error.message);
   await logDecryptAttempt({ actorEmail: email, personId, field: FIELD, justification: `anonymize: ${reason}`, succeeded: true });
   return { ok: true as const };
