@@ -1,10 +1,6 @@
 'use client';
 import { useState, useMemo } from 'react';
-
-const TIER_COLORS = { 'Super Culty':'#e8574d','Kinda Culty':'#d99b3e','Not Culty':'#5cb878' };
-// Softer reader-facing labels for the DB tier enum (keys are unchanged).
-const TIER_LABELS = { 'Super Culty':'High-Control','Kinda Culty':'Moderate-Control','Not Culty':'Low-Control' };
-const lbl = (t) => TIER_LABELS[t] || t;
+import { classifyComposite, compositeBandFromTier } from '../../../lib/scoring';
 
 function boxStats(scores) {
   if (!scores.length) return null;
@@ -52,12 +48,6 @@ export default function DistributionsClient({ orgs=[] }) {
   const H = PAD_T + sorted.length * ROW_H + 40;
   const x = (v) => PAD_L + (v / 100) * INNER_W;
   const cy = (i) => PAD_T + i * ROW_H + ROW_H / 2;
-
-  function tierAtScore(s) {
-    if (s>=71) return 'Super Culty';
-    if (s>=41) return 'Kinda Culty';
-    return 'Not Culty';
-  }
 
   return (
     <div style={{minHeight:'100vh'}}>
@@ -110,7 +100,7 @@ export default function DistributionsClient({ orgs=[] }) {
             {/* Tier threshold background strips */}
             {[[0,41,'Not Culty'],[41,71,'Kinda Culty'],[71,100,'Super Culty']].map(([x0,x1,t])=>(
               <rect key={t} x={x(x0)} y={PAD_T-8} width={x(x1)-x(x0)} height={sorted.length*ROW_H+16}
-                fill={TIER_COLORS[t]} fillOpacity={0.05}/>
+                fill={compositeBandFromTier(t)?.color} fillOpacity={0.05}/>
             ))}
 
             {/* X axis grid + labels */}
@@ -132,7 +122,7 @@ export default function DistributionsClient({ orgs=[] }) {
               const {q1,med,q3,mean,whiskerLo,whiskerHi,outliers,n} = cat.stats;
               const yc = cy(i);
               const bh = ROW_H * 0.52;
-              const tierColor = TIER_COLORS[tierAtScore(med)] || '#888';
+              const tierColor = classifyComposite(med)?.color || '#888';
               const isH = hovered?.cat===cat.cat;
               return (
                 <g key={cat.cat}

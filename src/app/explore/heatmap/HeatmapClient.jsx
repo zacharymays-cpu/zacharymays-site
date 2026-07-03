@@ -1,13 +1,10 @@
 'use client';
 import { useState, useMemo } from 'react';
+import { compositeBandFromTier } from '../../../lib/scoring';
 
 const CRITERIA = ['C1','C2','C3','C4','C5','C6','C7','C8','C9','C10'];
 const C_NAMES = { C1:'Leadership',C2:'Sacred Assumptions',C3:'Mission',C4:'Individuality',C5:'Isolation',C6:'Vernacular',C7:'Us/Them',C8:'Labor',C9:'Exit Costs',C10:'Ends/Means' };
 const TIERS = ['Super Culty','Kinda Culty','Not Culty'];
-const TIER_COLORS = { 'Super Culty':'#e8574d','Kinda Culty':'#d99b3e','Not Culty':'#5cb878' };
-// Softer reader-facing labels for the DB tier enum (keys are unchanged).
-const TIER_LABELS = { 'Super Culty':'High-Control','Kinda Culty':'Moderate-Control','Not Culty':'Low-Control' };
-const lbl = (t) => TIER_LABELS[t] || t;
 
 function scoreColor(v) {
   if (v === null || v === undefined) return 'rgba(212,206,196,0.05)';
@@ -76,15 +73,18 @@ export default function HeatmapClient({ orgs=[], scoreMap={} }) {
           {/* Controls */}
           <div style={{display:'flex',gap:'1rem',marginTop:'1rem',flexWrap:'wrap',alignItems:'center'}}>
             <div style={{display:'flex',gap:'0.4rem',flexWrap:'wrap'}}>
-              {TIERS.map(t=>(
+              {TIERS.map(t=>{
+                const tc = compositeBandFromTier(t)?.color;
+                return (
                 <button key={t} onClick={()=>toggle(t,tierFilter,setTierFilter)}
                   style={{fontFamily:'var(--mono)',fontSize:'0.6rem',padding:'0.25rem 0.55rem',
-                    background:tierFilter.includes(t)?`rgba(${hexRgb(TIER_COLORS[t])},0.2)`:'transparent',
-                    border:`1px solid ${tierFilter.includes(t)?TIER_COLORS[t]:'rgba(212,206,196,0.18)'}`,
-                    color:tierFilter.includes(t)?TIER_COLORS[t]:'var(--muted)',cursor:'pointer'}}>
-                  {lbl(t)}
+                    background:tierFilter.includes(t)?`rgba(${hexRgb(tc)},0.2)`:'transparent',
+                    border:`1px solid ${tierFilter.includes(t)?tc:'rgba(212,206,196,0.18)'}`,
+                    color:tierFilter.includes(t)?tc:'var(--muted)',cursor:'pointer'}}>
+                  {compositeBandFromTier(t)?.label || t}
                 </button>
-              ))}
+                );
+              })}
             </div>
             <select value={categoryFilter} onChange={e=>setCategoryFilter(e.target.value)}
               style={{fontFamily:'var(--mono)',fontSize:'0.68rem',background:'rgba(244,240,232,0.04)',border:'1px solid rgba(212,206,196,0.2)',color:'var(--muted)',padding:'0.3rem 0.6rem',cursor:'pointer'}}>
@@ -138,7 +138,7 @@ export default function HeatmapClient({ orgs=[], scoreMap={} }) {
           {/* Rows */}
           {filtered.map((org,i) => {
             const scores = scoreMap[org.id] || {};
-            const tc = TIER_COLORS[org.composite_tier] || '#666';
+            const tc = compositeBandFromTier(org.composite_tier)?.color || '#666';
             return (
               <div key={org.id} style={{display:'flex',alignItems:'center',borderBottom:'1px solid rgba(212,206,196,0.04)',
                 background:i%2===0?'transparent':'rgba(244,240,232,0.01)'}}>

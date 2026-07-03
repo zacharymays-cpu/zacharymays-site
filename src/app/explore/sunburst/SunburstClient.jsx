@@ -1,16 +1,8 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
-
-const TIER_COLORS = {
-  'Super Culty':  '#e8574d',
-  'Kinda Culty':  '#d99b3e',
-  'Not Culty':    '#5cb878',
-};
+import { compositeBandFromTier } from '../../../lib/scoring';
 
 const TIER_ORDER = ['Super Culty','Kinda Culty','Not Culty'];
-// Softer reader-facing labels for the DB tier enum (keys are unchanged).
-const TIER_LABELS = { 'Super Culty':'High-Control','Kinda Culty':'Moderate-Control','Not Culty':'Low-Control' };
-const lbl = (t) => TIER_LABELS[t] || t;
 
 export default function SunburstClient({ data = [] }) {
   const svgRef   = useRef(null);
@@ -34,7 +26,7 @@ export default function SunburstClient({ data = [] }) {
     return TIER_ORDER.filter(t => tiers[t]).map(t => ({
       name:  t,
       total: tiers[t].total,
-      color: TIER_COLORS[t],
+      color: compositeBandFromTier(t)?.color,
       children: Object.values(tiers[t].children).sort((a,b) => b.value - a.value),
     }));
   })();
@@ -198,11 +190,11 @@ export default function SunburstClient({ data = [] }) {
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.5rem' }}>
                 <div style={{ width: 8, height: 8, borderRadius: '50%', background: hovered.color }} />
                 <span style={{ fontFamily: 'var(--mono)', fontSize: '0.6rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: hovered.color }}>
-                  {hovered.type === 'tier' ? 'Tier' : lbl(hovered.tier)}
+                  {hovered.type === 'tier' ? 'Tier' : (compositeBandFromTier(hovered.tier)?.label || hovered.tier)}
                 </span>
               </div>
               <p style={{ fontFamily: 'var(--serif)', fontSize: '1rem', fontWeight: 700, color: 'var(--paper)', marginBottom: '0.5rem' }}>
-                {hovered.type === 'tier' ? lbl(hovered.name) : hovered.name}
+                {hovered.type === 'tier' ? (compositeBandFromTier(hovered.name)?.label || hovered.name) : hovered.name}
               </p>
               <p style={{ fontFamily: 'var(--mono)', fontSize: '0.75rem', color: 'var(--gold)' }}>
                 {hovered.total || hovered.value} organizations
@@ -239,7 +231,7 @@ export default function SunburstClient({ data = [] }) {
             {hierarchy.map(tier => (
               <div key={tier.name} style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', padding: '0.45rem 0', borderBottom: '1px solid rgba(212,206,196,0.05)' }}>
                 <div style={{ width: 7, height: 7, borderRadius: '50%', background: tier.color, flexShrink: 0 }} />
-                <span style={{ fontFamily: 'var(--mono)', fontSize: '0.65rem', color: 'var(--muted)', flex: 1 }}>{lbl(tier.name)}</span>
+                <span style={{ fontFamily: 'var(--mono)', fontSize: '0.65rem', color: 'var(--muted)', flex: 1 }}>{compositeBandFromTier(tier.name)?.label || tier.name}</span>
                 <span style={{ fontFamily: 'var(--mono)', fontSize: '0.7rem', color: 'var(--gold)', fontWeight: 700 }}>{tier.total}</span>
                 <span style={{ fontFamily: 'var(--mono)', fontSize: '0.58rem', color: 'rgba(212,206,196,0.35)', width: 38, textAlign: 'right' }}>
                   {((tier.total / totalOrgs) * 100).toFixed(1)}%
