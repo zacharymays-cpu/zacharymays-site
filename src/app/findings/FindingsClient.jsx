@@ -1,15 +1,15 @@
 'use client';
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { compositeBandFromTier } from '../../lib/scoring';
+import { compositeBandFromTier, classifyComposite } from '../../lib/scoring';
 
 const TIER_ORDER = ['Super Culty','Kinda Culty','Not Culty'];
 const TIER_RANGES = {
-  'Super Culty':'71–100%','Kinda Culty':'41–70%','Not Culty':'0–40%',
+  'Super Culty':'60–100%','Kinda Culty':'30–59%','Not Culty':'0–29%',
 };
 const TIER_THRESH = [
-  {x:41,label:'Kinda Culty'},
-  {x:71,label:'Super Culty'},
+  {x:30,label:'Kinda Culty'},
+  {x:60,label:'Super Culty'},
 ];
 const ANNOTATIONS = [
   {score:19, label:'NAACP 19%'},
@@ -63,9 +63,8 @@ export default function FindingsClient({ orgs=[] }) {
     for (let i = 0; i < 100; i += 5) {
       const center = i + 2.5;
       const count = scores.filter(s => s >= i && s < i+5).length;
-      let tier = 'Not Culty';
-      if (center >= 71) tier = 'Super Culty';
-      else if (center >= 41) tier = 'Kinda Culty';
+      const bandId = classifyComposite(center)?.id;
+      const tier = bandId === 'high' ? 'Super Culty' : bandId === 'moderate' ? 'Kinda Culty' : 'Not Culty';
       b.push({start:i, center, count, tier});
     }
     return b;
@@ -86,8 +85,8 @@ export default function FindingsClient({ orgs=[] }) {
   const chartMaxY = useMemo(() => Math.max(maxCount, maxNormalY) * 1.15, [maxCount, maxNormalY]);
 
   // Headline stats
-  const above41 = scores.filter(s=>s>=41).length;
-  const above71 = scores.filter(s=>s>=71).length;
+  const above30 = scores.filter(s=>s>=30).length;
+  const above60 = scores.filter(s=>s>=60).length;
   const pct = (n) => `${(100*n/scores.length).toFixed(0)}%`;
 
   // Instrument variance
@@ -142,9 +141,9 @@ export default function FindingsClient({ orgs=[] }) {
         <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'1rem',marginBottom:'3rem'}}>
           {[
             ['Organizations', scores.length, ''],
-            ['Super Culty', pct(above71), '71–100%'],
-            ['Kinda Culty', pct(above41-above71), '41–70%'],
-            ['Not Culty', pct(scores.length-above41), '0–40%'],
+            ['Super Culty', pct(above60), '60–100%'],
+            ['Kinda Culty', pct(above30-above60), '30–59%'],
+            ['Not Culty', pct(scores.length-above30), '0–29%'],
           ].map(([label,value,sub])=>(
             <div key={label} style={{padding:'1.25rem',background:'rgba(244,240,232,0.03)',border:'1px solid rgba(212,206,196,0.12)'}}>
               <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.14em',textTransform:'uppercase',color:'var(--muted)',marginBottom:'0.4rem'}}>{compositeBandFromTier(label)?.label || label}</div>
@@ -168,7 +167,7 @@ export default function FindingsClient({ orgs=[] }) {
 
               {/* Tier background shading */}
               {[
-                [0,41,'Not Culty'],[41,71,'Kinda Culty'],[71,100,'Super Culty'],
+                [0,30,'Not Culty'],[30,60,'Kinda Culty'],[60,100,'Super Culty'],
               ].map(([x0,x1,tier])=>(
                 <rect key={tier}
                   x={histX(x0)} y={HIST_PAD.t}
