@@ -3,33 +3,13 @@ import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { SUPABASE_URL, ANON_KEY } from '../../lib/supabase/config';
+import { compositeBandFromTier, youngBandFromDb, classifyLifton, TRACKS } from '../../lib/scoring';
 
-const TIER_COLORS = {
-  'Super Culty':'#e8574d','Kinda Culty':'#d99b3e','Not Culty':'#5cb878',
-};
 const TIER_CLASS = {
   'Super Culty':'tier-super-culty','Kinda Culty':'tier-kinda-culty','Not Culty':'tier-not-culty',
 };
 const TIERS = ['Super Culty','Kinda Culty','Not Culty'];
-const TIER_LABELS = { 'Super Culty':'High-Control','Kinda Culty':'Moderate-Control','Not Culty':'Low-Control' };
-const lbl = (t) => TIER_LABELS[t] || t;
 const TRAJECTORIES = ['Stable','Escalating','Declining','Defunct'];
-
-// ── Lifton psychological-totalism tier (C11) ────────────────────────────────
-const LIFTON_TIERS = ['Psychologically Totalizing','Moderately Totalizing','Non-Totalizing'];
-const LIFTON_TIER_COLORS = {
-  'Psychologically Totalizing':'#a06cd5','Moderately Totalizing':'#6d83b5','Non-Totalizing':'#5f8f86',
-};
-const LIFTON_TIER_SHORT = {
-  'Psychologically Totalizing':'Totalizing','Moderately Totalizing':'Moderate','Non-Totalizing':'Non-Totalizing',
-};
-const liftonTier = (score) => {
-  const v = parseFloat(score);
-  if (Number.isNaN(v)) return null;
-  if (v >= 6) return 'Psychologically Totalizing';
-  if (v >= 3) return 'Moderately Totalizing';
-  return 'Non-Totalizing';
-};
 const CRITERIA = ['C1','C2','C3','C4','C5','C6','C7','C8','C9','C10'];
 const CRITERIA_DETAIL = {
   C1:{name:'Charismatic Leadership',desc:'Has a defined, charismatic leader — or a central authoritative idea — treated as extraordinary, directives taken as truth, dissenters discredited.'},
@@ -219,7 +199,7 @@ function RadarChart({ scores }) {
 // ── Detail Modal ─────────────────────────────────────────────────────────────
 function DetailModal({ org, criterionScores, politicalPos, loading, onClose }) {
   const scores = criterionScores[org?.id] || {};
-  const tierColor = TIER_COLORS[org?.composite_tier] || '#888';
+  const tierColor = compositeBandFromTier(org?.composite_tier)?.color || '#888';
   const compositeNum = org ? parseFloat(org.composite_score) : NaN;
   const composite = Number.isNaN(compositeNum) ? null : compositeNum.toFixed(1);
 
@@ -286,7 +266,7 @@ function DetailModal({ org, criterionScores, politicalPos, loading, onClose }) {
               background:`rgba(${hexToRgb(tierColor)},0.15)`,
               border:`1px solid rgba(${hexToRgb(tierColor)},0.4)`}}>
               <div style={{width:8,height:8,borderRadius:'50%',background:tierColor}}/>
-              <span style={{fontFamily:'var(--mono)',fontSize:'0.65rem',letterSpacing:'0.1em',color:tierColor}}>{org.composite_tier}</span>
+              <span style={{fontFamily:'var(--mono)',fontSize:'0.65rem',letterSpacing:'0.1em',color:tierColor}}>{compositeBandFromTier(org.composite_tier)?.label || org.composite_tier}</span>
             </div>
             {org.trajectory&&(
               <div style={{padding:'0.35rem 0.75rem',border:'1px solid rgba(212,206,196,0.15)'}}>
@@ -321,7 +301,7 @@ function DetailModal({ org, criterionScores, politicalPos, loading, onClose }) {
               {politicalPos&&(
                 <div style={{padding:'1rem',background:'rgba(244,240,232,0.02)',border:'1px solid rgba(212,206,196,0.08)'}}>
                   <div style={{fontFamily:'var(--mono)',fontSize:'0.58rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--gold)',marginBottom:'0.6rem',textAlign:'center'}}>Political Position</div>
-                  <MiniCompass econ={politicalPos.econ} auth={politicalPos.auth} quadrant={politicalPos.quadrant} tierColor={TIER_COLORS[org.composite_tier]}/>
+                  <MiniCompass econ={politicalPos.econ} auth={politicalPos.auth} quadrant={politicalPos.quadrant} tierColor={compositeBandFromTier(org.composite_tier)?.color}/>
                   <div style={{textAlign:'center',marginTop:'0.4rem',paddingTop:'0.4rem',borderTop:'1px solid rgba(212,206,196,0.07)'}}>
                     <span style={{fontFamily:'var(--mono)',fontSize:'0.6rem',color:'rgba(212,206,196,0.4)'}}>{politicalPos.quadrant||'—'}</span>
                   </div>
@@ -430,7 +410,7 @@ export default function ExploreClient({ initialOrgs=[] }) {
          !o.category.toLowerCase().includes(search.toLowerCase())) return false;
       if(tierFilter.length&&!tierFilter.includes(o.composite_tier)) return false;
       if(youngsBandFilter.length&&!youngsBandFilter.includes(o.youngs_band)) return false;
-      if(liftonTierFilter.length&&!liftonTierFilter.includes(liftonTier(o.lifton_score))) return false;
+      if(liftonTierFilter.length&&!liftonTierFilter.includes(classifyLifton(o.lifton_score)?.label)) return false;
       if(trajFilter.length&&!trajFilter.includes(o.trajectory)) return false;
       if(categoryFilter.length&&!categoryFilter.includes(o.category)) return false;
       const s=parseFloat(o.composite_score);
@@ -518,8 +498,8 @@ export default function ExploreClient({ initialOrgs=[] }) {
                 </div>
                 {TIERS.map(t=>(
                   <label key={t} style={{display:'flex',alignItems:'center',gap:'0.5rem',marginBottom:'0.3rem',cursor:'pointer'}}>
-                    <input type="checkbox" checked={tierFilter.includes(t)} onChange={()=>toggle(t,tierFilter,setTierFilter)} style={{accentColor:TIER_COLORS[t]}}/>
-                    <span style={{fontSize:'0.77rem',color:tierFilter.includes(t)?'var(--paper)':'var(--muted)',flex:1}}>{lbl(t)}</span>
+                    <input type="checkbox" checked={tierFilter.includes(t)} onChange={()=>toggle(t,tierFilter,setTierFilter)} style={{accentColor:compositeBandFromTier(t)?.color}}/>
+                    <span style={{fontSize:'0.77rem',color:tierFilter.includes(t)?'var(--paper)':'var(--muted)',flex:1}}>{compositeBandFromTier(t)?.label || t}</span>
                     <span style={{fontFamily:'var(--mono)',fontSize:'0.63rem',color:'var(--muted)'}}>{orgs.filter(o=>o.composite_tier===t).length}</span>
                   </label>
                 ))}
@@ -532,8 +512,8 @@ export default function ExploreClient({ initialOrgs=[] }) {
                 </div>
                 {TIERS.map(t=>(
                   <label key={t} style={{display:'flex',alignItems:'center',gap:'0.5rem',marginBottom:'0.3rem',cursor:'pointer'}}>
-                    <input type="checkbox" checked={youngsBandFilter.includes(t)} onChange={()=>toggle(t,youngsBandFilter,setYoungsBandFilter)} style={{accentColor:TIER_COLORS[t]}}/>
-                    <span style={{fontSize:'0.77rem',color:youngsBandFilter.includes(t)?'var(--paper)':'var(--muted)',flex:1}}>{t}</span>
+                    <input type="checkbox" checked={youngsBandFilter.includes(t)} onChange={()=>toggle(t,youngsBandFilter,setYoungsBandFilter)} style={{accentColor:youngBandFromDb(t)?.color}}/>
+                    <span style={{fontSize:'0.77rem',color:youngsBandFilter.includes(t)?'var(--paper)':'var(--muted)',flex:1}}>{youngBandFromDb(t)?.label || t}</span>
                     <span style={{fontFamily:'var(--mono)',fontSize:'0.63rem',color:'var(--muted)'}}>{orgs.filter(o=>o.youngs_band===t).length}</span>
                   </label>
                 ))}
@@ -544,11 +524,11 @@ export default function ExploreClient({ initialOrgs=[] }) {
                 <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--muted)',marginBottom:'0.5rem'}}>
                   Totalism Tier <span style={{textTransform:'none',letterSpacing:0,color:'rgba(212,206,196,0.3)'}}>· Lifton</span>
                 </div>
-                {LIFTON_TIERS.map(t=>(
+                {TRACKS.lifton.bands.map(({label:t,color})=>(
                   <label key={t} style={{display:'flex',alignItems:'center',gap:'0.5rem',marginBottom:'0.3rem',cursor:'pointer'}}>
-                    <input type="checkbox" checked={liftonTierFilter.includes(t)} onChange={()=>toggle(t,liftonTierFilter,setLiftonTierFilter)} style={{accentColor:LIFTON_TIER_COLORS[t]}}/>
+                    <input type="checkbox" checked={liftonTierFilter.includes(t)} onChange={()=>toggle(t,liftonTierFilter,setLiftonTierFilter)} style={{accentColor:color}}/>
                     <span style={{fontSize:'0.77rem',color:liftonTierFilter.includes(t)?'var(--paper)':'var(--muted)',flex:1}}>{t}</span>
-                    <span style={{fontFamily:'var(--mono)',fontSize:'0.63rem',color:'var(--muted)'}}>{orgs.filter(o=>liftonTier(o.lifton_score)===t).length}</span>
+                    <span style={{fontFamily:'var(--mono)',fontSize:'0.63rem',color:'var(--muted)'}}>{orgs.filter(o=>classifyLifton(o.lifton_score)?.label===t).length}</span>
                   </label>
                 ))}
               </div>
@@ -645,19 +625,19 @@ export default function ExploreClient({ initialOrgs=[] }) {
                       </td>
                       <td style={{padding:'0.65rem 0.75rem',whiteSpace:'nowrap'}}>
                         {org.composite_tier
-                          ? <span style={{fontFamily:'var(--mono)',fontSize:'0.6rem',fontWeight:600,letterSpacing:'0.06em',textTransform:'uppercase',padding:'0.24rem 0.5rem',borderRadius:'2px',color:'#1c1814',background:TIER_COLORS[org.composite_tier],border:`1px solid ${TIER_COLORS[org.composite_tier]}`}}>{lbl(org.composite_tier)}</span>
+                          ? <span style={{fontFamily:'var(--mono)',fontSize:'0.6rem',fontWeight:600,letterSpacing:'0.06em',textTransform:'uppercase',padding:'0.24rem 0.5rem',borderRadius:'2px',color:'#1c1814',background:compositeBandFromTier(org.composite_tier)?.color,border:`1px solid ${compositeBandFromTier(org.composite_tier)?.color}`}}>{compositeBandFromTier(org.composite_tier)?.label || org.composite_tier}</span>
                           : <span style={{fontFamily:'var(--mono)',fontSize:'0.62rem',fontStyle:'italic',color:'rgba(212,206,196,0.3)'}}>Pending</span>}
                       </td>
                       <td style={{padding:'0.65rem 0.75rem',fontFamily:'var(--mono)',fontSize:'0.82rem',color:'rgba(212,206,196,0.8)'}}>{org.youngs_score==null?'—':`${org.youngs_score}/10`}</td>
                       <td className="explore-table-hide-mobile" style={{padding:'0.65rem 0.75rem',whiteSpace:'nowrap'}}>
                         {org.youngs_band
-                          ? <span style={{display:'inline-flex',alignItems:'center',gap:'0.4rem',fontFamily:'var(--mono)',fontSize:'0.62rem',color:'rgba(212,206,196,0.8)'}}><span style={{width:8,height:8,borderRadius:'50%',background:TIER_COLORS[org.youngs_band],flexShrink:0}}/>{lbl(org.youngs_band)}</span>
+                          ? <span style={{display:'inline-flex',alignItems:'center',gap:'0.4rem',fontFamily:'var(--mono)',fontSize:'0.62rem',color:'rgba(212,206,196,0.8)'}}><span style={{width:8,height:8,borderRadius:'50%',background:youngBandFromDb(org.youngs_band)?.color,flexShrink:0}}/>{youngBandFromDb(org.youngs_band)?.label || org.youngs_band}</span>
                           : <span style={{fontFamily:'var(--mono)',fontSize:'0.62rem',color:'rgba(212,206,196,0.3)'}}>—</span>}
                       </td>
                       <td className="explore-table-hide-mobile" style={{padding:'0.65rem 0.75rem',fontFamily:'var(--mono)',fontSize:'0.82rem',fontWeight:600,color:'var(--paper)',whiteSpace:'nowrap'}}>{org.lifton_score==null?<span style={{color:'rgba(212,206,196,0.35)',fontWeight:400}}>—</span>:`${parseFloat(org.lifton_score)}/10`}</td>
                       <td className="explore-table-hide-mobile" style={{padding:'0.65rem 0.75rem',whiteSpace:'nowrap'}}>
-                        {(() => { const lt = liftonTier(org.lifton_score); return lt
-                          ? <span style={{display:'inline-flex',alignItems:'center',gap:'0.4rem',fontFamily:'var(--mono)',fontSize:'0.62rem',color:'rgba(212,206,196,0.8)'}}><span style={{width:8,height:8,borderRadius:'50%',background:LIFTON_TIER_COLORS[lt],flexShrink:0}}/>{LIFTON_TIER_SHORT[lt]}</span>
+                        {(() => { const band = classifyLifton(org.lifton_score); return band
+                          ? <span style={{display:'inline-flex',alignItems:'center',gap:'0.4rem',fontFamily:'var(--mono)',fontSize:'0.62rem',color:'rgba(212,206,196,0.8)'}}><span style={{width:8,height:8,borderRadius:'50%',background:band.color,flexShrink:0}}/>{band.short}</span>
                           : <span style={{fontFamily:'var(--mono)',fontSize:'0.62rem',color:'rgba(212,206,196,0.3)'}}>—</span>; })()}
                       </td>
                       <td className="explore-table-hide-mobile" style={{padding:'0.65rem 0.75rem',color:'rgba(212,206,196,0.8)',fontSize:'0.75rem',fontFamily:'var(--mono)',whiteSpace:'nowrap'}}>{org.category}</td>
