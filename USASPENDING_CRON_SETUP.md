@@ -2,7 +2,7 @@
 
 ## ✅ What's Configured
 
-- [x] Supabase Edge Function: `sync-usaspending-awards` (deployed)
+- [x] Supabase Edge Function: `sync-usaspending` (deployed)
 - [x] Database Tables: `usaspending_awards`, `usaspending_sync_runs` (created)
 - [x] Cron Endpoint: `/api/cron/sync-usaspending` (updated)
 - [x] Cron Schedule: Daily at 2 AM UTC (`0 2 * * *`)

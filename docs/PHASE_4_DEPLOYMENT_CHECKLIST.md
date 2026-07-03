@@ -135,10 +135,8 @@ Phase 4 integrates 4 major components:
 
 3. **cultiness-spectrum Secrets (for CI/CD Workflows):**
    - [ ] `SUPABASE_SERVICE_KEY` — matches zacharymays-site's SUPABASE_SERVICE_ROLE_KEY
-   - [ ] `ANTHROPIC_API_KEY` — scorer API key
-   - [ ] `OPENAI_API_KEY` — scorer API key
-   - [ ] `GEMINI_API_KEY` — scorer API key
-   - [ ] `OPENROUTER_API_KEY` — scorer fallback
+   - [ ] `OPENROUTER_KEY_SCORING` — scorer jury API key (OpenRouter)
+   - [ ] `OPENROUTER_KEY_RESEARCH` — research/enrichment API key (OpenRouter)
 
 4. **Cron Schedule Verified:**
    - [ ] `/api/cron/sync-usaspending` at 02:00 UTC
@@ -163,12 +161,13 @@ Phase 4 integrates 4 major components:
 
 ### Photos Server Actions
 
-Currently **not wired to any UI page yet** — planned for Phase 5:
-- `/admin/photos` (new page to manage uploaded photos)
+The photo management UI has **shipped**: `/admin/photos`
+(`src/app/admin/photos/page.jsx`) wires the server actions below to a live
+admin page. Remaining follow-ups:
 - Person-photo tagging UI
 - Validation review UI
 
-**To wire when building Phase 5:**
+**Wiring pattern (as used by the `/admin/photos` page):**
 ```jsx
 import { uploadPhoto, tagPhotoPerson, suggestPhotoAssociations } from '@/app/actions/photos';
 
@@ -294,9 +293,10 @@ Phase 4 is **COMPLETE** when:
 
 ## Known Limitations
 
-1. **Photo upload UI not wired yet:**
-   - Server actions exist but no `/admin/photos` page yet (Phase 5)
-   - Can still test via direct API calls if needed
+1. **Photo upload UI — shipped:**
+   - The `/admin/photos` page (`src/app/admin/photos/page.jsx`) now wires the
+     photo server actions to a live UI. (This limitation no longer applies.)
+   - Can also test via direct API calls if needed
 
 2. **ML-based photo suggestions placeholder:**
    - `suggestPhotoAssociations` uses heuristic matching

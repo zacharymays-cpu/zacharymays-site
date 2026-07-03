@@ -56,8 +56,8 @@ Verified set on June 8, 2026:
 **Scope:** Production + Preview ✓
 
 ### ✅ Supabase Edge Function
-- **Name:** `sync-usaspending-awards`
-- **URL:** `https://shgdrkrqjnwtlyxcdayp.functions.supabase.co/sync-usaspending-awards`
+- **Name:** `sync-usaspending`
+- **URL:** `https://shgdrkrqjnwtlyxcdayp.functions.supabase.co/sync-usaspending`
 - **Version:** 2 (updated June 12, 2026)
 - **Status:** ACTIVE ✓
 - **JWT Required:** Yes (service_role)
@@ -122,7 +122,7 @@ metadata (JSONB)
    - If present → continues
 
 4. **Call Edge Function** (route.js)
-   - POST to `https://shgdrkrqjnwtlyxcdayp.functions.supabase.co/sync-usaspending-awards`
+   - POST to `https://shgdrkrqjnwtlyxcdayp.functions.supabase.co/sync-usaspending`
    - Headers: `Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}`
    - Timeout: 300 seconds (5 minutes)
 
