@@ -8,6 +8,7 @@ import SurvivorMovements from './SurvivorMovements';
 import NetworkTabs from './NetworkTabs';
 import BasemapSwitcher from './BasemapSwitcher';
 import MapControls from './MapControls';
+import { compositeBandFromTier } from '../../../lib/scoring';
 
 const MAPTILER_KEY = process.env.NEXT_PUBLIC_MAPTILER_KEY;
 const USING_MAPTILER = Boolean(MAPTILER_KEY);
@@ -96,10 +97,6 @@ export default function ChildrenOfGodClient({ cogData, compounds, personPaths, a
   });
 
   // Org detail styling constants
-  const TIER_TEXT = { 'Super Culty': '#dc322f', 'Kinda Culty': '#b58900', 'Not Culty': '#859900' };
-  const TIER_BG = { 'Super Culty': 'rgba(220,50,47,0.12)', 'Kinda Culty': 'rgba(181,137,0,0.12)', 'Not Culty': 'rgba(133,153,0,0.12)' };
-  const TIER_LABELS = { 'Super Culty': 'High-Control', 'Kinda Culty': 'Moderate-Control', 'Not Culty': 'Low-Control' };
-  const lbl = (t) => TIER_LABELS[t] || t;
   const CRITERIA = {
     C1: 'Charismatic Leadership', C2: 'Sacred Assumptions', C3: 'Transcendent Mission',
     C4: 'Identity Sublimation', C5: 'Information Isolation', C6: 'Private Vernacular',
@@ -140,8 +137,10 @@ export default function ChildrenOfGodClient({ cogData, compounds, personPaths, a
     mass: 'Mass scale (>10M)',
   };
 
-  const tierColor = cogData ? (TIER_BG[cogData.composite_tier] ?? 'rgba(212,206,196,0.1)') : 'rgba(212,206,196,0.1)';
-  const tierTextColor = cogData ? (TIER_TEXT[cogData.composite_tier] ?? 'var(--muted)') : 'var(--muted)';
+  const compositeBand = cogData ? compositeBandFromTier(cogData.composite_tier) : null;
+  // Module band colors are hex; append CSS alpha-hex for the translucent background.
+  const tierColor = compositeBand ? `${compositeBand.color}1f` : 'rgba(212,206,196,0.1)';
+  const tierTextColor = compositeBand ? compositeBand.color : 'var(--muted)';
   const compositePct = cogData ? `${parseFloat(cogData.composite_score).toFixed(0)}%` : '—';
 
   const membershipCount = cogData ? formatWholeNumber(cogData.membership_count) : null;
@@ -370,7 +369,7 @@ export default function ChildrenOfGodClient({ cogData, compounds, personPaths, a
               </span>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
                 <span style={{ fontFamily: 'var(--mono)', fontSize: '0.62rem', letterSpacing: '0.1em', textTransform: 'uppercase', padding: '0.2rem 0.5rem', background: tierColor, color: tierTextColor, border: `1px solid ${tierTextColor}55`, alignSelf: 'flex-start' }}>
-                  {lbl(cogData.composite_tier)}
+                  {compositeBand?.label || cogData.composite_tier}
                 </span>
                 <span style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--muted)' }}>
                   Group Dynamics Score
