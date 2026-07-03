@@ -6,6 +6,7 @@ const {
   classifyYoung,
   classifyComposite,
   compositeBandFromTier,
+  compositeDbTierFromScore,
   youngBandFromDb,
   classifyLifton,
 } = require('../src/lib/scoring');
@@ -68,6 +69,22 @@ test('compositeBandFromTier agrees with classifyComposite at representative scor
   assert.strictEqual(compositeBandFromTier('Super Culty').id, classifyComposite(65).id);
   // 45 stored as "Kinda Culty" (30–59) → Moderate both ways.
   assert.strictEqual(compositeBandFromTier('Kinda Culty').id, classifyComposite(45).id);
+});
+
+test('compositeDbTierFromScore maps score to STORED tier string via 30/60', () => {
+  assert.strictEqual(compositeDbTierFromScore(0), 'Not Culty');
+  assert.strictEqual(compositeDbTierFromScore(29), 'Not Culty');
+  assert.strictEqual(compositeDbTierFromScore(30), 'Kinda Culty');
+  assert.strictEqual(compositeDbTierFromScore(59), 'Kinda Culty');
+  assert.strictEqual(compositeDbTierFromScore(60), 'Super Culty');
+  assert.strictEqual(compositeDbTierFromScore(100), 'Super Culty');
+  assert.strictEqual(compositeDbTierFromScore(null), null);
+  assert.strictEqual(compositeDbTierFromScore(NaN), null);
+});
+test('compositeDbTierFromScore is the inverse of compositeBandFromTier', () => {
+  assert.strictEqual(compositeBandFromTier(compositeDbTierFromScore(65)).id, 'high');
+  assert.strictEqual(compositeBandFromTier(compositeDbTierFromScore(45)).id, 'moderate');
+  assert.strictEqual(compositeBandFromTier(compositeDbTierFromScore(10)).id, 'low');
 });
 
 test('youngBandFromDb keeps Cultiness labels', () => {

@@ -77,6 +77,16 @@ function compositeBandFromTier(dbTier) {
   return i === undefined ? null : COMPOSITE_BANDS[i];
 }
 
+// Inverse of compositeBandFromTier: numeric composite score → STORED DB tier
+// string, via the canonical 30/60 cut-lines in classifyComposite. Lets writers
+// stop hardcoding the cut-lines when assigning organizations.composite_tier.
+const BAND_ID_TO_DB_TIER = { low: 'Not Culty', moderate: 'Kinda Culty', high: 'Super Culty' };
+
+function compositeDbTierFromScore(score) {
+  const b = classifyComposite(score);
+  return b ? BAND_ID_TO_DB_TIER[b.id] : null;
+}
+
 function youngBandFromDb(dbBand) {
   const i = DB_TIER_TO_ID[dbBand];
   return i === undefined ? null : YOUNG_BANDS[i];
@@ -88,5 +98,6 @@ module.exports = {
   classifyComposite,
   classifyLifton,
   compositeBandFromTier,
+  compositeDbTierFromScore,
   youngBandFromDb,
 };
