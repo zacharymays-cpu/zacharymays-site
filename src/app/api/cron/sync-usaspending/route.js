@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic';
 
 const EDGE_FUNCTION_URL =
   process.env.EDGE_FUNCTION_URL ||
-  'https://shgdrkrqjnwtlyxcdayp.functions.supabase.co/sync-usaspending-awards';
+  'https://shgdrkrqjnwtlyxcdayp.functions.supabase.co/sync-usaspending';
 
 export async function GET(request) {
   const authHeader = request.headers.get('authorization');
