@@ -1,17 +1,17 @@
 'use client';
 import { useState, useMemo } from 'react';
 import dynamic from 'next/dynamic';
+import { compositeBandFromTier } from '../../../lib/scoring';
 
 const LineageGraphClient = dynamic(() => import('./LineageGraphClient'), { ssr: false });
 
-const TIER_COLORS = {
-  'Super Culty': '#e8574d',
-  'Kinda Culty': '#d99b3e',
-  'Not Culty':   '#5cb878',
-};
-// Softer reader-facing labels for the DB tier enum (keys are unchanged).
-const TIER_LABELS = { 'Super Culty':'High-Control','Kinda Culty':'Moderate-Control','Not Culty':'Low-Control' };
-const lbl = (t) => TIER_LABELS[t] || t;
+// Stored DB tier strings ('Super/Kinda/Not Culty') are used for KEYING
+// (node.composite_tier lookups, legend iteration order) throughout this file.
+// Display color/label come from the scoring module — Composite track,
+// rendered under its neutral labels (Low/Moderate/High-Control).
+const TIERS = ['Super Culty', 'Kinda Culty', 'Not Culty'];
+const tierColor = (t) => compositeBandFromTier(t)?.color || '#888';
+const lbl = (t) => compositeBandFromTier(t)?.label || t;
 
 // Branch (chain) palette — a qualitative set chosen so co-occurring branches are
 // always distinct (National Socialist red vs White-supremacist green no longer clash).
@@ -289,9 +289,9 @@ export default function LineageClient({ nodes = [], edges = [] }) {
           </div>
           <div style={{ display: 'flex', gap: '0.85rem', flexWrap: 'wrap', alignItems: 'center' }}>
             <span style={{ fontFamily: 'var(--mono)', fontSize: '0.6rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)' }}>Tiers</span>
-            {Object.entries(TIER_COLORS).map(([tier, c]) => (
+            {TIERS.map(tier => (
               <div key={tier} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                <span style={{ width: 9, height: 9, borderRadius: 2, background: c }} />
+                <span style={{ width: 9, height: 9, borderRadius: 2, background: tierColor(tier) }} />
                 <span style={{ fontFamily: 'var(--mono)', fontSize: '0.6rem', color: 'rgba(212,206,196,0.6)' }}>{lbl(tier)}</span>
               </div>
             ))}
@@ -329,7 +329,7 @@ export default function LineageClient({ nodes = [], edges = [] }) {
               const n = nodeBySlug[slug];
               const name = n?.name || slug;
               const isRoot = slug === rootSlug;
-              const tierColor = TIER_COLORS[n?.composite_tier] || '#888';
+              const nodeTierColor = tierColor(n?.composite_tier);
               const bColor = isRoot ? 'var(--gold)' : branchColor(branchOf[slug]);
               const hasScore = n && n.composite_score != null && !Number.isNaN(parseFloat(n.composite_score));
               const score = hasScore ? parseFloat(n.composite_score) : null;
@@ -341,11 +341,11 @@ export default function LineageClient({ nodes = [], edges = [] }) {
                   style={{ cursor: 'pointer' }}>
                   <g opacity={dimNode(slug) ? 0.25 : 1}>
                     <rect x={p.x} y={p.y} width={NODE_W} height={NODE_H} rx={4}
-                      fill="rgba(28,24,20,0.92)" stroke={isRoot ? 'var(--gold)' : tierColor}
+                      fill="rgba(28,24,20,0.92)" stroke={isRoot ? 'var(--gold)' : nodeTierColor}
                       strokeWidth={isRoot || hover === slug ? 2 : 1.2} />
                     <rect x={p.x} y={p.y} width={5} height={NODE_H} rx={2} fill={bColor} />
                     <text x={p.x + 13} y={p.y + 19} fontFamily="var(--serif)" fontSize={12.5} fill="var(--paper)" fontWeight={700}>{label}</text>
-                    <text x={p.x + 13} y={p.y + 36} fontFamily="var(--mono)" fontSize={9.5} fill={isRoot ? 'var(--gold)' : tierColor} fontWeight={600}>
+                    <text x={p.x + 13} y={p.y + 36} fontFamily="var(--mono)" fontSize={9.5} fill={isRoot ? 'var(--gold)' : nodeTierColor} fontWeight={600}>
                       {isRoot ? 'ORIGIN' : lbl(tierText)}{!isRoot && hasScore ? ` · ${score.toFixed(0)}%` : ''}
                     </text>
                   </g>

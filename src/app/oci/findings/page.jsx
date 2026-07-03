@@ -1,21 +1,23 @@
 import Link from 'next/link';
 import { getFindingsStats, TIER_ORDER } from '../../../lib/getFindingsStats';
 import CultsOverTimeChart from '../../../components/CultsOverTimeChart';
+import { compositeBandFromTier } from '../../../lib/scoring';
 
 export const metadata = {
   title: 'Findings — The Organizational Coercion Index',
   description: 'What systematic application of the Young-Reed framework across hundreds of American organizations reveals about institutional formation and cult-adjacent dynamics.',
 };
 
-// Tier display metadata (composite-score band + color); counts come live.
-const TIER_META = {
-  'Super Culty': { range: '71–100%', color: '#6b1010' },
-  'Kinda Culty': { range: '41–70%',  color: '#7a4a1a' },
-  'Not Culty':   { range: '0–40%',   color: '#2a6b4a' },
-};
-// Softer reader-facing labels for the DB tier enum (keys are unchanged).
-const TIER_LABELS = { 'Super Culty':'High-Control','Kinda Culty':'Moderate-Control','Not Culty':'Low-Control' };
-const lbl = (t) => TIER_LABELS[t] || t;
+// Tier display metadata: canonical 30/60 cut-lines (Low 0–29, Moderate 30–59,
+// High 60–100), driven from the scoring module (bug fix — this legend used to
+// hardcode stale 71/41 ranges). Keyed by band id, looked up per stored DB tier.
+const COMPOSITE_RANGES = { low: '0–29%', moderate: '30–59%', high: '60–100%' };
+const TIER_META = Object.fromEntries(
+  TIER_ORDER.map((dbTier) => {
+    const band = compositeBandFromTier(dbTier);
+    return [dbTier, { range: band ? COMPOSITE_RANGES[band.id] : '', color: band?.color }];
+  })
+);
 
 // Shown only if the live stats fetch fails (rare; values cached hourly).
 const FALLBACK = {
@@ -110,7 +112,7 @@ export default async function FindingsPage() {
                   letterSpacing: '0.08em', textTransform: 'uppercase',
                   color: 'var(--paper)', padding: '0.25rem 0.6rem',
                   background: meta.color,
-                }}>{lbl(t.tier)}</div>
+                }} title={meta.range}>{compositeBandFromTier(t.tier)?.label || t.tier}</div>
                 <div style={{
                   height: '8px', background: 'rgba(212,206,196,0.1)',
                   borderRadius: '1px', overflow: 'hidden',
@@ -130,7 +132,7 @@ export default async function FindingsPage() {
           </div>
 
           <p style={{color: 'var(--muted)', fontSize: '0.88rem', fontStyle: 'italic'}}>
-            {lbl(largest.tier)} is the largest single tier, accounting for
+            {compositeBandFromTier(largest.tier)?.label || largest.tier} is the largest single tier, accounting for
             {' '}{largest.pct.toFixed(0)}% of scored organizations. These figures
             update as new assessments are completed.
           </p>

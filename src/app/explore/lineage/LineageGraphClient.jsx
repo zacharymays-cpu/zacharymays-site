@@ -8,6 +8,7 @@ import {
 import '@xyflow/react/dist/style.css';
 import dagre from '@dagrejs/dagre';
 import { useRouter } from 'next/navigation';
+import { compositeBandFromTier } from '../../../lib/scoring';
 
 // ── Palettes ─────────────────────────────────────────────────────────────
 const CATEGORY_COLORS = {
@@ -55,18 +56,13 @@ const CHAIN_COLORS = {
 };
 const chainColor = (c) => CHAIN_COLORS[c] || 'rgba(212,206,196,0.45)';
 
-const TIER_COLORS = {
-  'Super Culty': '#e8574d',
-  'Kinda Culty': '#d99b3e',
-  'Not Culty':   '#5cb878',
-};
-const tierColor = (t) => TIER_COLORS[t] || 'rgba(212,206,196,0.35)';
-
-const TIER_LABELS = {
-  'Super Culty':  'High-Control',
-  'Kinda Culty':  'Moderate-Control',
-  'Not Culty':    'Low-Control',
-};
+// Stored DB tier strings ('Super/Kinda/Not Culty') are used for KEYING
+// (node.data.tier lookups, legend iteration order) throughout this file.
+// Display color/label come from the scoring module — Composite track,
+// rendered under its neutral labels (Low/Moderate/High-Control).
+const TIERS = ['Super Culty', 'Kinda Culty', 'Not Culty'];
+const tierColor = (t) => compositeBandFromTier(t)?.color || 'rgba(212,206,196,0.35)';
+const tierLabelFor = (t) => compositeBandFromTier(t)?.label;
 
 const REL_LABELS = {
   ideological_heir:        'Ideological heir',
@@ -112,7 +108,7 @@ function OrgNode({ data }) {
   const cc = catColor(data.category);
   const score = data.score != null && !Number.isNaN(parseFloat(data.score))
     ? `${parseFloat(data.score).toFixed(0)}%` : null;
-  const tierLabel = TIER_LABELS[data.tier] || (data.tier ? data.tier : 'Unscored');
+  const tierLabel = tierLabelFor(data.tier) || (data.tier ? data.tier : 'Unscored');
 
   return (
     <div style={{
@@ -325,11 +321,11 @@ export default function LineageGraphClient({ nodes = [], edges = [] }) {
         {/* Tier legend */}
         <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid rgba(212,206,196,0.1)' }}>
           <Stat label="Tier" />
-          {Object.entries(TIER_COLORS).map(([t, c]) => (
+          {TIERS.map(t => (
             <div key={t} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-              <span style={{ width: 8, height: 8, borderRadius: 2, background: c, flexShrink: 0 }} />
+              <span style={{ width: 8, height: 8, borderRadius: 2, background: tierColor(t), flexShrink: 0 }} />
               <span style={{ fontFamily: 'monospace', fontSize: 9, color: 'rgba(212,206,196,0.6)', textTransform: 'uppercase' }}>
-                {TIER_LABELS[t]}
+                {tierLabelFor(t)}
               </span>
             </div>
           ))}

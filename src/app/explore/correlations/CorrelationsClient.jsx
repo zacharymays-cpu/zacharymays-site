@@ -1,5 +1,6 @@
 'use client';
 import { useState, useMemo } from 'react';
+import { compositeBandFromTier } from '../../../lib/scoring';
 
 const CRITERIA = ['C1','C2','C3','C4','C5','C6','C7','C8','C9','C10'];
 const C_NAMES = { C1:'Charismatic Leadership',C2:'Sacred Assumptions',C3:'Transcendent Mission',C4:'Sublimation of Individuality',C5:'Isolation',C6:'Private Vernacular',C7:'Us-Versus-Them',C8:'Exploitation of Labor',C9:'High Exit Costs',C10:'Ends Justify the Means' };
@@ -77,8 +78,6 @@ export default function CorrelationsClient({ orgs=[], scoreMap={} }) {
     const pairs = getScatterPairs(a, b);
     setSelected(sel => sel?.a===a&&sel?.b===b ? null : {a, b, r, pairs});
   };
-
-  const TIER_COLORS = { 'Super Culty':'#e8574d','Kinda Culty':'#d99b3e','Not Culty':'#5cb878' };
 
   return (
     <div style={{minHeight:'100vh'}}>
@@ -183,7 +182,7 @@ export default function CorrelationsClient({ orgs=[], scoreMap={} }) {
                     <line x1={SP} y1={SP} x2={SP} y2={SH-SP} stroke="rgba(212,206,196,0.2)" strokeWidth="1"/>
                     {pairs.map((p,i)=>(
                       <circle key={i} cx={sx(p.x)} cy={sy(p.y)} r={3}
-                        fill={TIER_COLORS[p.tier]||'#888'} fillOpacity={0.65} stroke="none">
+                        fill={compositeBandFromTier(p.tier)?.color||'#888'} fillOpacity={0.65} stroke="none">
                         <title>{p.name}: ({p.x}, {p.y})</title>
                       </circle>
                     ))}

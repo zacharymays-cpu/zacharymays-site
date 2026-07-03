@@ -1,16 +1,9 @@
 'use client';
 import { useState, useMemo, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import { compositeBandFromTier } from '../../lib/scoring';
 
-const TIER_COLORS = {
-  'Super Culty':  '#e8574d',
-  'Kinda Culty':  '#d99b3e',
-  'Not Culty':    '#5cb878',
-};
 const TIERS       = ['Super Culty','Kinda Culty','Not Culty'];
-// Softer reader-facing labels for the DB tier enum (keys are unchanged).
-const TIER_LABELS = { 'Super Culty':'High-Control','Kinda Culty':'Moderate-Control','Not Culty':'Low-Control' };
-const lbl = (t) => TIER_LABELS[t] || t;
 const TRAJECTORIES= ['Stable','Escalating','Declining','Defunct'];
 const QUADRANTS   = ['Authoritarian Left','Authoritarian Right','Libertarian Left','Libertarian Right'];
 
@@ -90,7 +83,7 @@ export default function CompassClient({ orgs=[], regimes=[], presidentialEras=[]
     const bw    = Math.max(name.length*7+16, 130);
     const line2 = isRegime  ? item.description?.slice(0,55)+'…'
                 : isPresEra ? `${item.era_start}–${item.era_end||'present'}`
-                :             `${lbl(item.composite_tier)} · ${parseFloat(item.composite_score).toFixed(0)}%`;
+                :             `${compositeBandFromTier(item.composite_tier)?.label || item.composite_tier} · ${parseFloat(item.composite_score).toFixed(0)}%`;
     return (
       <g style={{pointerEvents:'none'}}>
         <rect x={tx-4} y={ty-14} width={bw} height={44}
@@ -106,13 +99,13 @@ export default function CompassClient({ orgs=[], regimes=[], presidentialEras=[]
     );
   };
 
-  const FilterSection = ({label, items, counts, state, setter}) => (
+  const FilterSection = ({label, items, counts, state, setter, labelFn=(t)=>t}) => (
     <div style={{marginBottom:'1rem'}}>
       <div style={{fontFamily:'var(--mono)',fontSize:'0.58rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--muted)',marginBottom:'0.4rem'}}>{label}</div>
       {items.map(t=>(
         <label key={t} style={{display:'flex',alignItems:'center',gap:'0.4rem',marginBottom:'0.22rem',cursor:'pointer'}}>
           <input type="checkbox" checked={state.includes(t)} onChange={()=>toggle(t,state,setter)}/>
-          <span style={{fontSize:'0.73rem',color:state.includes(t)?'var(--paper)':'var(--muted)',flex:1,lineHeight:1.3}}>{lbl(t)}</span>
+          <span style={{fontSize:'0.73rem',color:state.includes(t)?'var(--paper)':'var(--muted)',flex:1,lineHeight:1.3}}>{labelFn(t)}</span>
           {counts&&<span style={{fontFamily:'var(--mono)',fontSize:'0.6rem',color:'rgba(212,206,196,0.3)'}}>{counts[t]||0}</span>}
         </label>
       ))}
@@ -214,7 +207,7 @@ export default function CompassClient({ orgs=[], regimes=[], presidentialEras=[]
                 </label>
               </div>
 
-              <FilterSection label="Tier"       items={TIERS}        counts={tierCounts} state={tierFilter} setter={setTierFilter}/>
+              <FilterSection label="Tier"       items={TIERS}        counts={tierCounts} state={tierFilter} setter={setTierFilter} labelFn={(t)=>compositeBandFromTier(t)?.label || t}/>
               <FilterSection label="Trajectory" items={TRAJECTORIES} counts={trajCounts} state={trajFilter} setter={setTrajFilter}/>
               <FilterSection label="Quadrant"   items={QUADRANTS}    counts={quadCounts} state={quadFilter} setter={setQuadFilter}/>
 
@@ -261,7 +254,7 @@ export default function CompassClient({ orgs=[], regimes=[], presidentialEras=[]
                 {/* Org dots */}
                 {filteredOrgs.map((org,i)=>{
                   const x=cx(org.econ), y=cy(org.auth);
-                  const color=TIER_COLORS[org.composite_tier]||'#888';
+                  const color=compositeBandFromTier(org.composite_tier)?.color||'#888';
                   const isH=hovered?.id===org.id, isS=selected?.id===org.id;
                   return(<g key={org.id||i}>
                     {(isH||isS)&&<circle cx={x} cy={y} r={15} fill={color} opacity={0.15}/>}
@@ -319,8 +312,8 @@ export default function CompassClient({ orgs=[], regimes=[], presidentialEras=[]
                   <div style={{fontFamily:'var(--mono)',fontSize:'0.62rem',letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--gold)',marginBottom:'0.65rem'}}>Tier Legend</div>
                   {TIERS.map(tier=>(
                     <div key={tier} style={{display:'flex',alignItems:'center',gap:'0.45rem',marginBottom:'0.38rem'}}>
-                      <div style={{width:8,height:8,borderRadius:'50%',background:TIER_COLORS[tier],flexShrink:0}}/>
-                      <span style={{fontFamily:'var(--mono)',fontSize:'0.67rem',color:'var(--muted)',flex:1}}>{lbl(tier)}</span>
+                      <div style={{width:8,height:8,borderRadius:'50%',background:compositeBandFromTier(tier)?.color,flexShrink:0}}/>
+                      <span style={{fontFamily:'var(--mono)',fontSize:'0.67rem',color:'var(--muted)',flex:1}}>{compositeBandFromTier(tier)?.label || tier}</span>
                       <span style={{fontFamily:'var(--mono)',fontSize:'0.6rem',color:'rgba(212,206,196,0.3)'}}>{tierCounts[tier]||0}</span>
                     </div>
                   ))}

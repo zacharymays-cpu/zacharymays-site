@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { applyDecision, approveOrg } from './actions';
+import { compositeBandFromTier } from '../../../lib/scoring';
 
 // Site palette (dark theme): paper text on ink. Panels sit just above ink.
 const C = {
@@ -17,7 +18,6 @@ const C = {
   ok: '#7fbf9b',
   err: '#e08b8b',
 };
-const TIER_COLOR = { 'Super Culty': '#8b2020', 'Kinda Culty': '#9a6a2a', 'Not Culty': '#2a6b4a' };
 
 // Review thresholds. DRIFT_HI: |published − AI| at/above which a criterion needs a
 // look (also where Δ goes gold). DRIFT_BIG: large divergence → red. SPREAD_HI: per-
@@ -209,7 +209,7 @@ function OrgCard({ item }) {
           ) : item.jurySpread != null ? (
             <span style={{ fontSize: 12, fontWeight: 700, color: highSpread ? C.gold : C.muted, whiteSpace: 'nowrap' }}>spread {item.jurySpread}</span>
           ) : null}
-          <span style={{ fontSize: 13, color: C.paper, padding: '3px 10px', borderRadius: 999, background: TIER_COLOR[item.tier] || '#555', whiteSpace: 'nowrap' }}>
+          <span style={{ fontSize: 13, color: C.paper, padding: '3px 10px', borderRadius: 999, background: compositeBandFromTier(item.tier)?.color || '#555', whiteSpace: 'nowrap' }}>
             {item.composite}% · {item.tier}
           </span>
           <span style={{ color: C.muted }}>{open ? '▲' : '▼'}</span>

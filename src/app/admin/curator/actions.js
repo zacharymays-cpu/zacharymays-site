@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { createSupabaseServerClient } from '../../../lib/supabase/server';
 import { createSupabaseAdminClient } from '../../../lib/supabase/admin';
 import { nextStatusFor } from '../../../lib/curatorLifecycle';
+import { compositeDbTierFromScore } from '../../../lib/scoring';
 
 function adminEmails() {
   return (process.env.ADMIN_EMAILS || '')
@@ -128,7 +129,7 @@ async function recomputeComposite(admin, orgId) {
     const breadth = active.length;
     const mean = active.reduce((a, b) => a + b, 0) / breadth;
     composite = Math.round((breadth / 10) * (mean / 10) * 100 * 100) / 100;
-    tier = composite >= 60 ? 'Super Culty' : composite >= 30 ? 'Kinda Culty' : 'Not Culty';
+    tier = compositeDbTierFromScore(composite) || 'Not Culty';
   }
   await admin
     .from('organizations')

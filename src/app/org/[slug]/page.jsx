@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../../../lib/supabase/config'
+import { compositeBandFromTier, youngBandFromDb, classifyLifton } from '../../../lib/scoring'
 
 export const revalidate = 300
 
@@ -56,28 +57,24 @@ export async function generateMetadata({ params }) {
   const org = await getOrg(slug)
   if (!org) return { title: 'Organization Not Found' }
   const scored = !Number.isNaN(parseFloat(org.composite_score))
+  const band = compositeBandFromTier(org.composite_tier)
   return {
     title: `${org.name} — Cultiness Spectrum`,
     description: scored
-      ? `${org.name} scored ${parseFloat(org.composite_score).toFixed(0)}% (${lbl(org.composite_tier)}). Young's Score: ${org.youngs_score}/10.`
+      ? `${org.name} scored ${parseFloat(org.composite_score).toFixed(0)}% (${band?.label || org.composite_tier}). Young's Score: ${org.youngs_score}/10.`
       : `${org.name} — assessment pending in the Cultiness Spectrum dataset.`,
   }
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────
-const TIER_TEXT = {
-  'Super Culty': '#dc322f',
-  'Kinda Culty': '#b58900',
-  'Not Culty':   '#859900',
+// Module band colors are hex; some chart helpers below (RadarChart, MiniCompass)
+// manipulate the tier background via rgba(...) regex replace, so convert here.
+function hexToRgba(hex, alpha) {
+  const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex || '')
+  if (!m) return 'rgba(212,206,196,0.1)'
+  const [r, g, b] = [m[1], m[2], m[3]].map(h => parseInt(h, 16))
+  return `rgba(${r},${g},${b},${alpha})`
 }
-const TIER_BG = {
-  'Super Culty': 'rgba(220,50,47,0.12)',
-  'Kinda Culty': 'rgba(181,137,0,0.12)',
-  'Not Culty':   'rgba(133,153,0,0.12)',
-}
-// Softer reader-facing labels for the DB tier enum (keys are unchanged).
-const TIER_LABELS = { 'Super Culty':'High-Control','Kinda Culty':'Moderate-Control','Not Culty':'Low-Control' }
-const lbl = (t) => TIER_LABELS[t] || t
 
 const SCORE_COLOR = (s) => {
   if (s == null) return 'rgba(212,206,196,0.4)'
@@ -264,10 +261,8 @@ export default async function OrgPage({ params }) {
     .sort((a, b) => parseInt(a.criterion.replace('C','')) - parseInt(b.criterion.replace('C','')))
   const liftonRow   = (org.criterion_scores || []).find(c => c.criterion === 'C11')
   const liftonScore = liftonRow && liftonRow.score != null ? parseFloat(liftonRow.score) : null
-  const liftonTier  = liftonScore == null ? null
-    : liftonScore >= 6 ? 'Psychologically Totalizing'
-    : liftonScore >= 3 ? 'Moderately Totalizing'
-    : 'Non-Totalizing'
+  const liftonBand  = classifyLifton(liftonScore)
+  const liftonTier  = liftonBand ? liftonBand.label : null
   // C11 totalism narrative (the jury's own rationale). Suppress legacy label-only
   // stubs (e.g. "Lifton psychological totalism (C11): Psychologically Totalizing").
   const liftonBody = (liftonRow?.body_text && liftonRow.body_text.trim().length > 120
@@ -293,8 +288,9 @@ export default async function OrgPage({ params }) {
   const ps          = Array.isArray(org.political_scores) ? (org.political_scores[0] ?? null) : (org.political_scores ?? null)
   const isUnscored  = Number.isNaN(parseFloat(org.composite_score))
   const compositePct = isUnscored ? 'Pending' : `${parseFloat(org.composite_score).toFixed(0)}%`
-  const tierColor   = TIER_BG[org.composite_tier]   ?? 'rgba(212,206,196,0.1)'
-  const tierText    = TIER_TEXT[org.composite_tier]  ?? 'var(--muted)'
+  const compositeBand = compositeBandFromTier(org.composite_tier)
+  const tierColor   = compositeBand ? hexToRgba(compositeBand.color, 0.12) : 'rgba(212,206,196,0.1)'
+  const tierText    = compositeBand ? compositeBand.color : 'var(--muted)'
   const lastUpdated = new Date(org.updated_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
   const membershipCount = formatWholeNumber(org.membership_count)
   const revenueUsd = formatUsd(org.revenue_usd)
@@ -355,7 +351,7 @@ export default async function OrgPage({ params }) {
               <span style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(2.6rem,7vw,3.6rem)', fontWeight: 700, color: tierText, lineHeight: 0.9 }}>{compositePct}</span>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
                 <span style={{ fontFamily: 'var(--mono)', fontSize: '0.62rem', letterSpacing: '0.1em', textTransform: 'uppercase', padding: '0.2rem 0.5rem', background: tierColor, color: tierText, border: `1px solid ${tierText}55`, alignSelf: 'flex-start' }}>
-                  {org.composite_tier ? lbl(org.composite_tier) : 'Not Yet Scored'}
+                  {org.composite_tier ? (compositeBand?.label || org.composite_tier) : 'Not Yet Scored'}
                 </span>
                 <span style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--muted)' }}>Group Dynamics Score</span>
               </div>
@@ -368,7 +364,7 @@ export default async function OrgPage({ params }) {
                   <span style={{ fontFamily: 'var(--serif)', fontSize: '1.5rem', fontWeight: 700, color: 'var(--paper)', lineHeight: 1 }}>
                     {org.youngs_score}<span style={{ fontSize: '0.9rem', color: 'var(--muted)' }}>/10</span>
                   </span>
-                  <span style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)' }}>Young's{org.youngs_band ? ` · ${org.youngs_band}` : ''}</span>
+                  <span style={{ fontFamily: 'var(--mono)', fontSize: '0.55rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted)' }}>Young's{org.youngs_band ? ` · ${youngBandFromDb(org.youngs_band)?.label || org.youngs_band}` : ''}</span>
                 </div>
               </>
             )}

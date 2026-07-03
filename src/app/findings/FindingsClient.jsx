@@ -1,23 +1,16 @@
 'use client';
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
+import { compositeBandFromTier, classifyComposite } from '../../lib/scoring';
 
 const TIER_ORDER = ['Super Culty','Kinda Culty','Not Culty'];
-const TIER_COLORS = {
-  'Super Culty':  '#c02020',
-  'Kinda Culty':  '#b07030',
-  'Not Culty':    '#30a060',
-};
 const TIER_RANGES = {
-  'Super Culty':'71–100%','Kinda Culty':'41–70%','Not Culty':'0–40%',
+  'Super Culty':'60–100%','Kinda Culty':'30–59%','Not Culty':'0–29%',
 };
 const TIER_THRESH = [
-  {x:41,label:'Kinda Culty'},
-  {x:71,label:'Super Culty'},
+  {x:30,label:'Kinda Culty'},
+  {x:60,label:'Super Culty'},
 ];
-// Softer reader-facing labels for the DB tier enum (keys are unchanged).
-const TIER_LABELS = { 'Super Culty':'High-Control','Kinda Culty':'Moderate-Control','Not Culty':'Low-Control' };
-const lbl = (t) => TIER_LABELS[t] || t;
 const ANNOTATIONS = [
   {score:19, label:'NAACP 19%'},
   {score:36, label:'Dem. Party 36%'},
@@ -70,9 +63,8 @@ export default function FindingsClient({ orgs=[] }) {
     for (let i = 0; i < 100; i += 5) {
       const center = i + 2.5;
       const count = scores.filter(s => s >= i && s < i+5).length;
-      let tier = 'Not Culty';
-      if (center >= 71) tier = 'Super Culty';
-      else if (center >= 41) tier = 'Kinda Culty';
+      const bandId = classifyComposite(center)?.id;
+      const tier = bandId === 'high' ? 'Super Culty' : bandId === 'moderate' ? 'Kinda Culty' : 'Not Culty';
       b.push({start:i, center, count, tier});
     }
     return b;
@@ -93,8 +85,8 @@ export default function FindingsClient({ orgs=[] }) {
   const chartMaxY = useMemo(() => Math.max(maxCount, maxNormalY) * 1.15, [maxCount, maxNormalY]);
 
   // Headline stats
-  const above41 = scores.filter(s=>s>=41).length;
-  const above71 = scores.filter(s=>s>=71).length;
+  const above30 = scores.filter(s=>s>=30).length;
+  const above60 = scores.filter(s=>s>=60).length;
   const pct = (n) => `${(100*n/scores.length).toFixed(0)}%`;
 
   // Instrument variance
@@ -149,12 +141,12 @@ export default function FindingsClient({ orgs=[] }) {
         <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'1rem',marginBottom:'3rem'}}>
           {[
             ['Organizations', scores.length, ''],
-            ['Super Culty', pct(above71), '71–100%'],
-            ['Kinda Culty', pct(above41-above71), '41–70%'],
-            ['Not Culty', pct(scores.length-above41), '0–40%'],
+            ['Super Culty', pct(above60), '60–100%'],
+            ['Kinda Culty', pct(above30-above60), '30–59%'],
+            ['Not Culty', pct(scores.length-above30), '0–29%'],
           ].map(([label,value,sub])=>(
             <div key={label} style={{padding:'1.25rem',background:'rgba(244,240,232,0.03)',border:'1px solid rgba(212,206,196,0.12)'}}>
-              <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.14em',textTransform:'uppercase',color:'var(--muted)',marginBottom:'0.4rem'}}>{lbl(label)}</div>
+              <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',letterSpacing:'0.14em',textTransform:'uppercase',color:'var(--muted)',marginBottom:'0.4rem'}}>{compositeBandFromTier(label)?.label || label}</div>
               <div style={{fontFamily:'var(--serif)',fontSize:'2rem',fontWeight:700,color:'var(--gold)',lineHeight:1}}>{value}</div>
               {sub&&<div style={{fontFamily:'var(--mono)',fontSize:'0.62rem',color:'rgba(212,206,196,0.35)',marginTop:'0.3rem'}}>{sub}</div>}
             </div>
@@ -175,12 +167,12 @@ export default function FindingsClient({ orgs=[] }) {
 
               {/* Tier background shading */}
               {[
-                [0,41,'Not Culty'],[41,71,'Kinda Culty'],[71,100,'Super Culty'],
+                [0,30,'Not Culty'],[30,60,'Kinda Culty'],[60,100,'Super Culty'],
               ].map(([x0,x1,tier])=>(
                 <rect key={tier}
                   x={histX(x0)} y={HIST_PAD.t}
                   width={histX(x1)-histX(x0)} height={HIST_INNER_H}
-                  fill={TIER_COLORS[tier]} fillOpacity={0.07}/>
+                  fill={compositeBandFromTier(tier)?.color} fillOpacity={0.07}/>
               ))}
 
               {/* Y grid lines */}
@@ -206,7 +198,7 @@ export default function FindingsClient({ orgs=[] }) {
                   <rect key={bin.start}
                     x={x+0.5} y={y}
                     width={BAR_W} height={barH}
-                    fill={TIER_COLORS[bin.tier]}
+                    fill={compositeBandFromTier(bin.tier)?.color}
                     fillOpacity={isHovered ? 1 : 0.8}
                     stroke={isHovered ? 'rgba(244,240,232,0.6)' : 'rgba(26,23,20,0.3)'}
                     strokeWidth={isHovered ? 1.5 : 0.5}
@@ -230,7 +222,7 @@ export default function FindingsClient({ orgs=[] }) {
                   <line x1={histX(x)} y1={HIST_PAD.t} x2={histX(x)} y2={HIST_PAD.t+HIST_INNER_H}
                     stroke="rgba(212,206,196,0.2)" strokeWidth="1" strokeDasharray="3 3"/>
                   <text x={histX(x)-3} y={HIST_PAD.t+8} textAnchor="end"
-                    fill="rgba(212,206,196,0.25)" fontSize={8} transform={`rotate(-90,${histX(x)-3},${HIST_PAD.t+8})`}>{lbl(label)}</text>
+                    fill="rgba(212,206,196,0.25)" fontSize={8} transform={`rotate(-90,${histX(x)-3},${HIST_PAD.t+8})`}>{compositeBandFromTier(label)?.label || label}</text>
                 </g>
               ))}
 
@@ -290,10 +282,10 @@ export default function FindingsClient({ orgs=[] }) {
               const count = validOrgs.filter(o=>o.composite_tier===tier).length;
               const pctTier = scores.length ? (100*count/scores.length).toFixed(1) : '0';
               return(
-                <div key={tier} style={{padding:'0.75rem 1rem',borderLeft:`3px solid ${TIER_COLORS[tier]}`,background:'rgba(244,240,232,0.02)'}}>
-                  <div style={{fontFamily:'var(--serif)',fontSize:'0.9rem',fontWeight:700,color:'var(--paper)',marginBottom:'0.15rem'}}>{lbl(tier)}</div>
+                <div key={tier} style={{padding:'0.75rem 1rem',borderLeft:`3px solid ${compositeBandFromTier(tier)?.color}`,background:'rgba(244,240,232,0.02)'}}>
+                  <div style={{fontFamily:'var(--serif)',fontSize:'0.9rem',fontWeight:700,color:'var(--paper)',marginBottom:'0.15rem'}}>{compositeBandFromTier(tier)?.label || tier}</div>
                   <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',color:'var(--muted)',marginBottom:'0.35rem'}}>{TIER_RANGES[tier]}</div>
-                  <div style={{fontFamily:'var(--mono)',fontSize:'1.1rem',fontWeight:700,color:TIER_COLORS[tier]}}>{count}</div>
+                  <div style={{fontFamily:'var(--mono)',fontSize:'1.1rem',fontWeight:700,color:compositeBandFromTier(tier)?.color}}>{count}</div>
                   <div style={{fontFamily:'var(--mono)',fontSize:'0.6rem',color:'rgba(212,206,196,0.4)'}}>{pctTier}% of dataset</div>
                 </div>
               );
@@ -346,7 +338,7 @@ export default function FindingsClient({ orgs=[] }) {
                       <circle key={`${tier}-${i}`}
                         cx={scX(o.youngsNorm)} cy={scY(o.composite)}
                         r={isH ? 6 : 4}
-                        fill={TIER_COLORS[tier]} fillOpacity={isH ? 1 : 0.7}
+                        fill={compositeBandFromTier(tier)?.color} fillOpacity={isH ? 1 : 0.7}
                         stroke={isH ? 'var(--gold)' : 'rgba(26,23,20,0.4)'} strokeWidth={isH ? 1.5 : 0.5}
                         style={{cursor:'pointer'}}
                         onMouseEnter={(e)=>{setHoveredScatter(o);setTooltipPos({x:e.clientX,y:e.clientY});}}
@@ -422,7 +414,7 @@ export default function FindingsClient({ orgs=[] }) {
                         [isPos?'left':'right']:'50%',
                         width:`${barW/2}%`,
                         height:14,
-                        background:TIER_COLORS[o.composite_tier]||'#888',
+                        background:compositeBandFromTier(o.composite_tier)?.color||'#888',
                         opacity:0.8,
                       }}/>
                       <div style={{position:'absolute',left:'50%',top:0,bottom:0,width:1,background:'rgba(212,206,196,0.15)'}}/>
@@ -461,7 +453,7 @@ export default function FindingsClient({ orgs=[] }) {
           background:'rgba(18,15,12,0.97)',border:'1px solid rgba(200,168,75,0.5)',
           padding:'0.5rem 0.75rem',pointerEvents:'none',zIndex:9999,fontFamily:'monospace',fontSize:'0.7rem'}}>
           <div style={{color:'var(--paper)',fontWeight:600}}>{hoveredDist.center-2.5}–{hoveredDist.center+2.5}%</div>
-          <div style={{color:TIER_COLORS[hoveredDist.tier]}}>{hoveredDist.tier}</div>
+          <div style={{color:compositeBandFromTier(hoveredDist.tier)?.color}}>{compositeBandFromTier(hoveredDist.tier)?.label || hoveredDist.tier}</div>
           <div style={{color:'rgba(212,206,196,0.6)'}}>{hoveredDist.count} organizations</div>
         </div>
       )}
@@ -470,7 +462,7 @@ export default function FindingsClient({ orgs=[] }) {
           background:'rgba(18,15,12,0.97)',border:'1px solid rgba(200,168,75,0.5)',
           padding:'0.5rem 0.75rem',pointerEvents:'none',zIndex:9999,fontFamily:'monospace',fontSize:'0.7rem',maxWidth:220}}>
           <div style={{color:'var(--paper)',fontWeight:600,marginBottom:'0.2rem'}}>{hoveredScatter.name}</div>
-          <div style={{color:TIER_COLORS[hoveredScatter.composite_tier]}}>{hoveredScatter.composite_tier}</div>
+          <div style={{color:compositeBandFromTier(hoveredScatter.composite_tier)?.color}}>{compositeBandFromTier(hoveredScatter.composite_tier)?.label || hoveredScatter.composite_tier}</div>
           <div style={{color:'rgba(200,168,75,0.8)'}}>Composite: {hoveredScatter.composite.toFixed(0)}%</div>
           <div style={{color:'rgba(200,168,75,0.8)'}}>Young's: {hoveredScatter.youngs_score}/10 (norm. {hoveredScatter.youngsNorm})</div>
           <div style={{color:hoveredScatter.variance>0?'var(--gold)':'rgba(160,140,200,0.8)',marginTop:'0.15rem'}}>
