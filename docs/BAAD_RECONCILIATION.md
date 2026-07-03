@@ -1,7 +1,16 @@
 # BAAD Reconciliation Status
 
+> ## ⚠️ SUPERSEDED — BAAD data has been divested
+>
+> The BAAD (Big Allied and Dangerous) dataset was **removed** from the database
+> in the BAAD divestment. The ~3,555 `organization_attributes` rows described
+> below as "retained" / "available for future use" **were DELETED** and are no
+> longer present. This document is preserved for historical context only; the
+> "Data Disposition" and "Future Possibilities" sections below reflect a
+> pre-divestment plan that no longer holds.
+
 **Date:** June 7, 2026  
-**Status:** ✅ Reconciliation complete (out-of-scope determination)
+**Status:** ⚠️ Superseded — BAAD data divested (see banner above). Original reconciliation: complete (out-of-scope determination)
 
 ## Summary
 
@@ -19,7 +28,7 @@ The BAAD dataset and the Cultiness Spectrum dataset have fundamentally different
 
 ### Cultiness Spectrum Dataset
 - **Focus:** American institutional analysis of cult-like dynamics
-- **Categories:** Corporations (111), Political organizations (99), Religious groups (79), Think tanks (42), Academic (33), etc.
+- **Categories:** Corporations (111), Political organizations (99), Religious groups (79), Think tanks (42), Academic (33), etc. _(Note: these hardcoded counts predate the 27-org archival and are stale; do not treat them as current.)_
 - **Geographic scope:** Primarily United States
 - **Institutional context:** Mainstream American institutions
 
@@ -36,9 +45,13 @@ The BAAD dataset and the Cultiness Spectrum dataset have fundamentally different
   - `internal_entity_id = NULL` (unchanged)
 
 **Organization Attributes:**
-- All 9 × 395 = 3,555 attributes remain in `organization_attributes`
+- ~~All 9 × 395 = 3,555 attributes remain in `organization_attributes`~~
+  **UPDATE (superseded):** these ~3,555 rows were **DELETED** in the BAAD
+  divestment — they no longer remain in `organization_attributes`.
 - Not surfaced on org detail pages (no matching canonical org to attach to)
-- **Available for future use:** If BAAD orgs are ever added to canonical table as a new research area, attributes can be linked at that time
+- ~~**Available for future use:** If BAAD orgs are ever added to canonical table as a new research area, attributes can be linked at that time~~
+  No longer applicable: the attribute rows have been removed. Re-adding BAAD as
+  a research area would require re-ingesting the source data.
 
 ## Future Possibilities
 
@@ -50,4 +63,6 @@ The BAAD dataset and the Cultiness Spectrum dataset have fundamentally different
 
 - `external_entity_ids`: 395 rows updated (match_status='no_match')
 - No changes to org detail pages (already handle NULL `internal_entity_id`)
-- No changes to `organization_attributes` (attributes remain in DB)
+- ~~No changes to `organization_attributes` (attributes remain in DB)~~
+  **Superseded:** the ~3,555 BAAD `organization_attributes` rows were later
+  DELETED in the BAAD divestment (see banner at top).
