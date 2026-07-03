@@ -1,16 +1,15 @@
 'use client';
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { compositeBandFromTier } from '../../../lib/scoring';
 
-const TIER_COLORS = {
-  'Super Culty':   '#e8574d',
-  'Kinda Culty':   '#d99b3e',
-  'Not Culty':     '#5cb878',
-};
+// Stored DB tier strings — used for KEYING (filters, feature properties,
+// object lookups) only. Display color/label now come from the scoring module
+// (compositeBandFromTier), which renders the Composite track under its
+// neutral labels (Low/Moderate/High-Control) instead of the Cultiness ones.
 const TIERS = ['Super Culty','Kinda Culty','Not Culty'];
-// Softer reader-facing labels for the DB tier enum (keys are unchanged).
-const TIER_LABELS = { 'Super Culty':'High-Control','Kinda Culty':'Moderate-Control','Not Culty':'Low-Control' };
-const lbl = (t) => TIER_LABELS[t] || t;
+const tierColor = (t) => compositeBandFromTier(t)?.color || '#888';
+const lbl = (t) => compositeBandFromTier(t)?.label || t;
 const SIZE_RADIUS = { micro:5, small:7, medium:10, large:14, mass:20 };
 
 const CHAIN_COLORS = {
@@ -146,7 +145,7 @@ export default function MapClient({ orgs=[], stateStats=[], foundingData=[], wit
           hq_city: o.hq_city, hq_state: o.hq_state,
           size_tier: o.size_tier, membership_count: o.membership_count,
           econ: o.econ ?? null, auth: o.auth ?? null, quadrant: o.quadrant ?? null,
-          color:  TIER_COLORS[o.composite_tier] || '#888',
+          color:  tierColor(o.composite_tier),
           radius: SIZE_RADIUS[o.size_tier] || 7,
           escalating: o.trajectory === 'Escalating' ? 1 : 0,
         },
@@ -562,7 +561,7 @@ export default function MapClient({ orgs=[], stateStats=[], foundingData=[], wit
                       <div style={{ display:'flex', justifyContent:'space-between', marginTop:2 }}>
                         <span style={{ fontFamily:'var(--mono)', fontSize:'0.58rem', color:'var(--muted)' }}>{org.category}</span>
                         <span style={{ fontFamily:'var(--mono)', fontSize:'0.62rem',
-                          color: TIER_COLORS[org.composite_tier] || '#888', fontWeight:700 }}>
+                          color: tierColor(org.composite_tier), fontWeight:700 }}>
                           {parseFloat(org.composite_score||0).toFixed(0)}%
                         </span>
                       </div>
@@ -607,9 +606,9 @@ export default function MapClient({ orgs=[], stateStats=[], foundingData=[], wit
               {TIERS.map(t => (
                 <button key={t} onClick={() => toggle(t, tierFilter, setTierFilter)}
                   style={{ fontFamily:'var(--mono)', fontSize:'0.56rem', padding:'0.18rem 0.45rem',
-                    background: tierFilter.includes(t) ? `${TIER_COLORS[t]}22` : 'transparent',
-                    border:`1px solid ${tierFilter.includes(t) ? TIER_COLORS[t] : 'rgba(212,206,196,0.12)'}`,
-                    color: tierFilter.includes(t) ? TIER_COLORS[t] : 'var(--muted)', cursor:'pointer' }}>
+                    background: tierFilter.includes(t) ? `${tierColor(t)}22` : 'transparent',
+                    border:`1px solid ${tierFilter.includes(t) ? tierColor(t) : 'rgba(212,206,196,0.12)'}`,
+                    color: tierFilter.includes(t) ? tierColor(t) : 'var(--muted)', cursor:'pointer' }}>
                   {t}
                 </button>
               ))}
@@ -790,11 +789,11 @@ export default function MapClient({ orgs=[], stateStats=[], foundingData=[], wit
                       padding:'0.5rem 0.6rem', background:'rgba(244,240,232,0.03)',
                       border:'1px solid rgba(212,206,196,0.08)', cursor:'pointer' }}>
                     <span style={{ width:8, height:8, borderRadius:'50%', flexShrink:0,
-                      background: TIER_COLORS[it.composite_tier] || '#888' }} />
+                      background: tierColor(it.composite_tier) }} />
                     <span style={{ flex:1, fontFamily:'var(--serif)', fontSize:'0.82rem', color:'var(--paper)',
                       whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{it.name}</span>
                     <span style={{ fontFamily:'var(--mono)', fontSize:'0.62rem', fontWeight:700,
-                      color: TIER_COLORS[it.composite_tier] || '#888' }}>
+                      color: tierColor(it.composite_tier) }}>
                       {Math.round(it.composite_score || 0)}%
                     </span>
                   </button>
@@ -808,10 +807,10 @@ export default function MapClient({ orgs=[], stateStats=[], foundingData=[], wit
                 <h2 style={{ fontFamily:'var(--serif)', fontSize:'1.05rem', fontWeight:700, color:'var(--paper)', lineHeight:1.2 }}>{selected.name}</h2>
               </div>
               <div style={{ display:'inline-flex', alignItems:'center', gap:'0.4rem', padding:'0.35rem 0.65rem',
-                background:`${TIER_COLORS[selected.composite_tier]||'#888'}18`,
-                border:`1px solid ${TIER_COLORS[selected.composite_tier]||'#888'}40` }}>
-                <div style={{ width:7, height:7, borderRadius:'50%', background:TIER_COLORS[selected.composite_tier]||'#888' }} />
-                <span style={{ fontFamily:'var(--mono)', fontSize:'0.62rem', color:TIER_COLORS[selected.composite_tier]||'#888', textTransform:'uppercase' }}>{lbl(selected.composite_tier)}</span>
+                background:`${tierColor(selected.composite_tier)}18`,
+                border:`1px solid ${tierColor(selected.composite_tier)}40` }}>
+                <div style={{ width:7, height:7, borderRadius:'50%', background:tierColor(selected.composite_tier) }} />
+                <span style={{ fontFamily:'var(--mono)', fontSize:'0.62rem', color:tierColor(selected.composite_tier), textTransform:'uppercase' }}>{lbl(selected.composite_tier)}</span>
                 <span style={{ fontFamily:'var(--mono)', fontSize:'0.7rem', color:'var(--paper)', fontWeight:700 }}>{parseFloat(selected.composite_score||0).toFixed(0)}%</span>
               </div>
               <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.6rem' }}>
@@ -881,9 +880,9 @@ export default function MapClient({ orgs=[], stateStats=[], foundingData=[], wit
               </div>
               <div style={{ display:'grid', gap:'2px' }}>
                 {[
-                  ['Super Culty', selectedStateStats.cult, '#e8574d'],
-                  ['Kinda Culty', selectedStateStats.high_control, '#d99b3e'],
-                  ['Not Culty', selectedStateStats.healthy_group, '#5cb878'],
+                  ['Super Culty', selectedStateStats.cult, tierColor('Super Culty')],
+                  ['Kinda Culty', selectedStateStats.high_control, tierColor('Kinda Culty')],
+                  ['Not Culty', selectedStateStats.healthy_group, tierColor('Not Culty')],
                 ].filter(([,v]) => v > 0).map(([label, count, color]) => (
                   <div key={label} style={{ display:'flex', alignItems:'center', gap:'0.5rem', padding:'0.3rem 0.5rem', background:'rgba(244,240,232,0.02)' }}>
                     <div style={{ width:7, height:7, borderRadius:'50%', background:color, flexShrink:0 }} />
@@ -920,7 +919,7 @@ export default function MapClient({ orgs=[], stateStats=[], foundingData=[], wit
           <div style={{ display:'flex', gap:'1.25rem', flexWrap:'wrap', alignItems:'center' }}>
             {layer === 'hq' && TIERS.map(t => (
               <div key={t} style={{ display:'flex', alignItems:'center', gap:'0.3rem' }}>
-                <div style={{ width:8, height:8, borderRadius:'50%', background:TIER_COLORS[t] }} />
+                <div style={{ width:8, height:8, borderRadius:'50%', background:tierColor(t) }} />
                 <span style={{ fontFamily:'var(--mono)', fontSize:'0.58rem', color:'rgba(212,206,196,0.45)' }}>
                   {lbl(t)} ({orgGeojson.features.filter(f => f.properties.composite_tier === t).length})
                 </span>
