@@ -1,12 +1,9 @@
 'use client';
 import { useState, useMemo } from 'react';
+import { compositeBandFromTier } from '../../../lib/scoring';
 
 const CRITERIA = ['C1','C2','C3','C4','C5','C6','C7','C8','C9','C10'];
 const C_SHORT = { C1:'Leadership',C2:'Sacred Assump.',C3:'Mission',C4:'Individuality',C5:'Isolation',C6:'Vernacular',C7:'Us/Them',C8:'Labor',C9:'Exit Costs',C10:'Ends/Means' };
-const TIER_COLORS = { 'Super Culty':'#e8574d','Kinda Culty':'#d99b3e','Not Culty':'#5cb878' };
-// Softer reader-facing labels for the DB tier enum (keys are unchanged).
-const TIER_LABELS = { 'Super Culty':'High-Control','Kinda Culty':'Moderate-Control','Not Culty':'Low-Control' };
-const lbl = (t) => TIER_LABELS[t] || t;
 
 // Pre-populated pairs that illustrate the book's core arguments
 const PRESET_PAIRS = [
@@ -105,8 +102,8 @@ export default function CompareClient({ orgs=[], scoreMap={} }) {
     return { c, va, vb, delta };
   });
 
-  const tierColorA = TIER_COLORS[dataA?.composite_tier] || '#888';
-  const tierColorB = TIER_COLORS[dataB?.composite_tier] || '#888';
+  const tierColorA = compositeBandFromTier(dataA?.composite_tier)?.color || '#888';
+  const tierColorB = compositeBandFromTier(dataB?.composite_tier)?.color || '#888';
 
   const OrgPicker = ({ side, value, search, setSearch, open, setOpen, filtered, onSelect }) => {
     const data = side === 'a' ? dataA : dataB;
@@ -124,9 +121,9 @@ export default function CompareClient({ orgs=[], scoreMap={} }) {
             lineHeight:1.2,marginBottom:'0.35rem'}}>{value || '—'}</div>
           {data && (
             <div style={{display:'flex',alignItems:'center',gap:'0.5rem'}}>
-              <div style={{width:7,height:7,borderRadius:'50%',background:TIER_COLORS[data.composite_tier]||'#888',flexShrink:0}}/>
+              <div style={{width:7,height:7,borderRadius:'50%',background:compositeBandFromTier(data.composite_tier)?.color||'#888',flexShrink:0}}/>
               <span style={{fontFamily:'var(--mono)',fontSize:'0.62rem',color:'var(--muted)'}}>
-                {lbl(data.composite_tier)} · {parseFloat(data.composite_score).toFixed(0)}%
+                {compositeBandFromTier(data.composite_tier)?.label || data.composite_tier} · {parseFloat(data.composite_score).toFixed(0)}%
               </span>
             </div>
           )}
@@ -151,7 +148,7 @@ export default function CompareClient({ orgs=[], scoreMap={} }) {
                   borderBottom:'1px solid rgba(212,206,196,0.04)'}}
                 onMouseEnter={e=>e.currentTarget.style.background='rgba(212,206,196,0.05)'}
                 onMouseLeave={e=>e.currentTarget.style.background=o.name===value?'rgba(212,206,196,0.06)':'transparent'}>
-                <div style={{width:6,height:6,borderRadius:'50%',background:TIER_COLORS[o.composite_tier]||'#888',flexShrink:0}}/>
+                <div style={{width:6,height:6,borderRadius:'50%',background:compositeBandFromTier(o.composite_tier)?.color||'#888',flexShrink:0}}/>
                 <span style={{fontFamily:'var(--serif)',fontSize:'0.82rem',color:'var(--paper)',flex:1,lineHeight:1.3}}>{o.name}</span>
                 <span style={{fontFamily:'var(--mono)',fontSize:'0.62rem',color:'var(--muted)',flexShrink:0}}>{parseFloat(o.composite_score).toFixed(0)}%</span>
               </div>
@@ -238,8 +235,8 @@ export default function CompareClient({ orgs=[], scoreMap={} }) {
                     {parseFloat(item.d.composite_score).toFixed(0)}%
                   </div>
                   <div style={{display:'flex',alignItems:'center',gap:'0.4rem',justifyContent:item.align==='right'?'flex-end':'flex-start',marginBottom:'0.25rem'}}>
-                    <div style={{width:7,height:7,borderRadius:'50%',background:TIER_COLORS[item.d.composite_tier]||'#888'}}/>
-                    <span style={{fontFamily:'var(--mono)',fontSize:'0.65rem',color:'var(--muted)'}}>{lbl(item.d.composite_tier)}</span>
+                    <div style={{width:7,height:7,borderRadius:'50%',background:compositeBandFromTier(item.d.composite_tier)?.color||'#888'}}/>
+                    <span style={{fontFamily:'var(--mono)',fontSize:'0.65rem',color:'var(--muted)'}}>{compositeBandFromTier(item.d.composite_tier)?.label || item.d.composite_tier}</span>
                   </div>
                   <div style={{fontFamily:'var(--mono)',fontSize:'0.62rem',color:'rgba(212,206,196,0.35)'}}>
                     Young's {item.d.youngs_score}/10 · {item.d.trajectory}
