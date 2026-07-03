@@ -27,6 +27,18 @@ const STYLE_OPTIONS = [
 
 const CONFIDENCE_COLORS = { HIGH: '#d62728', MEDIUM: '#ff7f0e', LOW: '#9467bd' };
 
+// Convert person-points array into GeoJSON for the optional person-pin layer.
+const personPointsToGeoJSON = (points) => ({
+  type: 'FeatureCollection',
+  features: (points || [])
+    .filter((p) => p.latitude != null && p.longitude != null)
+    .map((p) => ({
+      type: 'Feature',
+      geometry: { type: 'Point', coordinates: [Number(p.longitude), Number(p.latitude)] },
+      properties: { name: p.public_display_name || 'Unknown', role: p.role_title || p.role_type || '' },
+    })),
+});
+
 // Convert Supabase cog_compounds rows into the GeoJSON the map layer expects.
 const compoundsToGeoJSON = (compounds) => ({
   type: 'FeatureCollection',
@@ -55,7 +67,7 @@ const compoundsToGeoJSON = (compounds) => ({
 const DEFAULT_ABOUT_TEXT =
   "This dataset documents the global network of the Children of God (later known as The Family International), a high-control religious organization founded by David Brandt Berg in 1968. The cultiness scores reflect extensive survivor testimony, legal records, and academic documentation.";
 
-export default function ChildrenOfGodClient({ cogData, compounds, personPaths, aboutText = DEFAULT_ABOUT_TEXT, sources = null }) {
+export default function ChildrenOfGodClient({ cogData, compounds, personPaths, aboutText = DEFAULT_ABOUT_TEXT, sources = null, personPoints = [] }) {
   const [activeTab, setActiveTab] = useState('compounds');
   const mapContainer = useRef(null);
   const map = useRef(null);
@@ -157,6 +169,24 @@ export default function ChildrenOfGodClient({ cogData, compounds, personPaths, a
         map.current.on('load', () => {
           viewRef.current = { center: map.current.getCenter(), zoom: map.current.getZoom() };
           addDataToMap(data, filters);
+
+          // Optional person-pin layer — only added when personPoints are provided.
+          if ((personPoints || []).length) {
+            map.current.addSource('person-points', { type: 'geojson', data: personPointsToGeoJSON(personPoints) });
+            map.current.addLayer({
+              id: 'person-points-layer', type: 'circle', source: 'person-points',
+              paint: { 'circle-radius': 5, 'circle-color': '#6c71c4',
+                       'circle-stroke-width': 1.5, 'circle-stroke-color': '#fff' },
+            });
+            map.current.on('click', 'person-points-layer', (e) => {
+              const pr = e.features[0].properties;
+              new maplibregl.Popup().setLngLat(e.lngLat)
+                .setHTML(`<strong>${pr.name}</strong><br/><span style="font-size:12px">${pr.role}</span>`)
+                .addTo(map.current);
+            });
+            map.current.on('mouseenter', 'person-points-layer', () => { map.current.getCanvas().style.cursor = 'pointer'; });
+            map.current.on('mouseleave', 'person-points-layer', () => { map.current.getCanvas().style.cursor = ''; });
+          }
         });
       } catch (error) {
         console.error('Error initializing map:', error);
@@ -171,7 +201,7 @@ export default function ChildrenOfGodClient({ cogData, compounds, personPaths, a
         map.current = null;
       }
     };
-  }, [activeTab, compounds]);
+  }, [activeTab, compounds, personPoints]);
 
   const addDataToMap = (data, currentFilters) => {
     if (!map.current || !data) return;
