@@ -22,6 +22,8 @@ const NAV_ITEMS = [
       { href: '/research-system/v6-0-lifton-framework', label: 'V6.0: Lifton Framework' },
       { href: '/research-system/v6-1-permanence-aware', label: 'V6.1: Permanence-Aware' },
       { href: '/research-system/evolution-timeline', label: 'Evolution Timeline' },
+      { href: '/research-system/evidence-pipeline', label: 'Evidence Pipeline' },
+      { href: '/research-system/data-governance', label: 'Data Governance' },
     ],
   },
   { href: '/about',  label: 'About' },
