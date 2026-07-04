@@ -14,7 +14,7 @@
     "@aws-crypto/client-node": "^5.0.0",
     "@dagrejs/dagre": "^3.0.0",
     "@xyflow/react": "^12.3.6",
-    "@zacharymays-cpu/oci-research-system": "github:zacharymays-cpu/oci-research-system-content#main",
+    "@zacharymays-cpu/oci-research-system": "github:zacharymays-cpu/oci-research-system-content#5c571d8749cf61375ca11768d8c7050c4509481d",
     "next": "15.3.8",
     "react": "^18",
     "react-dom": "^18",
