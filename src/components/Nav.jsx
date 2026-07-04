@@ -25,7 +25,7 @@ const NAV_ITEMS = [
     ],
   },
   { href: '/about',  label: 'About' },
-  { href: 'https://organizationalcoercionindex.org', label: 'Research Project', external: true },
+  { href: 'https://organizationalcoercionindex.org', label: 'The Index', external: true },
   { href: '/donate', label: 'Support' },
 ];
 

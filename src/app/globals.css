@@ -129,8 +129,18 @@ a:hover { color: var(--paper); }
 
 .nav__links {
   display: flex;
+  align-items: center;
   gap: 2.5rem;
   list-style: none;
+}
+
+/* Dropdown triggers are <button> elements with their own internal flex layout
+   (label + caret); buttons and anchors have different intrinsic line-heights,
+   so without this each <li> can center its child differently, misaligning the
+   dropdown triggers against the plain-link items. */
+.nav__links > li {
+  display: flex;
+  align-items: center;
 }
 
 .nav__links a {
