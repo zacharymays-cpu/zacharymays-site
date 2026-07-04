@@ -1,8 +1,6 @@
-import OrgCount from '../../components/OrgCount';
-
 export const metadata = {
   title: 'Support the Project',
-  description: 'Support the Cultiness Spectrum research project and the work of Zachary S. Mays.',
+  description: 'Support the Organizational Coercion Index research project and the work of Zachary S. Mays.',
 };
 
 export default function DonatePage() {
@@ -13,7 +11,7 @@ export default function DonatePage() {
           <span className="hero__eyebrow animate-up">Support the Work</span>
           <h1 className="hero__title animate-up-2">Keep This<br />Going</h1>
           <p className="hero__subtitle animate-up-3">
-            The Cultiness Spectrum is a free, public educational resource.
+            The Organizational Coercion Index is a free, public educational resource.
             If it has been useful to you, consider supporting its continued
             development.
           </p>
@@ -38,9 +36,12 @@ export default function DonatePage() {
           <p>
             The questions <em>How We Got Here</em> raised about high-control
             organizations and America's odd comfort with them required more than
-            argument. That became the Cultiness Spectrum Dataset — a systematic,
-            evenhanded application of the Young-Reed framework across <OrgCount /> American
-            organizations, publicly available and free to use.
+            argument. That became the Organizational Coercion Index — a systematic,
+            evenhanded application of the Young-Reed framework across hundreds of American
+            organizations, publicly available and free to use at{' '}
+            <a href="https://organizationalcoercionindex.org" target="_blank" rel="noopener noreferrer">
+              organizationalcoercionindex.org
+            </a>.
           </p>
 
           <p style={{color: 'var(--muted)', fontStyle: 'italic'}}>
@@ -66,7 +67,7 @@ export default function DonatePage() {
             }}>Buy Me a Coffee</p>
 
             <p style={{fontSize: '0.95rem', color: 'var(--muted)', marginBottom: '1.5rem', lineHeight: 1.75}}>
-              The Cultiness Spectrum Dataset is and will remain free to access,
+              The Organizational Coercion Index is and will remain free to access,
               explore, and use. In an effort to continue providing and expanding
               this dataset to the public at no charge — covering research time,
               infrastructure, API costs, and the ongoing work of scoring new
@@ -91,7 +92,7 @@ export default function DonatePage() {
 
           <div style={{display: 'flex', flexDirection: 'column', gap: '0', margin: '1rem 0 2.5rem'}}>
             {[
-              { item: 'New organization assessments', desc: <>Each entry requires research, evidence review, scoring, and human validation. The dataset is at <OrgCount /> organizations and growing.</> },
+              { item: 'New organization assessments', desc: <>Each entry requires research, evidence review, scoring, and human validation. The dataset is at 700+ organizations and growing.</> },
               { item: 'Body text audit and revision', desc: 'Roughly 25% of existing entries have placeholder content pending evidence-based body text. This is ongoing work.' },
               { item: 'Methodology refinement', desc: 'Keeping the analytical framework current, internally consistent, and defensible as a research resource.' },
               { item: 'Infrastructure', desc: 'Hosting, database, and API costs for the public dataset and this site.' },

@@ -1,6 +1,6 @@
 export const metadata = {
   title: 'Terms of Use — zacharymays.com',
-  description: 'Terms of use for zacharymays.com and the Cultiness Spectrum Dataset.',
+  description: 'Terms of use for zacharymays.com.',
 }
 
 export default function TermsPage() {
@@ -16,15 +16,18 @@ export default function TermsPage() {
         <p style={{ marginBottom: '1.5rem' }}>
           Last updated: June 2026
         </p>
-        <h2 style={{ fontFamily: 'var(--mono)', fontSize: '0.75rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--paper)', marginBottom: '0.75rem', marginTop: '2.5rem' }}>Use of the Dataset</h2>
+        <h2 style={{ fontFamily: 'var(--mono)', fontSize: '0.75rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--paper)', marginBottom: '0.75rem', marginTop: '2.5rem' }}>Use of This Site</h2>
         <p style={{ marginBottom: '1.5rem' }}>
-          The Cultiness Spectrum Dataset (HWGH-v1) is made available for research, educational, and journalistic purposes. 
-          All scores reflect documented institutional behaviors based on publicly verifiable sources. 
-          Scores are not statements about individuals within organizations.
+          This site is made available for research, educational, and journalistic purposes.
+          The Organizational Coercion Index — the dataset previously hosted here — is now its
+          own standalone project at{' '}
+          <a href="https://organizationalcoercionindex.org/terms" target="_blank" rel="noopener noreferrer">
+            organizationalcoercionindex.org
+          </a>, whose own terms of use govern the dataset itself.
         </p>
         <h2 style={{ fontFamily: 'var(--mono)', fontSize: '0.75rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--paper)', marginBottom: '0.75rem', marginTop: '2.5rem' }}>No Warranties</h2>
         <p style={{ marginBottom: '1.5rem' }}>
-          This site and dataset are provided as-is. While every effort is made to ensure accuracy, 
+          This site is provided as-is. While every effort is made to ensure accuracy,
           no warranty is made regarding completeness or fitness for any particular purpose.
         </p>
         <h2 style={{ fontFamily: 'var(--mono)', fontSize: '0.75rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--paper)', marginBottom: '0.75rem', marginTop: '2.5rem' }}>Attribution</h2>

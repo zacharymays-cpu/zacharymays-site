@@ -1,5 +1,3 @@
-import OrgCount from '../../components/OrgCount';
-
 export const metadata = {
   title: 'About the Author',
   description: 'Zachary S. Mays — U.S. Marine Corps veteran, researcher, and author.',
@@ -72,19 +70,22 @@ export default function AboutPage() {
                   The questions <em>How We Got Here</em> raised about
                   high-control organizations and America's odd comfort with
                   them required more than argument. They required evidence.
-                  That became the Cultiness Spectrum.
+                  That became the Organizational Coercion Index.
                 </p>
               </div>
 
               <p>
-                The Cultiness Spectrum Dataset applies Daniella Mestyanek
+                The Organizational Coercion Index applies Daniella Mestyanek
                 Young and Amy Reed's framework from{' '}
                 <a href="https://uncultureyourself.com" target="_blank" rel="noopener noreferrer">
                   <em>The Culting of America</em>
                 </a>{' '}
-                across <OrgCount /> American organizations — systematically,
+                across hundreds of American organizations — systematically,
                 evenhandedly, and publicly. It is a free educational resource
-                and will remain one.
+                and will remain one, now hosted at{' '}
+                <a href="https://organizationalcoercionindex.org" target="_blank" rel="noopener noreferrer">
+                  organizationalcoercionindex.org
+                </a>.
               </p>
 
               <hr className="rule" />

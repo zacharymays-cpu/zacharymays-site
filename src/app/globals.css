@@ -12,6 +12,18 @@
   --serif:      var(--font-serif), 'Playfair Display', Georgia, serif;
   --body:       var(--font-body), 'Libre Baskerville', Georgia, serif;
   --mono:       var(--font-mono), 'DM Mono', 'Courier New', monospace;
+
+  /* Consumed by the shared @zacharymays-cpu/oci-research-system package (also
+     used on organizationalcoercionindex.org) — mapped to this site's warm
+     palette so the same components render natively on both sites.
+     --text-3 intentionally reuses --muted rather than the research-system
+     pages' original literal (#6b6560) — that's the exact color the --muted
+     comment above documents as a failed 2.7:1 AA contrast. */
+  --text-1:     var(--paper);
+  --text-2:     var(--muted);
+  --text-3:     var(--muted);
+  --text-faint: rgba(212, 206, 196, 0.4);
+  --overlay:    rgba(244, 240, 232, 0.04);
 }
 
 *, *::before, *::after {

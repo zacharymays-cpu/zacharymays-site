@@ -25,19 +25,19 @@ const dmMono = DM_Mono({
 export const metadata = {
   metadataBase: new URL('https://www.zacharymays.com'),
   title: { default: 'Zachary S. Mays', template: '%s — Zachary S. Mays' },
-  description: 'Author and researcher. The Cultiness Spectrum dataset. How We Got Here. Assholes in History.',
+  description: 'Author and researcher. How We Got Here. Assholes in History.',
   alternates: { canonical: '/' },
   openGraph: {
     type: 'website',
     siteName: 'Zachary S. Mays',
     title: 'Zachary S. Mays',
-    description: 'Author and researcher. The Cultiness Spectrum — a systematic, evenhanded assessment of cult-adjacent dynamics across American organizations.',
+    description: 'Author and researcher.',
     url: 'https://www.zacharymays.com',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Zachary S. Mays',
-    description: 'The Cultiness Spectrum — a systematic, evenhanded assessment of cult-adjacent dynamics across American organizations.',
+    description: 'Author and researcher.',
   },
 };
 
@@ -64,7 +64,7 @@ export default function RootLayout({ children }) {
                   Terms of Use
                 </a>
                 {'  ·  '}
-                <a href="/admin/review"
+                <a href="https://organizationalcoercionindex.org/admin/review" target="_blank" rel="noopener noreferrer"
                    style={{color: 'inherit', textDecoration: 'underline', textDecorationColor: 'rgba(212,206,196,0.3)'}}>
                   Analyst login
                 </a>

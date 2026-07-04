@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import OrgCount from '../components/OrgCount';
 
 export const metadata = {
   title: 'Zachary S. Mays — Author',
@@ -63,50 +62,39 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Cultiness Spectrum section */}
+      {/* Research project — the OCI dataset, now its own standalone site */}
       <section style={{padding:'5rem 0',borderBottom:'1px solid rgba(212,206,196,0.1)'}}>
-        <div className="container">
-          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'4rem',alignItems:'center'}}>
-            <div>
-              <span style={{fontFamily:'var(--mono)',fontSize:'0.68rem',letterSpacing:'0.2em',textTransform:'uppercase',color:'var(--gold)',display:'block',marginBottom:'1.25rem'}}>
-                The Organizational Coercion Index
-              </span>
-              <h2 style={{fontFamily:'var(--serif)',fontSize:'clamp(1.8rem,3vw,2.8rem)',lineHeight:1.15,letterSpacing:'-0.02em',color:'var(--paper)',marginBottom:'1.25rem'}}>
-                <OrgCount /> American organizations.<br />One framework.
-              </h2>
-              <p style={{fontSize:'0.95rem',color:'var(--muted)',lineHeight:1.75,marginBottom:'2rem'}}>
-                The empirical backbone of <em>How We Got Here</em> — a large-scale application of
-                Daniella Mestyanek Young and Amy Reed's framework from{' '}
-                <a href="https://uncultureyourself.com" target="_blank" rel="noopener noreferrer" style={{color:'var(--gold)'}}>
-                  The Culting of America
-                </a>{' '}
-                across American institutions. Every organization scored on ten criteria,
-                two independent metrics, publicly documented and freely available.
-              </p>
-              <div style={{display:'flex',gap:'1rem',flexWrap:'wrap'}}>
-                <Link href="/explore" className="btn-primary">Explore the Dataset</Link>
-                <Link href="/oci" className="btn-secondary">About the Project</Link>
-              </div>
-            </div>
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'2px'}}>
-              {[
-                {href:'/explore',         label:'Dataset Explorer',    desc:'Search, filter, and browse the full dataset'},
-                {href:'/compass',         label:'Political Compass',   desc:'Organizations plotted by political and authority axes'},
-                {href:'/oci/methodology',    label:'Methodology',         desc:'How the scoring works, criteria, and N/A rules'},
-                {href:'/oci/findings',       label:'Key Findings',        desc:'The headline correlation, tier distribution, and benchmark comparisons'},
-              ].map((item,i) => (
-                <Link key={i} href={item.href} style={{
-                  display:'block', padding:'1.25rem',
-                  background:'rgba(244,240,232,0.03)',
-                  border:'1px solid rgba(212,206,196,0.1)',
-                  textDecoration:'none',
-                  transition:'border-color 0.2s, background 0.2s',
-                }}>
-                  <div style={{fontFamily:'var(--serif)',fontSize:'0.95rem',fontWeight:700,color:'var(--paper)',marginBottom:'0.4rem'}}>{item.label}</div>
-                  <div style={{fontFamily:'var(--mono)',fontSize:'0.68rem',color:'var(--muted)',lineHeight:1.5}}>{item.desc}</div>
-                </Link>
-              ))}
-            </div>
+        <div className="container--narrow">
+          <div style={{
+            padding:'3rem',
+            border:'1px solid rgba(212,206,196,0.15)',
+            borderLeft:'3px solid var(--gold)',
+            borderRadius:4,
+          }}>
+            <span style={{fontFamily:'var(--mono)',fontSize:'0.68rem',letterSpacing:'0.2em',textTransform:'uppercase',color:'var(--gold)',display:'block',marginBottom:'1.25rem'}}>
+              Research Project
+            </span>
+            <h2 style={{fontFamily:'var(--serif)',fontSize:'clamp(1.8rem,3vw,2.8rem)',lineHeight:1.15,letterSpacing:'-0.02em',color:'var(--paper)',marginBottom:'1.25rem'}}>
+              The Organizational Coercion Index
+            </h2>
+            <p style={{fontSize:'0.95rem',color:'var(--muted)',lineHeight:1.75,marginBottom:'2rem',maxWidth:'640px'}}>
+              A systematic, evidence-based index measuring coercive control across hundreds of
+              American organizations — the empirical backbone of <em>How We Got Here</em>. Applies
+              Daniella Mestyanek Young and Amy Reed's framework from{' '}
+              <a href="https://uncultureyourself.com" target="_blank" rel="noopener noreferrer" style={{color:'var(--gold)'}}>
+                The Culting of America
+              </a>{' '}
+              systematically, openly documented, and freely available on its own site.
+            </p>
+            <a
+              href="https://organizationalcoercionindex.org"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-primary"
+              style={{display:'inline-block'}}
+            >
+              Explore the Index →
+            </a>
           </div>
         </div>
       </section>
