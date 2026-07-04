@@ -12,36 +12,6 @@ const NAV_ITEMS = [
     ],
   },
   {
-    label: 'Organizational Coercion Index',
-    items: [
-      { href: '/oci',               label: 'Overview' },
-      { href: '/explore',                 label: 'Dataset Explorer' },
-      { href: '/explore/map',             label: 'Geographic Map' },
-      { href: '/compass',                 label: 'Political Compass' },
-      { href: '/explore/heatmap',         label: 'Criterion Heatmap' },
-      { href: '/explore/distributions',   label: 'Distributions' },
-      { href: '/explore/timeline',        label: 'Active Over Time' },
-      { href: '/explore/correlations',    label: 'Correlations' },
-      { href: '/explore/lineage',         label: 'Formation Lineage' },
-      { href: '/explore/sankey',          label: 'Category Flow' },
-      { href: '/explore/sunburst',        label: 'Sunburst' },
-      { href: '/explore/compare',         label: 'Head-to-Head' },
-      { heading: 'Case Studies' },
-      { href: '/research/children-of-god-network', label: 'Children of God' },
-      { href: '/research/twelve-tribes-network',   label: 'Twelve Tribes' },
-    ],
-  },
-  {
-    label: 'Methodology',
-    items: [
-      { href: '/oci/methodology',     label: 'Scoring Methodology' },
-      { href: '/oci/ai-methodology',  label: 'AI & Scoring' },
-      { href: '/oci/findings',        label: 'Key Findings' },
-      { href: '/findings',                  label: 'Distribution Analysis' },
-      { href: '/oci/dataset',         label: 'Dataset Overview' },
-    ],
-  },
-  {
     label: 'Research System',
     items: [
       { href: '/research-system',                    label: 'Overview' },
@@ -55,6 +25,7 @@ const NAV_ITEMS = [
     ],
   },
   { href: '/about',  label: 'About' },
+  { href: 'https://organizationalcoercionindex.org', label: 'Research Project', external: true },
   { href: '/donate', label: 'Support' },
 ];
 
@@ -138,6 +109,12 @@ export default function Nav() {
             {NAV_ITEMS.map(item =>
               item.items ? (
                 <Dropdown key={item.label} item={item} path={path} onNavigate={() => setMobileOpen(false)} />
+              ) : item.external ? (
+                <li key={item.href}>
+                  <a href={item.href} target="_blank" rel="noopener noreferrer" onClick={() => setMobileOpen(false)}>
+                    {item.label}
+                  </a>
+                </li>
               ) : (
                 <li key={item.href}>
                   <Link

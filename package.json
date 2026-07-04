@@ -8,18 +8,13 @@
   "scripts": {
     "dev": "next dev -H localhost",
     "build": "next build",
-    "start": "next start",
-    "test": "node --test test/"
+    "start": "next start"
   },
   "dependencies": {
     "@aws-crypto/client-node": "^5.0.0",
     "@dagrejs/dagre": "^3.0.0",
-    "@supabase/ssr": "^0.5.2",
-    "@supabase/supabase-js": "^2.108.2",
-    "@vercel/blob": "^2.4.1",
     "@xyflow/react": "^12.3.6",
-    "exif-parser": "^0.1.12",
-    "maplibre-gl": "^5.24.0",
+    "@zacharymays-cpu/oci-research-system": "github:zacharymays-cpu/oci-research-system-content#main",
     "next": "15.3.8",
     "react": "^18",
     "react-dom": "^18",

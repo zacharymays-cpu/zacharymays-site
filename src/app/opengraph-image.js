@@ -2,7 +2,7 @@ import { ImageResponse } from 'next/og';
 
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
-export const alt = 'Zachary S. Mays — The Cultiness Spectrum';
+export const alt = 'Zachary S. Mays — Author';
 
 export default function OpengraphImage() {
   return new ImageResponse(
@@ -24,13 +24,13 @@ export default function OpengraphImage() {
           Zachary S. Mays
         </div>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <div style={{ fontSize: 88, fontWeight: 700, lineHeight: 1.04 }}>The Cultiness Spectrum</div>
+          <div style={{ fontSize: 88, fontWeight: 700, lineHeight: 1.04 }}>Author &amp; Researcher</div>
           <div style={{ fontSize: 34, color: '#9a948c', marginTop: 28, maxWidth: 900 }}>
-            A systematic, evenhanded assessment of cult-adjacent dynamics across American organizations.
+            How We Got Here · Assholes in History
           </div>
         </div>
         <div style={{ fontSize: 22, letterSpacing: 4, textTransform: 'uppercase', color: '#6b6560' }}>
-          How We Got Here · Assholes in History
+          zacharymays.com
         </div>
       </div>
     ),

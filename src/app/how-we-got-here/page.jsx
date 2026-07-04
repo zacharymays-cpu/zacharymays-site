@@ -1,6 +1,3 @@
-import OrgCount from '../../components/OrgCount';
-import Correlation from '../../components/Correlation';
-
 export const metadata = {
   title: 'How We Got Here',
   description: 'The Formation of a Population Built Not to Know — by Zachary S. Mays.',
@@ -58,11 +55,11 @@ export default function HowWeGotHerePage() {
           <div className="section__label">The Empirical Backbone</div>
 
           <p>
-            The book's analytical argument is grounded in the Cultiness Spectrum
-            Dataset — a large-scale application of Daniella Mestyanek Young and
+            The book's analytical argument is grounded in the Organizational
+            Coercion Index — a large-scale application of Daniella Mestyanek Young and
             Amy Reed's framework from{' '}
-            <em>The Culting of America</em> (Otterpine, 2026) across{' '}
-            <OrgCount /> American organizations. The dataset applies a dual-metric
+            <em>The Culting of America</em> (Otterpine, 2026) across hundreds of American
+            organizations. The dataset applies a dual-metric
             scoring system across ten criteria, producing independent assessments
             that allow systematic comparison across institutional categories that
             are rarely examined together.
@@ -77,7 +74,7 @@ export default function HowWeGotHerePage() {
             The result is a body of evidence that allows the book's argument to
             move from historical claim to measurable pattern. The correlation
             between authority-axis position and composite cultiness score
-            is <Correlation />. This is not a coincidence. It is the architecture,
+            is 0.670. This is not a coincidence. It is the architecture,
             documented.
           </p>
 
@@ -86,8 +83,8 @@ export default function HowWeGotHerePage() {
               Key Finding
             </p>
             <p style={{fontFamily: 'var(--serif)', fontSize: '1.15rem', fontStyle: 'italic', color: 'var(--cream)', lineHeight: 1.6, margin: 0}}>
-              r = <Correlation /> correlation between authority-axis political position
-              and composite cultiness score across <OrgCount /> American organizations.
+              r = 0.670 correlation between authority-axis political position
+              and composite cultiness score across hundreds of American organizations.
               The formation pipeline is measurable. It has been running for
               fifty years. The dataset shows what it produced.
             </p>
@@ -148,10 +145,12 @@ export default function HowWeGotHerePage() {
             divergence is itself analytically meaningful.
           </p>
 
-          {/* TODO(dataset URL): linked to the on-site dataset explorer (/explore); swap if an external/download URL is preferred. */}
           <p>
             The framework is publicly documented. The dataset is published and
-            freely available in the <a href="/explore">dataset explorer</a>.
+            freely available in the{' '}
+            <a href="https://organizationalcoercionindex.org/explore" target="_blank" rel="noopener noreferrer">
+              dataset explorer
+            </a>.
           </p>
 
           <p>

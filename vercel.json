@@ -1,18 +1,4 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "framework": "nextjs",
-  "crons": [
-    {
-      "path": "/api/cron/sync-usaspending",
-      "schedule": "0 2 * * *"
-    },
-    {
-      "path": "/api/cron/run-intake",
-      "schedule": "0 3 * * *"
-    },
-    {
-      "path": "/api/cron/refresh-network-stats",
-      "schedule": "0 4 * * *"
-    }
-  ]
+  "framework": "nextjs"
 }
