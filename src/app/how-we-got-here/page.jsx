@@ -107,7 +107,7 @@ export default function HowWeGotHerePage() {
               },
               {
                 label: 'The Political Formation Pipeline',
-                text: 'From the Powell Memo through the think-tank infrastructure, conservative talk radio, Fox News, the Daily Wire, and algorithmic media — a consent infrastructure built specifically to produce and maintain a population that could not be reached by counter-evidence.'
+                text: 'From the Powell Memo through the think-tank infrastructure and algorithmic media — a consent infrastructure built specifically to produce and maintain a population that could not be reached by counter-evidence.'
               },
               {
                 label: 'The Structural Design',
