@@ -146,6 +146,30 @@ export default function HowWeGotHerePage() {
           </p>
 
           <p>
+            The first instrument is behavioral: each of Young and Reed's ten
+            criteria — charismatic leadership, sacred assumptions, isolation,
+            exploitation of labor, and so on — is scored on how present and
+            intense it is. The <em>composite cultiness score</em> referenced
+            above comes entirely from this instrument: it multiplies how many
+            of the ten criteria show up at all against how intensely they show
+            up on average, producing a single 0–100 figure.
+          </p>
+
+          <p>
+            The second instrument is structural, drawn from psychiatrist
+            Robert Jay Lifton's framework for psychological totalism — how
+            completely an organization controls thought, emotion, and identity,
+            independent of which specific coercive behaviors are present. An
+            organization can score high on the behavioral checklist while
+            scoring low on totalism if it still leaves people real exit
+            pathways; another can score low on individual behaviors while
+            scoring high on totalism if what remains of a member's life is
+            totally controlled. Lifton's score is reported alongside the
+            composite score, never merged into it — the gap between the two is
+            itself part of what the dataset shows.
+          </p>
+
+          <p>
             The framework is publicly documented. The dataset is published and
             freely available in the{' '}
             <a href="https://organizationalcoercionindex.org/explore" target="_blank" rel="noopener noreferrer">
