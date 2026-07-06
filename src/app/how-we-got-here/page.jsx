@@ -103,7 +103,7 @@ export default function HowWeGotHerePage() {
             {[
               {
                 label: 'The Religious Formation Pipeline',
-                text: 'From prosperity theology and biblical inerrancy movements through the Moral Majority and Christian nationalism to the contemporary evangelical formation system — a multi-decade project that transformed American Protestantism from a heterodox theological tradition into a compliance architecture.'
+                text: 'From prosperity theology and biblical inerrancy movements to the contemporary evangelical formation system — a multi-decade project that transformed American Protestantism from a heterodox theological tradition into a compliance architecture.'
               },
               {
                 label: 'The Political Formation Pipeline',
