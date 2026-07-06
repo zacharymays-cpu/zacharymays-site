@@ -1,7 +1,7 @@
 const BASE = 'https://www.zacharymays.com';
 
 const STATIC_PATHS = [
-  '', '/about', '/donate', '/terms',
+  '', '/about', '/terms',
   '/how-we-got-here', '/assholes-in-history',
   '/research-system', '/research-system/overview', '/research-system/evolution-timeline',
   '/research-system/v4-anchor-heuristic', '/research-system/v5-0-evidence-jury',
