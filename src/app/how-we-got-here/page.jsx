@@ -74,7 +74,7 @@ export default function HowWeGotHerePage() {
             The result is a body of evidence that allows the book's argument to
             move from historical claim to measurable pattern. The correlation
             between authority-axis position and composite cultiness score
-            is 0.670. This is not a coincidence. It is the architecture,
+            is 0.561. This is not a coincidence. It is the architecture,
             documented.
           </p>
 
@@ -83,7 +83,7 @@ export default function HowWeGotHerePage() {
               Key Finding
             </p>
             <p style={{fontFamily: 'var(--serif)', fontSize: '1.15rem', fontStyle: 'italic', color: 'var(--cream)', lineHeight: 1.6, margin: 0}}>
-              r = 0.670 correlation between authority-axis political position
+              r = 0.561 correlation between authority-axis political position
               and composite cultiness score across hundreds of American organizations.
               The formation pipeline is measurable. It has been running for
               fifty years. The dataset shows what it produced.
